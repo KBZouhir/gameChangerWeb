@@ -11,9 +11,6 @@ const togglePassword = () => {
     showPassword.value = !showPassword.value
 }
 
-const googleLogin = () => {
-    
-}
 
 </script>
 
@@ -21,7 +18,8 @@ const googleLogin = () => {
     <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
             <UCard class="md:w-2/4 w-full p-8 relative z-50">
-                <h2 class="text-3xl font-bold">Welcome Back {{ $t('home') }}</h2>
+                <h2 class="text-3xl font-bold">Welcome Back</h2>
+                <IntlTelInput />
                 <p class="text-blueGray-900 dark:text-slate-300">Please log in to continue</p>
 
                 <div class="mt-8">
