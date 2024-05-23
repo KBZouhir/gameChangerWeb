@@ -4,7 +4,7 @@
             <div class="relative flex h-20 items-center justify-between">
                 <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                     <div class="flex flex-shrink-0 items-center dark:hidden">
-                        <img class="h-8 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Your Company">
+                        <img class="h-8 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
                     </div>
                     <!-- <div class="flex flex-shrink-0 items-center light:hidden">
                         <img class="h-8 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Your Company">
