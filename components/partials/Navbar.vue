@@ -4,12 +4,12 @@
             <div class="relative flex h-20 items-center justify-between">
                 <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                     <div class="flex flex-shrink-0 items-center dark:hidden">
-                        <img class="h-8 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
+                        <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
                     </div>
                     <!-- <div class="flex flex-shrink-0 items-center light:hidden">
                         <img class="h-8 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Your Company">
                     </div> -->
-                    <div class="hidden sm:ml-16 sm:block">
+                    <div class="hidden sm:ml-16 sm:flex items-center">
                         <div class="flex space-x-4">
                             <a href="#"
                                 class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Events</a>

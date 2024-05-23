@@ -11,6 +11,10 @@ const togglePassword = () => {
     showPassword.value = !showPassword.value
 }
 
+const googleLogin = () => {
+    
+}
+
 </script>
 
 <template>
@@ -58,7 +62,7 @@ const togglePassword = () => {
 
                     <p class="mb-6 mt-4 text-center text-sm">Or log in with:</p>
                     <div class="grid grid-cols-2 gap-6">
-                        <MediaButton type="google" />
+                        <MediaButton type="google" @click="googleLogin()"/>
                         <MediaButton type="twitter" />
                     </div>
 
