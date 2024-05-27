@@ -5,7 +5,7 @@
         </label>
         <input ref="phoneInput" type="tel" id="phone" @input="onInput" autofocus class="text-sm" :value="modelValue"
             @blur="validatePhone" />
-        <!-- <span v-if="errors.has('phone')">{{ errors.first('phone') }}</span> -->
+        <span v-if="validationMessage" class="text-sm text-red-500">{{ validationMessage }}</span>
     </div>
 </template>
 
@@ -22,12 +22,20 @@ const emits = defineEmits(['update:modelValue', 'hidePhone']);
 
 const phoneInput = ref(null);
 const iti = ref({});
+const validationMessage = ref();
 
 
 onMounted(() => {
     iti.value = intlTelInput(phoneInput.value, {
-        initialCountry: 'dz',
-        utilsScript: "~/node_modules/intl-tel-input/build/js/utils.js",
+        initialCountry: 'auto',
+        geoIpLookup: function (success, failure) {
+            fetch("https://ipapi.co/json")
+                .then(function (res) { return res.json(); })
+                .then(function (data) { success(data.country_code); })
+                .catch(function () { failure(); });
+        },
+
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/23.0.9/js/utils.min.js",
     });
 
     phoneInput.value.addEventListener('countrychange', () => {
@@ -52,17 +60,16 @@ const onInput = (event) => {
 
 
 const validatePhone = () => {
-    console.log(iti.value.isValidNumber());
-//   if (phoneInput.value && iti.value) {
-//     const isValid = iti.value.isValidNumber();
-//     if (!isValid) {
-//       validationMessage.value = 'Invalid phone number';
-//     } else {
-//       validationMessage.value = '';
-//       const phoneNumber = iti.value.getNumber();
-//       emits('update:modelValue', phoneNumber);
-//     }
-//   }
+    if (phoneInput.value && iti.value) {
+        const isValid = iti.value.isValidNumber();
+        if (!isValid) {
+            validationMessage.value = 'Invalid phone number';
+        } else {
+            validationMessage.value = '';
+            const phoneNumber = iti.value.getNumber();
+            emits('update:modelValue', phoneNumber);
+        }
+    }
 }
 
 watch(() => props.modelValue, (newValue) => {
