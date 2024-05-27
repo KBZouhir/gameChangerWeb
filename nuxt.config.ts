@@ -17,7 +17,12 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/ui", "@nuxtjs/i18n", "nuxt-vuefire"],
+  modules: ["@nuxt/ui", "@nuxtjs/i18n", "nuxt-vuefire", "@pinia/nuxt"],
+
+  pinia: {
+    storesDirs: ['./stores/**'],
+  },
+
   i18n: {
     locales: [
       { code: 'en', name: 'English', flag: '🇬🇧' },

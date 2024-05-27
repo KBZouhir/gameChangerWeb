@@ -27,7 +27,7 @@ const validationMessage = ref();
 
 onMounted(() => {
     iti.value = intlTelInput(phoneInput.value, {
-        initialCountry: 'auto',
+        initialCountry: 'dz',
         geoIpLookup: function (success, failure) {
             fetch("https://ipapi.co/json")
                 .then(function (res) { return res.json(); })

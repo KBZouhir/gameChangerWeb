@@ -7,8 +7,12 @@ definePageMeta({
 
 let showPassword = ref(false)
 
-let email = ref('')
-let phone = ref('')
+const state = reactive({
+    email: undefined,
+    phone: undefined,
+    password: undefined
+})
+
 let isPhoneInput = ref(false)
 
 
@@ -18,18 +22,22 @@ const togglePassword = () => {
 
 const hidePhoneComp = () => {
     isPhoneInput.value = false
-    email.value = ""
+    state.email = ""
 }
 
-watch(email, async (newValue, oldValue) => {
+watch(() => state.email, (newValue) => {
     const regex = /^[+0-9]/;
     if (regex.test(newValue)) {
         isPhoneInput.value = true
-        phone.value = email.value
+        state.phone = state.email
     } else {
         hidePhoneComp()
     }
 })
+
+async function onSubmit(event) {
+    console.log(event);
+}
 
 
 </script>
@@ -41,18 +49,18 @@ watch(email, async (newValue, oldValue) => {
                 <h2 class="text-3xl font-bold">Welcome Back</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">Please log in to continue</p>
 
-                <div class="mt-8">
+                <UForm ref="form" :state="state" @submit="onSubmit" class="mt-8">
                     <div class="mt-8">
                         <template v-if="!isPhoneInput">
                             <label for="email" class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">
                                 Email Address
                             </label>
-                            <UInput type="email" id="email" size="lg" class="mt-2" v-model="email" autofocus
+                            <UInput type="email" id="email" size="lg" class="mt-2" v-model="state.email" autofocus
                                 placeholder="exmple@mail.com" />
                         </template>
-                        
+
                         <template v-else>
-                            <IntlTelInput v-model="phone" @hidePhone="hidePhoneComp" />
+                            <IntlTelInput v-model="state.phone" @hidePhone="hidePhoneComp" />
                         </template>
                     </div>
 
@@ -60,7 +68,7 @@ watch(email, async (newValue, oldValue) => {
                         <label for="password"
                             class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">Password</label>
                         <UInput :type="(showPassword) ? 'text' : 'password'" id="password" size="lg" class="mt-2"
-                            placeholder="**********">
+                            placeholder="********">
                             <template #trailing>
                                 <UButton @click="togglePassword" :padded="false" color="gray" variant="link"
                                     class="pointer-events-auto"
@@ -80,7 +88,7 @@ watch(email, async (newValue, oldValue) => {
                     </div>
 
                     <div class="mt-4">
-                        <UButton block class="px-6 py-3 bg-emerald-400">Log In</UButton>
+                        <UButton type="submit" block class="px-6 py-3 bg-emerald-400">Log In</UButton>
                     </div>
 
                     <UDivider label="" class="my-6 border-blueGray-700" />
@@ -96,7 +104,7 @@ watch(email, async (newValue, oldValue) => {
                         class="my-6 text-center text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
                         No account yet? Sign Up
                     </p>
-                </div>
+                </UForm>
             </UCard>
         </div>
 
