@@ -1,73 +1,95 @@
 <template>
-    <div>
-        <input ref="phoneInput" type="tel" @blur="validatePhone" />
-
+    <div class="flex flex-col">
+        <label for="phone" class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold mb-2">
+            Phone number
+        </label>
+        <input ref="phoneInput" type="tel" id="phone" @input="onInput" autofocus class="text-sm" :value="modelValue"
+            @blur="validatePhone" />
+        <!-- <span v-if="errors.has('phone')">{{ errors.first('phone') }}</span> -->
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import intlTelInput from 'intl-tel-input';
 import 'intl-tel-input/build/css/intlTelInput.css';
 
+const props = defineProps({
+    modelValue: String,
+});
+
+const emits = defineEmits(['update:modelValue', 'hidePhone']);
+
 const phoneInput = ref(null);
+const iti = ref({});
+
 
 onMounted(() => {
-    const iti = intlTelInput(phoneInput.value, {
-        // Your desired options here
-        initialCountry: 'auto',
-        geoIpLookup: (success, failure) => {
-            fetch('https://ipinfo.io/json')
-                .then((response) => response.json())
-                .then((data) => success(data.country))
-                .catch(failure);
-        },
-        utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js', // Use the latest utils script
+    iti.value = intlTelInput(phoneInput.value, {
+        initialCountry: 'dz',
+        utilsScript: "~/node_modules/intl-tel-input/build/js/utils.js",
     });
 
     phoneInput.value.addEventListener('countrychange', () => {
-        // Trigger validation on country change
         validatePhone();
     });
 
+    phoneInput.value.focus()
+
     onBeforeUnmount(() => {
-        if (iti) {
-            iti.destroy();
+        if (iti.value) {
+            iti.value.destroy();
         }
     });
 });
 
-const validatePhone = () => {
-    if (phoneInput.value) {
-        const isValid = iti.isValidNumber();
-        const phoneNumber = iti.getNumber();
-
-        if (!isValid) {
-            // Handle invalid phone number
-            console.error('Invalid phone number');
-        } else {
-            // Handle valid phone number
-            console.log('Valid phone number:', phoneNumber);
-        }
-    }
+const onInput = (event) => {
+    const input = event.target;
+    const sanitizedValue = event.target.value.replace(/[^0-9+]/g, '');
+    input.value = sanitizedValue;
+    emits('update:modelValue', sanitizedValue);
 };
+
+
+const validatePhone = () => {
+    console.log(iti.value.isValidNumber());
+//   if (phoneInput.value && iti.value) {
+//     const isValid = iti.value.isValidNumber();
+//     if (!isValid) {
+//       validationMessage.value = 'Invalid phone number';
+//     } else {
+//       validationMessage.value = '';
+//       const phoneNumber = iti.value.getNumber();
+//       emits('update:modelValue', phoneNumber);
+//     }
+//   }
+}
+
+watch(() => props.modelValue, (newValue) => {
+    if (newValue.trim() == "") {
+        emits('hidePhone')
+    }
+    if (phoneInput.value) {
+        phoneInput.value.value = newValue;
+    }
+});
 </script>
 
 
 <style scoped>
-.iti{
+.iti {
     width: 100% !important;
 }
 
-.iti__tel-input{
+.iti__tel-input {
     width: 100%;
     border: 1px solid #d1d5db;
-    padding: 0.625rem;
+    padding: 0.500rem;
     border-radius: 8px;
 }
 
-.iti__selected-country{
-    background-color: #d1d5db !important;
+.iti__tel-input:focus-visible {
+    outline: 2px solid #22c55e !important;
+    border-radius: 3px !important;
 }
-
 </style>

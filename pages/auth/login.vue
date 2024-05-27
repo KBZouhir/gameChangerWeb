@@ -7,9 +7,29 @@ definePageMeta({
 
 let showPassword = ref(false)
 
+let email = ref('')
+let phone = ref('')
+let isPhoneInput = ref(false)
+
+
 const togglePassword = () => {
     showPassword.value = !showPassword.value
 }
+
+const hidePhoneComp = () => {
+    isPhoneInput.value = false
+    email.value = ""
+}
+
+watch(email, async (newValue, oldValue) => {
+    const regex = /^[+0-9]/;
+    if (regex.test(newValue)) {
+        isPhoneInput.value = true
+        phone.value = email.value
+    } else {
+        hidePhoneComp()
+    }
+})
 
 
 </script>
@@ -19,27 +39,32 @@ const togglePassword = () => {
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
             <UCard class="md:w-2/4 w-full p-8 relative z-50">
                 <h2 class="text-3xl font-bold">Welcome Back</h2>
-                <IntlTelInput />
                 <p class="text-blueGray-900 dark:text-slate-300">Please log in to continue</p>
 
                 <div class="mt-8">
                     <div class="mt-8">
-                        <label for="email" class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">Email Address</label>
-                        <UInput type="email" id="email" size="lg" class="mt-2" placeholder="exmple@mail.com" />
+                        <template v-if="!isPhoneInput">
+                            <label for="email" class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">
+                                Email Address
+                            </label>
+                            <UInput type="email" id="email" size="lg" class="mt-2" v-model="email" autofocus
+                                placeholder="exmple@mail.com" />
+                        </template>
+                        
+                        <template v-else>
+                            <IntlTelInput v-model="phone" @hidePhone="hidePhoneComp" />
+                        </template>
                     </div>
 
                     <div class="mt-4">
-                        <label for="password" class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">Password</label>
-                        <UInput :type="(showPassword) ? 'text' : 'password'" id="password" size="lg" class="mt-2" placeholder="**********">
+                        <label for="password"
+                            class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">Password</label>
+                        <UInput :type="(showPassword) ? 'text' : 'password'" id="password" size="lg" class="mt-2"
+                            placeholder="**********">
                             <template #trailing>
-                                <UButton
-                                    @click="togglePassword"
-                                    :padded="false"
-                                    color="gray"
-                                    variant="link"
+                                <UButton @click="togglePassword" :padded="false" color="gray" variant="link"
                                     class="pointer-events-auto"
-                                    :icon="(showPassword) ? 'i-heroicons-eye-20-solid' : 'i-heroicons-eye-slash-20-solid'"
-                                />
+                                    :icon="(showPassword) ? 'i-heroicons-eye-20-solid' : 'i-heroicons-eye-slash-20-solid'" />
                             </template>
                         </UInput>
                         <small class="text-[#697077]">
@@ -48,8 +73,10 @@ const togglePassword = () => {
                     </div>
 
                     <div class="flex justify-between items-center mt-4">
-                        <UCheckbox class="text-sm" v-model="selected" name="notifications" label="Remember me" />
-                        <a href="" class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">Forgot Password?</a>
+                        <UCheckbox class="text-sm" name="notifications" label="Remember me" />
+                        <a href=""
+                            class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">Forgot
+                            Password?</a>
                     </div>
 
                     <div class="mt-4">
@@ -60,12 +87,13 @@ const togglePassword = () => {
 
                     <p class="mb-6 mt-4 text-center text-sm">Or log in with:</p>
                     <div class="grid grid-cols-2 gap-6">
-                        <MediaButton type="google" @click="googleLogin()"/>
+                        <MediaButton type="google" @click="googleLogin()" />
                         <MediaButton type="twitter" />
                     </div>
 
                     <UDivider label="" class="my-6" />
-                    <p class="my-6 text-center text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
+                    <p
+                        class="my-6 text-center text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
                         No account yet? Sign Up
                     </p>
                 </div>
