@@ -3,9 +3,7 @@
 </script>
 
 <template>
-    <div>
-        <h1 class="text-3xl font-bold underline">
-            Hello world!
-        </h1>
+    <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
+        eezezddezzde
     </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <label for="phone" class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold mb-2">
+        <label for="phone" class="text-gray-700 dark:text-slate-300 text-sm font-medium mb-2">
             Phone number
         </label>
         <input ref="phoneInput" type="tel" id="phone" @input="onInput" autofocus class="text-sm" :value="modelValue"

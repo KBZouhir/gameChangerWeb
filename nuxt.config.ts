@@ -6,9 +6,10 @@ export default defineNuxtConfig({
     preference: 'light'
   },
 
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
   
-
-  css: ['~/assets/css/main.css'],
 
   postcss: {
     plugins: {

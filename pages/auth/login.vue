@@ -1,4 +1,5 @@
 <script setup>
+import schema from '~/schemas/auth/login';
 
 definePageMeta({
     layout: 'guest',
@@ -25,20 +26,22 @@ const hidePhoneComp = () => {
     state.email = ""
 }
 
+
 watch(() => state.email, (newValue) => {
     const regex = /^[+0-9]/;
     if (regex.test(newValue)) {
         isPhoneInput.value = true
         state.phone = state.email
     } else {
-        hidePhoneComp()
+        if (isPhoneInput.value) {
+            hidePhoneComp()
+        }
     }
 })
 
 async function onSubmit(event) {
-    console.log(event);
+    console.log(event.data);
 }
-
 
 </script>
 
@@ -49,42 +52,39 @@ async function onSubmit(event) {
                 <h2 class="text-3xl font-bold">Welcome Back</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">Please log in to continue</p>
 
-                <UForm ref="form" :state="state" @submit="onSubmit" class="mt-8">
+                <UForm ref="form" :schema="schema" :state="state" @submit="onSubmit" class="mt-8">
                     <div class="mt-8">
-                        <template v-if="!isPhoneInput">
-                            <label for="email" class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">
-                                Email Address
-                            </label>
-                            <UInput type="email" id="email" size="lg" class="mt-2" v-model="state.email" autofocus
-                                placeholder="exmple@mail.com" />
-                        </template>
-
-                        <template v-else>
+                        <UFormGroup label="Email Address" name="email" v-if="!isPhoneInput">
+                            <UInput v-model="state.email" size="lg" autofocus placeholder="exmple@mail.com" />
+                        </UFormGroup>
+                        <UFormGroup name="phone" v-else>
                             <IntlTelInput v-model="state.phone" @hidePhone="hidePhoneComp" />
-                        </template>
+                        </UFormGroup>
+
                     </div>
 
                     <div class="mt-4">
-                        <label for="password"
-                            class="text-blueGray-900 dark:text-slate-300 text-sm font-semibold">Password</label>
-                        <UInput :type="(showPassword) ? 'text' : 'password'" id="password" size="lg" class="mt-2"
-                            placeholder="********">
-                            <template #trailing>
-                                <UButton @click="togglePassword" :padded="false" color="gray" variant="link"
-                                    class="pointer-events-auto"
-                                    :icon="(showPassword) ? 'i-heroicons-eye-20-solid' : 'i-heroicons-eye-slash-20-solid'" />
-                            </template>
-                        </UInput>
-                        <small class="text-[#697077]">
-                            It must be a combination of minimum 8 letters, numbers, and symbols.
-                        </small>
+                        <UFormGroup v-slot="{ error }" label="Password" name="password"
+                            help="It must be a combination of minimum 8 letters, numbers, and symbols.">
+                            <UInput :type="(showPassword) ? 'text' : 'password'" id="password" size="lg"
+                                v-model="state.password" placeholder="********">
+                                <template #trailing>
+                                    <UButton @click="togglePassword" :padded="false" color="gray" variant="link"
+                                        class="pointer-events-auto "
+                                        :class="(error) ? 'text-red-600 hover:text-red-600' : ''"
+                                        :icon="(showPassword) ? 'i-heroicons-eye-20-solid' : 'i-heroicons-eye-slash-20-solid'" />
+                                </template>
+                            </UInput>
+                        </UFormGroup>
+
+
                     </div>
 
                     <div class="flex justify-between items-center mt-4">
                         <UCheckbox class="text-sm" name="notifications" label="Remember me" />
-                        <a href=""
-                            class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">Forgot
-                            Password?</a>
+                        <NuxtLink to="forgotpassword" class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
+                            Forgot Password?
+                        </NuxtLink>
                     </div>
 
                     <div class="mt-4">
@@ -100,10 +100,12 @@ async function onSubmit(event) {
                     </div>
 
                     <UDivider label="" class="my-6" />
-                    <p
-                        class="my-6 text-center text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
-                        No account yet? Sign Up
-                    </p>
+                    <div class="text-center">
+                        <NuxtLink to="/auth/register"
+                            class="my-6 text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
+                            No account yet? Sign Up
+                        </NuxtLink>
+                    </div>
                 </UForm>
             </UCard>
         </div>

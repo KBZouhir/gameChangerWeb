@@ -1,7 +1,9 @@
-import { defineStore } from 'pinia'
-import { useFetch } from '#app'
+import { defineStore } from "pinia";
+import { useAuthApi } from "~/composables/useAuth";
 
-export const useAuthStore = defineStore('auth', {
+const { authApi } = useAuthApi();
+
+export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
     token: null,
@@ -10,48 +12,79 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     async register(userData) {
-      this.loading = true
-      this.error = null
+      this.loading = true;
+      this.error = null;
+      let cleanData = { ...userData };
+      if (!userData.email || userData.email === "0") {
+        const { email, ...rest } = userData;
+        cleanData = rest;
+      }
+      const axiosInstance = await authApi.raw();
       try {
-        const { data, error } = await useFetch('/api/register', {
-          method: 'POST',
-          body: userData
-        })
-        if (error.value) {
-          throw new Error(error.value.message)
+        const response = await axiosInstance.post(`https://gc-dev.informatikab.com/api/v1/register`,cleanData).finally(()=> {this.loading = false;});
+        if (response.status == 200) {
+          this.token = response.data.token;
+          this.user = response.data.user;
+          return {
+            success: true,
+            data: response
+          };
         }
-        this.user = data.value.user
-        this.token = data.value.token
-      } catch (err) {
-        this.error = err.message
-      } finally {
-        this.loading = false
+      } catch (e) {
+        return {
+          success: false,
+          data: e
+        };
       }
     },
 
-    async login(credentials) {
-      this.loading = true
-      this.error = null
+    async validationMail(userData) {
+      this.loading = true;
+      this.error = null;
+      const axiosInstance = await authApi.raw();
       try {
-        const { data, error } = await useFetch('/api/login', {
-          method: 'POST',
-          body: credentials
-        })
-        if (error.value) {
-          throw new Error(error.value.message)
+        const response = await axiosInstance.post(`https://gc-dev.informatikab.com/api/v1/email/verify`,userData).finally(()=> {this.loading = false;});
+        if (response.status == 200) {
+          return {
+            success: true,
+            data: response
+          };
         }
-        this.user = data.value.user
-        this.token = data.value.token
-      } catch (err) {
-        this.error = err.message
-      } finally {
-        this.loading = false
+      } catch (e) {
+        return {
+          success: false,
+          data: e
+        };
       }
     },
-    
+
+    async login(userData) {
+      this.loading = true;
+      this.error = null;
+      const axiosInstance = await authApi.raw();
+      try {
+        const response = await axiosInstance.post(`https://gc-dev.informatikab.com/api/v1/login`,userData).finally(()=> {this.loading = false;});
+        if (response.status == 200) {
+          this.token = response.data.token;
+          this.user = response.data.user;
+          return {
+            success: true,
+            data: response
+          };
+        }
+      } catch (e) {
+        return {
+          success: false,
+          data: e
+        };
+      }
+
+      
+    },
+
     logout() {
-      this.user = null
-      this.token = null
+      this.user = null;
+      this.token = null;
     },
   },
-})
+});
