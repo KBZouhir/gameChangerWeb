@@ -55,37 +55,41 @@ async function validationOtp() {
         error.value = true
         return
     }
-    
+
     await authStore.validationMail(state).then(async (result) => {
         if (result.success) {
             alert('valid')
         } else {
             if (result.data.response.status == 422) {
-                let errors = result.data.response.data.errors;
-                let formattedErrors = [];
-
-                for (const key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        errors[key].forEach(message => {
-                            formattedErrors.push({
-                                path: key,
-                                message: message
-                            });
-                        });
-                    }
-                }
+                const errors = result.data.response.data.errors;
+                const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
+                    messages.map(message => ({ path: key, message }))
+                );
                 form.value.setErrors(formattedErrors);
             }
         }
-
     })
-
 }
 
 async function resendOtp() {
     clearInterval(intervalId);
     timeLeft.value = 30
     counter()
+
+    await authStore.resendValidationLink().then(async (result) => {
+        if (result.success) {
+            alert('valid')
+        } else {
+            if (result.data.response.status == 422) {
+                const errors = result.data.response.data.errors;
+                const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
+                    messages.map(message => ({ path: key, message }))
+                );
+                form.value.setErrors(formattedErrors);
+            }
+        }
+
+    })
 }
 
 </script>

@@ -58,6 +58,47 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+    async resendValidationLink() {
+      this.loading = true;
+      this.error = null;
+      const axiosInstance = await authApi.raw();
+      try {
+        const response = await axiosInstance.post(`https://gc-dev.informatikab.com/api/v1/email/resend`).finally(()=> {this.loading = false;});
+        if (response.status == 200) {
+          return {
+            success: true,
+            data: response
+          };
+        }
+      } catch (e) {
+        return {
+          success: false,
+          data: e
+        };
+      }
+    },
+
+
+    async sendResetPasswordLink(userData) {
+      this.loading = true;
+      this.error = null;
+      const axiosInstance = await authApi.raw();
+      try {
+        const response = await axiosInstance.post(`https://gc-dev.informatikab.com/api/v1/forgot-password`, userData).finally(()=> {this.loading = false;});
+        if (response.status == 200) {
+          return {
+            success: true,
+            data: response
+          };
+        }
+      } catch (e) {
+        return {
+          success: false,
+          data: e
+        };
+      }
+    },
+
     async login(userData) {
       this.loading = true;
       this.error = null;

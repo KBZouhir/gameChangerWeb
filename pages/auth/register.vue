@@ -57,24 +57,14 @@ async function onSubmit(event) {
     let data = event.data
     form.value.clear()
     await authStore.register(data).then(async (result) => {
-        console.log(result);
         if (result.success) {
             await navigateTo({ path: '/auth/validation' })
-        }else {
+        } else {
             if (result.data.response.status == 422) {
-                let errors = result.data.response.data.errors;
-                let formattedErrors = [];
-
-                for (const key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        errors[key].forEach(message => {
-                            formattedErrors.push({
-                                path: key,
-                                message: message
-                            });
-                        });
-                    }
-                }
+                const errors = result.data.response.data.errors;
+                const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
+                    messages.map(message => ({ path: key, message }))
+                );
                 form.value.setErrors(formattedErrors);
             }
         }

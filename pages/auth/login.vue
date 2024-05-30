@@ -1,5 +1,6 @@
 <script setup>
-import schema from '~/schemas/auth/login';
+import { z } from "zod";
+import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({
     layout: 'guest',
@@ -7,6 +8,7 @@ definePageMeta({
 })
 
 let showPassword = ref(false)
+const authStore = useAuthStore()
 
 const state = reactive({
     email: undefined,
@@ -15,6 +17,11 @@ const state = reactive({
 })
 
 let isPhoneInput = ref(false)
+const form = ref()
+
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 
 
 const togglePassword = () => {
@@ -25,6 +32,21 @@ const hidePhoneComp = () => {
     isPhoneInput.value = false
     state.email = ""
 }
+
+const schema = z.object({
+    email: z.string().optional().refine((val) => val === "0" || val === undefined || emailRegex.test(val), { message: "Invalid email" }),
+    phone: z.string().optional(),
+    password: z.string().min(8, "Must be at least 8 characters"),
+}).superRefine((data, ctx) => {
+    if (data.email !== "0" && !data.email && !data.phone) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Either email or phone must be provided",
+            path: ["email", "phone"],
+        });
+    }
+});
+
 
 
 watch(() => state.email, (newValue) => {
@@ -40,7 +62,22 @@ watch(() => state.email, (newValue) => {
 })
 
 async function onSubmit(event) {
-    console.log(event.data);
+    let data = event.data
+    form.value.clear()
+    await authStore.login(data).then(async (result) => {
+        if (result.success) {
+            await navigateTo({ path: '/auth/validation' })
+        } else {
+            if (result.data.response.status == 422) {
+                const errors = result.data.response.data.errors;
+                const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
+                    messages.map(message => ({ path: key, message }))
+                );
+                form.value.setErrors(formattedErrors);
+            }
+        }
+
+    })
 }
 
 </script>
@@ -82,7 +119,8 @@ async function onSubmit(event) {
 
                     <div class="flex justify-between items-center mt-4">
                         <UCheckbox class="text-sm" name="notifications" label="Remember me" />
-                        <NuxtLink to="forgotpassword" class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
+                        <NuxtLink to="forgotpassword"
+                            class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
                             Forgot Password?
                         </NuxtLink>
                     </div>
