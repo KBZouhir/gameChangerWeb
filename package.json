@@ -19,11 +19,10 @@
     "firebase": "^10.12.1",
     "intl-tel-input": "^23.0.9",
     "nuxt": "^3.11.2",
-    "nuxt-vuefire": "^1.0.2",
     "pinia": "^2.1.7",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
-    "vuefire": "^3.1.23",
+    "vue3-toastify": "^0.2.1",
     "yup": "^1.4.0",
     "zod": "^3.23.8"
   },

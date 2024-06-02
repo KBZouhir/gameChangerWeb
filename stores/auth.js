@@ -103,8 +103,13 @@ export const useAuthStore = defineStore("auth", {
       this.loading = true;
       this.error = null;
       const axiosInstance = await authApi.raw();
+      let cleanData = { ...userData };
+      if (!userData.email || userData.email === "0") {
+        const { email, ...rest } = userData;
+        cleanData = rest;
+      }
       try {
-        const response = await axiosInstance.post(`https://gc-dev.informatikab.com/api/v1/login`,userData).finally(()=> {this.loading = false;});
+        const response = await axiosInstance.post(`https://gc-dev.informatikab.com/api/v1/login`,cleanData).finally(()=> {this.loading = false;});
         if (response.status == 200) {
           this.token = response.data.token;
           this.user = response.data.user;

@@ -74,6 +74,8 @@ async function onSubmit(event) {
                     messages.map(message => ({ path: key, message }))
                 );
                 form.value.setErrors(formattedErrors);
+            }else{
+                useNuxtApp().$toast.error(result.data.response.data.message);
             }
         }
 
@@ -126,7 +128,7 @@ async function onSubmit(event) {
                     </div>
 
                     <div class="mt-4">
-                        <UButton type="submit" block class="px-6 py-3 bg-emerald-400">Log In</UButton>
+                        <UButton type="submit" block :loading="authStore.loading" class="px-6 py-3 bg-emerald-400">Log In</UButton>
                     </div>
 
                     <UDivider label="" class="my-6 border-blueGray-700" />
