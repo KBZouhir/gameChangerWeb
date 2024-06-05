@@ -24,6 +24,12 @@ export default defineNuxtConfig({
     storesDirs: ['./stores/**'],
   },
 
+  runtimeConfig: {
+    public: {
+      googleMapsApiKey: 'AIzaSyCGknJpFjo7lwAIMDBruZgT56TdZYGotnA',  // Replace with your actual API key
+    }
+  },
+
   i18n: {
     locales: [
       { code: 'en', name: 'English', flag: '🇬🇧' },
