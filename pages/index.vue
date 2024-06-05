@@ -2,7 +2,6 @@
     <input
       type="text"
       ref="autocompleteInput"
-      @input="handleInput"
       placeholder="Enter an address"
       style="width: 100%; padding: 8px;"
     />
@@ -24,12 +23,14 @@
   <script setup>  
   // Initial map center
   const mapCenter = ref({ lat: 37.7749, lng: -122.4194 })
+
+  const autocompleteInput= ref()
+  let autocomplete = null
   
   // Markers array
   const markers = ref([
     { position: { lat: 37.7749, lng: -122.4194 } }
   ])
-  
   
   // Handle marker drag end
   const onMarkerDragEnd = (index, event) => {
@@ -38,6 +39,27 @@
     const newLng = event.latLng.lng()
     markers.value[index].position = { lat: newLat, lng: newLng }
   }
+
+// const initializeAutocomplete = () => {
+//   if (window.google && window.google.maps && window.google.maps.places) {
+//     const google = window.google;
+//     autocomplete = new google.maps.places.Autocomplete(autocompleteInput.value, {
+//     types: ["address"],
+//       fields: ["address_components"]
+//   })
+
+//   autocomplete.addListener('place_changed', () => {
+//     const place = autocomplete.getPlace()
+//     console.log(place);
+//   })
+//   } else {
+//     setTimeout(initializeAutocomplete, 100);
+//   }
+// }
+
+//   onMounted(() => {
+//     console.log(window);
+//   })
   
   </script>
   
