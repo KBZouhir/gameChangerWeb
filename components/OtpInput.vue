@@ -46,7 +46,7 @@ const handlePaste = (e) => {
 </script>
 
 <template>
-  <div class="grid grid-cols-6 gap-4 mb-4 text-center" @input="handleOtpInput">
+  <div class="grid grid-cols-6 gap-4 mb-4 text-center">
     <template v-for="(field, index) in fields" :key="field">
       <input
         v-model="data[field - 1]"
@@ -56,6 +56,7 @@ const handlePaste = (e) => {
         class="border rounded focus:outline-green-400 w-14 h-14 text-center"
         :autofocus="index === 0"
         @paste="field === 1 && handlePaste($event)"
+        @input="handleOtpInput"
       />
     </template>
   </div>

@@ -1,25 +1,15 @@
-import { useToast } from 'primevue/usetoast'
-
-export const alertSuccess = (message) => {
-  const toast = useToast()
-
-  toast.add({ severity: 'success', summary: message, life: 3000 })
+export const successAlert = (message) => {
+    useNuxtApp().$toast.success(message);
 }
 
-export const alertInfo = (message) => {
-  const toast = useToast()
-
-  toast.add({ severity: 'info', summary: message, life: 3000 })
+export const infoAlert = (message) => {
+    useNuxtApp().$toast.info(message);
 }
 
-export const alertWarn = (message) => {
-  const toast = useToast()
-
-  toast.add({ severity: 'warn', summary: message, life: 3000 })
+export const errorAlert = (message) => {
+    useNuxtApp().$toast.error(message);
 }
 
-export const alertError = (message) => {
-  const toast = useToast()
-
-  toast.add({ severity: 'error', summary: message, life: 3000 })
+export const warningAlert = (message) => {
+    useNuxtApp().$toast.warning(message);
 }

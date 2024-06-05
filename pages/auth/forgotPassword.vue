@@ -1,13 +1,15 @@
 <script setup>
 import schema from '~/schemas/auth/forgotpassword';
-import { useAuthStore } from '~/stores/auth'
+import { forgotPassword, isLoading } from '~/composables/store/useApiAuth'
+import { handleApiError } from '~/composables/useApiError'
+import { warningAlert, successAlert } from '~/composables/useAlert'
+
 
 definePageMeta({
     layout: 'guest',
     title: 'Forgot password'
 })
 
-const authStore = useAuthStore()
 const form = ref()
 const linkSend = ref(false)
 const state = reactive({
@@ -18,24 +20,22 @@ const state = reactive({
 
 
 async function onSubmit(event) {
-    let data = event.data;
-    form.value.clear();
-    const result = await authStore.sendResetPasswordLink(data);
-    if (result.success) {
-        if (result.data.data.success) {
-            linkSend.value = {
-                status: true,
-                message: result.data.data.message
-            }
+    let {data} = event;
+    const result = await forgotPassword(data);
+    if (!result.data) {
+        const error = handleApiError(result.error);
+        if (error.status === 422) {
+            form.value.setErrors(error.errors);
         }
-    } else {
-        if (result.data.response.status === 422) {
-            const errors = result.data.response.data.errors;
-            const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
-                messages.map(message => ({ path: key, message }))
-            );
-            form.value.setErrors(formattedErrors);
-        }
+    }
+
+    if(result.data?.success){
+        linkSend.value = true
+        successAlert(result.data?.status)
+    }
+
+    if(result.data?.success == false){
+        warningAlert(result.data?.status)
     }
 }
 
@@ -44,7 +44,7 @@ async function onSubmit(event) {
 <template>
     <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-2/4 w-full p-8 relative z-50" v-show="!linkSend.status">
+            <UCard class="md:w-2/4 w-full p-8 relative z-50" v-show="!linkSend">
                 <h2 class="text-3xl font-bold">Forgotten your password?</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">There is nothing to worry about, we'll send you a
                     message to help you reset your password.</p>
@@ -58,7 +58,7 @@ async function onSubmit(event) {
 
 
                     <div class="mt-4">
-                        <UButton type="submit" block class="px-6 py-3 bg-emerald-400">Send Reset Link</UButton>
+                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400">Send Reset Link</UButton>
                     </div>
 
                     <UDivider label="" class="my-6" />
@@ -71,12 +71,12 @@ async function onSubmit(event) {
                 </UForm>
             </UCard>
 
-            <UCard class="md:w-2/4 w-full p-8 relative z-50" v-show="linkSend.status">
+            <UCard class="md:w-2/4 w-full p-8 relative z-50" v-show="linkSend">
                 <div class="w-full flex flex-col justify-center items-center">
                     <img class="w-auto h-52" src="~/assets/svg/vectors/check.svg" alt="Game changer">
 
                     <h3 class="text-2xl font-bold mb-3">Reset password</h3>
-                    <p class="text-blueGray-900 dark:text-slate-300 text-center">{{ linkSend.message }}</p>
+                    <p class="text-blueGray-900 dark:text-slate-300 text-center">Reset password link sent on your email.</p>
                 </div>
 
 

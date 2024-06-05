@@ -7,6 +7,8 @@ import firebaseConfig from '~/firebaseConfig';
 export default defineNuxtPlugin((nuxtApp) => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+
+  console.log(auth);
   
   nuxtApp.provide('auth', auth);
   nuxtApp.provide('RecaptchaVerifier', RecaptchaVerifier);

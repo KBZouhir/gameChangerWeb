@@ -1,28 +1,29 @@
 <script setup>
+import { useNuxtApp } from '#app';
 import { z } from "zod";
-import { useAuthStore } from '~/stores/auth'
+import { login, ResendValidationMail, sendOtp, isLoading } from '~/composables/store/useApiAuth'
+import { handleApiError } from '~/composables/useApiError'
+const { $auth, $RecaptchaVerifier } = useNuxtApp();
 
 definePageMeta({
     layout: 'guest',
-    title: 'Login Page'
+    title: 'Login Page',
+    middleware: 'auth'
 })
 
 let showPassword = ref(false)
-const authStore = useAuthStore()
 
 const state = reactive({
-    email: undefined,
+    email: 'user@app.com',
     phone: undefined,
-    password: undefined
+    password: 'password1A@'
 })
 
 let isPhoneInput = ref(false)
+let recaptchaToken = ref(null);
 const form = ref()
 
-
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
 
 const togglePassword = () => {
     showPassword.value = !showPassword.value
@@ -32,6 +33,13 @@ const hidePhoneComp = () => {
     isPhoneInput.value = false
     state.email = ""
 }
+
+
+onMounted(() => {
+    window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
+        'size': 'invisible',
+    });
+});
 
 const schema = z.object({
     email: z.string().optional().refine((val) => val === "0" || val === undefined || emailRegex.test(val), { message: "Invalid email" }),
@@ -48,7 +56,6 @@ const schema = z.object({
 });
 
 
-
 watch(() => state.email, (newValue) => {
     const regex = /^[+0-9]/;
     if (regex.test(newValue)) {
@@ -61,25 +68,58 @@ watch(() => state.email, (newValue) => {
     }
 })
 
+const getRecaptchaToken = async () => {
+    try {
+        await window.recaptchaVerifier.render();
+        const token = await window.recaptchaVerifier.verify();
+        recaptchaToken.value = token;
+        console.log(token);
+    } catch (error) {
+        console.error('Error getting reCAPTCHA token:', error);
+    }
+};
+
 async function onSubmit(event) {
-    let data = event.data
-    form.value.clear()
-    await authStore.login(data).then(async (result) => {
-        if (result.success) {
-            await navigateTo({ path: '/auth/validation' })
-        } else {
-            if (result.data.response.status == 422) {
-                const errors = result.data.response.data.errors;
-                const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
-                    messages.map(message => ({ path: key, message }))
-                );
-                form.value.setErrors(formattedErrors);
-            }else{
-                useNuxtApp().$toast.error(result.data.response.data.message);
-            }
+    const { data } = event
+    const result = await login(data);
+    if (!result.data) {
+        const error = handleApiError(result.error);
+        if (error.status === 422) {
+            form.value.setErrors(error.errors);
+        }
+    }
+    if (result.data?.success) {
+        const { is_completed, is_email_verified, is_phone_verified, phone, email } = result.data.user
+        if (is_completed && (is_email_verified || is_phone_verified)) {
+            // go to dashboard
+            setTimeout(async () => {
+                await navigateTo('dashboard')
+            }, 1000);
+
+            return
         }
 
-    })
+        if (!is_completed && (is_email_verified || is_phone_verified)) {
+            // go to complete-profile
+            await navigateTo('/auth/complete-profile')
+
+            return
+        }
+
+        if (!is_email_verified && email && !phone) {
+            await ResendValidationMail();
+        }
+
+        if (!is_phone_verified && phone && !email) {
+            await getRecaptchaToken()
+            let payload = {
+                phoneNumber: data.phone,
+                recaptchaToken: recaptchaToken.value
+            }
+            await sendOtp(payload);
+        }
+
+    }
 }
 
 </script>
@@ -87,7 +127,7 @@ async function onSubmit(event) {
 <template>
     <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-2/4 w-full p-8 relative z-50">
+            <UCard class="md:w-3/5 w-full p-8 relative z-50">
                 <h2 class="text-3xl font-bold">Welcome Back</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">Please log in to continue</p>
 
@@ -106,7 +146,7 @@ async function onSubmit(event) {
                         <UFormGroup v-slot="{ error }" label="Password" name="password"
                             help="It must be a combination of minimum 8 letters, numbers, and symbols.">
                             <UInput :type="(showPassword) ? 'text' : 'password'" id="password" size="lg"
-                                v-model="state.password" placeholder="********">
+                                v-model="state.password" placeholder="********" autocomplete>
                                 <template #trailing>
                                     <UButton @click="togglePassword" :padded="false" color="gray" variant="link"
                                         class="pointer-events-auto "
@@ -128,7 +168,8 @@ async function onSubmit(event) {
                     </div>
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="authStore.loading" class="px-6 py-3 bg-emerald-400">Log In</UButton>
+                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400">Log
+                            In</UButton>
                     </div>
 
                     <UDivider label="" class="my-6 border-blueGray-700" />
@@ -146,6 +187,8 @@ async function onSubmit(event) {
                             No account yet? Sign Up
                         </NuxtLink>
                     </div>
+
+                    <div id="recaptcha-container"></div>
                 </UForm>
             </UCard>
         </div>

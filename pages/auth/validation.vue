@@ -1,6 +1,10 @@
 <script setup>
 
-import { useAuthStore } from '~/stores/auth'
+import { validationMail, ResendValidationMail, sendOtp, isLoading } from '~/composables/store/useApiAuth'
+import VOtpInput from "vue3-otp-input";
+
+
+
 
 definePageMeta({
     layout: 'guest',
@@ -9,7 +13,6 @@ definePageMeta({
 
 const error = ref(false)
 const timeLeft = ref(30)
-const authStore = useAuthStore()
 const form = ref()
 let intervalId = null
 
@@ -20,12 +23,6 @@ const state = reactive({
 
 onMounted(() => {
     counter()
-})
-
-watch(() => state.code, (newValue) => {
-    if (newValue) {
-        validationOtp()
-    }
 })
 
 const padTime = (value) => {
@@ -48,27 +45,34 @@ const counter = () => {
     }, 1000);
 }
 
-async function validationOtp() {
-    form.value.clear()
 
-    if (!state.code) {
+async function validationOtp() {
+    form.value.setErrors([])
+    const result = null
+    const currentUserCookie = useCookie("current_user");
+    const { is_email_verified, is_phone_verified, phone, email } = currentUserCookie.value
+
+    if (state.code.length <= 5) {
         error.value = true
         return
     }
 
-    await authStore.validationMail(state).then(async (result) => {
-        if (result.success) {
-            alert('valid')
-        } else {
-            if (result.data.response.status == 422) {
-                const errors = result.data.response.data.errors;
-                const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
-                    messages.map(message => ({ path: key, message }))
-                );
-                form.value.setErrors(formattedErrors);
-            }
+    if(!is_email_verified && email && !phone) {
+        result = await validationMail(state);
+    }
+
+    if (!result.data) {
+        const error = handleApiError(result.error);
+        if (error.status === 422) {
+            form.value.setErrors(error.errors);
         }
-    })
+    }
+
+    if (result.data?.success) {
+        setTimeout(async () => {
+            await navigateTo({ path: '/' })
+        }, 1000);
+    }
 }
 
 async function resendOtp() {
@@ -76,20 +80,13 @@ async function resendOtp() {
     timeLeft.value = 30
     counter()
 
-    await authStore.resendValidationLink().then(async (result) => {
-        if (result.success) {
-            alert('valid')
-        } else {
-            if (result.data.response.status == 422) {
-                const errors = result.data.response.data.errors;
-                const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
-                    messages.map(message => ({ path: key, message }))
-                );
-                form.value.setErrors(formattedErrors);
-            }
+    const result = ResendValidationMail()
+    if (!result.data) {
+        const error = handleApiError(result.error);
+        if (error.status === 422) {
+            form.value.setErrors(error.errors);
         }
-
-    })
+    }
 }
 
 </script>
@@ -97,24 +94,24 @@ async function resendOtp() {
 <template>
     <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-2/4 w-full p-8 relative z-50">
+            <UCard class="md:w-3/5 w-full p-8 relative z-50">
                 <h2 class="text-3xl font-bold">Verification code</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">
                     We just send you a verify code. Check your inbox to get them.
                 </p>
-
-                <UForm ref="form" :state="state" @submit="validationOtp" class="mt-8">
+                <UForm ref="form" :state="state" class="mt-8">
                     <div class="mt-8">
                         <UFormGroup name="code">
-                            <OtpInput v-model="state.code" :fields="6"></OtpInput>
+                            <VOtpInput input-classes="otp-input" separator="" inputType="numeric" :num-inputs="6"
+                                v-model:value="state.code" :should-auto-focus="true" :should-focus-order="true" />
                             <span class="text-red-500 text-sm" v-if="error">invalid verification code</span>
                         </UFormGroup>
                     </div>
 
 
                     <div class="mt-4">
-                        <UButton type="submit" block class="px-6 py-3 bg-emerald-400" :loading="useAuthStore.loading"
-                            :disabled="state.code == null">Continue</UButton>
+                        <UButton type="submit" block class="px-6 py-3 bg-emerald-400" :loading="isLoading"
+                            @click="validationOtp" :disabled="state.code == null || state.code == ''">Continue</UButton>
                     </div>
 
                     <UDivider label="" class="my-6" />
@@ -136,3 +133,39 @@ async function resendOtp() {
         </div>
     </div>
 </template>
+
+<style>
+.otp-input-container {
+    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1rem;
+    text-align: center;
+}
+
+.otp-input {
+    height: 3.5rem;
+    width: 3.5rem;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    text-align: center;
+}
+
+.otp-input:focus {
+    outline-color: #4ade80;
+}
+
+.otp-input.is-complete {
+    background-color: #e4e4e4;
+}
+
+.otp-input.error {
+    border: 1px solid red !important;
+}
+
+.otp-input::-webkit-inner-spin-button,
+.otp-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+</style>
