@@ -40,26 +40,26 @@
     markers.value[index].position = { lat: newLat, lng: newLng }
   }
 
-// const initializeAutocomplete = () => {
-//   if (window.google && window.google.maps && window.google.maps.places) {
-//     const google = window.google;
-//     autocomplete = new google.maps.places.Autocomplete(autocompleteInput.value, {
-//     types: ["address"],
-//       fields: ["address_components"]
-//   })
+const initializeAutocomplete = () => {
+  if (window.google && window.google.maps && window.google.maps.places) {
+    const google = window.google;
+    autocomplete = new google.maps.places.Autocomplete(autocompleteInput.value, {
+    types: ["address"],
+      fields: ["address_components"]
+  })
 
-//   autocomplete.addListener('place_changed', () => {
-//     const place = autocomplete.getPlace()
-//     console.log(place);
-//   })
-//   } else {
-//     setTimeout(initializeAutocomplete, 100);
-//   }
-// }
+  autocomplete.addListener('place_changed', () => {
+    const place = autocomplete.getPlace()
+    console.log(place);
+  })
+  } else {
+    setTimeout(initializeAutocomplete, 100);
+  }
+}
 
-//   onMounted(() => {
-//     console.log(window);
-//   })
+  onMounted(() => {
+    initializeAutocomplete()
+  })
   
   </script>
   

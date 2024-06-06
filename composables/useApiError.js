@@ -33,6 +33,12 @@ export const handleApiError = error => {
         apiError.message = 'NOT_FOUND_KEY';
     }
 
+    if (status === 500)
+        {
+            apiError.status = 500;
+            apiError.message = 'SERVER_ERROR';
+        }
+
     if (status === 403)
     {
         apiError.status = 403;
