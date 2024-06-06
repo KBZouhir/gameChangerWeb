@@ -7,7 +7,8 @@ import { warningAlert, successAlert } from '~/composables/useAlert'
 
 definePageMeta({
     layout: 'guest',
-    title: 'Forgot password'
+    title: 'Forgot password',
+    middleware: 'guest'
 })
 
 const form = ref()

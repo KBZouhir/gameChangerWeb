@@ -8,7 +8,7 @@ const { $auth, $RecaptchaVerifier } = useNuxtApp();
 definePageMeta({
     layout: 'guest',
     title: 'Login Page',
-    middleware: 'auth'
+    middleware: 'guest'
 })
 
 let showPassword = ref(false)
@@ -92,22 +92,19 @@ async function onSubmit(event) {
         const { is_completed, is_email_verified, is_phone_verified, phone, email } = result.data.user
         if (is_completed && (is_email_verified || is_phone_verified)) {
             // go to dashboard
-            setTimeout(async () => {
-                await navigateTo('dashboard')
-            }, 1000);
-
+             navigateTo('dashboard')
             return
         }
 
         if (!is_completed && (is_email_verified || is_phone_verified)) {
             // go to complete-profile
-            await navigateTo('/auth/complete-profile')
-
+            navigateTo('/auth/complete-profile')
             return
         }
 
         if (!is_email_verified && email && !phone) {
             await ResendValidationMail();
+            return
         }
 
         if (!is_phone_verified && phone && !email) {

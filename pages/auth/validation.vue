@@ -7,8 +7,9 @@ import VOtpInput from "vue3-otp-input";
 
 
 definePageMeta({
-    layout: 'guest',
-    title: 'Validation'
+    layout: 'auth',
+    title: 'Validation',
+    middleware: 'auth'
 })
 
 const error = ref(false)
@@ -69,9 +70,7 @@ async function validationOtp() {
     }
 
     if (result.data?.success) {
-        setTimeout(async () => {
-            await navigateTo({ path: '/' })
-        }, 1000);
+        await navigateTo({ path: '/' })
     }
 }
 

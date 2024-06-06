@@ -1,0 +1,107 @@
+<template>
+    <div class="p-4">
+        <div class="relative">
+            <input type="text" ref="autocompleteInput" autofocus placeholder="Enter an address"
+                class="relative block w-full disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 form-input rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-base px-3.5 py-2.5 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 mb-3" />
+        </div>
+        <GMapMap :center="mapCenter" :zoom="12" style="width: 100%; height: 500px">
+            <GMapMarker v-for="(marker, index) in markers" :key="index" :position="marker.position" :draggable="false"
+                @dragend="onMarkerDragEnd(index, $event)" />
+        </GMapMap>
+    </div>
+</template>
+
+<script setup>
+// Initial map center
+const mapCenter = ref({ lat: 37.7749, lng: -122.4194 })
+
+const props = defineProps({
+    modelValue: { type: [Array, Boolean] },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const autocompleteInput = ref()
+let autocomplete = null
+const addressComponents = ref({
+    country: '',
+    state: '',
+    zip_code: '',
+    lat: null,
+    lng: null,
+})
+
+// Markers array
+const markers = ref([
+    { position: { lat: 37.7749, lng: -122.4194 } }
+])
+
+
+const moveMarker = () => {
+    markers.value[0].position.lat = addressComponents.value.lat
+    markers.value[0].position.lng = addressComponents.value.lng
+    mapCenter.value.lat = addressComponents.value.lat
+    mapCenter.value.lng = addressComponents.value.lng
+}
+
+const initializeAutocomplete = () => {
+    if (window.google && window.google.maps && window.google.maps.places) {
+        const google = window.google;
+        autocomplete = new google.maps.places.Autocomplete(autocompleteInput.value, {
+            types: ["address"],
+            fields: ["address_components", "formatted_address", "geometry"]
+        })
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace()
+
+            const components = place.address_components
+            console.log(components);
+            const getAddressComponent = (type) => {
+                return components.find(component => component.types.includes(type))?.long_name || ''
+            }
+
+            addressComponents.value = {
+                country: getAddressComponent('country'),
+                city: getAddressComponent('administrative_area_level_1'),
+                zip_code: getAddressComponent('postal_code') || getAddressComponent('administrative_area_level_5') || getAddressComponent('postal_code'),
+                lat: place.geometry.location ? place.geometry.location.lat() : null,
+                lng: place.geometry.location ? place.geometry.location.lng() : null,
+                address: place.formatted_address
+            }
+
+            moveMarker()
+
+            emit('update:modelValue', addressComponents.value)
+        })
+    } else {
+        setTimeout(initializeAutocomplete, 100);
+    }
+}
+
+const moveCureentMarker = (postion) => {
+
+    markers.value[0].position.lat = postion.coords.latitude
+    markers.value[0].position.lng = postion.coords.longitude
+    mapCenter.value.lat = postion.coords.latitude
+    mapCenter.value.lng = postion.coords.longitude
+}
+
+const getCurrentPostion = () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(moveCureentMarker, (showError) => {console.log(showError);});
+    } else {
+        document.getElementById('output').innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
+
+onMounted(() => {
+    initializeAutocomplete()
+    getCurrentPostion()
+})
+
+</script>
+
+<style scoped>
+/* Add your styles here */
+</style>

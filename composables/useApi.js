@@ -8,57 +8,46 @@ import { useCookie, callWithNuxt } from "nuxt/app";
  * @param options
  */
 
-
-
 export const useApi = async (url, options) => {
+  const cookie = useCookie("user_access_token");
+  let token = cookie.value;
+  const apiRoute = "https://gc-dev.informatikab.com/api/v1";
 
+  const DEFAULT_HEADERS = {
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+    Authorization: `Bearer ${token}`,
+  };
 
-    const cookie = useCookie('user_access_token')
-    let token = cookie.value;
-    console.log(token);
-       //const apiRoute = 'https://sb.dev-it.me/api/user';
-      const apiRoute ="https://gc-dev.informatikab.com/api/v1";
-    //   const apiRoute = 'http://127.0.0.1:8000/api/user';
+  // Here we will create a default set of headers for every request
+  // if present we will also spread the `headers` set by the user
+  // then we will delete them to avoid collision in next spread
+  const cookieHeaders = useRequestHeaders(["cookie"]);
 
-    const DEFAULT_HEADERS = {
-        Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-        "Authorization": `Bearer ${token}`,
-    }
+  const headers = { ...DEFAULT_HEADERS, ...options?.headers, ...cookieHeaders };
 
-    // Here we will create a default set of headers for every request
-    // if present we will also spread the `headers` set by the user
-    // then we will delete them to avoid collision in next spread
-    const cookieHeaders = useRequestHeaders(['cookie'])
+  // At this point all the `headers` passed by the user where correctly
+  // set in the defaults, now we will spread `options` to remove the
+  // `headers` attribute, so we don't spread it again in `useFetch`
+  const opts = options ? (({ headers, ...opts }) => opts)(options) : null;
+  const baseURL = !options?.baseURL ? apiRoute : options.baseURL;
 
-    const headers = { ...DEFAULT_HEADERS, ...options?.headers, ...cookieHeaders };
-
-    // At this point all the `headers` passed by the user where correctly
-    // set in the defaults, now we will spread `options` to remove the
-    // `headers` attribute, so we don't spread it again in `useFetch`
-    const opts = options ? (({ headers, ...opts }) => opts)(options) : null;
-    const baseURL = !options?.baseURL ? apiRoute : options.baseURL;
-
- 
-    const { data, refresh, error, pending } = await useFetch(url, {
-        baseURL: baseURL,
-        onResponseError({ request, response, options }) {
-            if (response.status === 401) {
-                window.location.reload()
-            }
-        },
-        headers,
-        ...opts
-    })
-  ;
-
-    return {
-        data: data.value,
-        error: error.value,
-        refresh,
-        pending
-    }
-
+  const { data, refresh, error, pending } = await useFetch(url, {
+    baseURL: baseURL,
+    onResponseError({ request, response, options }) {
+      if (response.status === 401) {
+        window.location.reload();
+      }
+    },
+    headers,
+    ...opts,
+  });
+  return {
+    data: data.value,
+    error: error.value,
+    refresh,
+    pending,
+  };
 };
 
 /**
@@ -69,51 +58,48 @@ export const useApi = async (url, options) => {
  */
 
 export const useaSyncApi = async (url, key, options) => {
+  const cookie = useCookie("customer_access_token");
+  let token = cookie.value;
 
-    const cookie = useCookie('customer_access_token')
-    let token = cookie.value;
+  const apiRoute = "https://cma-mpifitness.wekode.agency/api/user";
+  // const apiRoute = 'http://127.0.0.1:8000/api/user';
 
-  const apiRoute ="https://cma-mpifitness.wekode.agency/api/user";
-    // const apiRoute = 'http://127.0.0.1:8000/api/user';
+  const DEFAULT_HEADERS = {
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+    Authorization: `Bearer ${token}`,
+  };
 
+  key = key ? key : url;
 
-    const DEFAULT_HEADERS = {
-        Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-        "Authorization": `Bearer ${token}`,
-    }
+  // Here we will create a default set of headers for every request
+  // if present we will also spread the `headers` set by the user
+  // then we will delete them to avoid collision in next spread
+  const headers = { ...DEFAULT_HEADERS, ...options?.headers };
 
-    key = key ? key : url;
+  // At this point all the `headers` passed by the user where correctly
+  // set in the defaults, now we will spread `options` to remove the
+  // `headers` attribute, so we don't spread it again in `useFetch`
+  const opts = options ? (({ headers, ...opts }) => opts)(options) : null;
 
-    // Here we will create a default set of headers for every request
-    // if present we will also spread the `headers` set by the user
-    // then we will delete them to avoid collision in next spread
-    const headers = { ...DEFAULT_HEADERS, ...options?.headers };
+  const baseURL = !options?.baseURL ? apiRoute : options.baseURL;
+  const { data, refresh, error, pending } = await useAsyncData(key, () =>
+    $fetch(url, {
+      baseURL: baseURL,
+      onResponseError({ request, response, options }) {
+        if (response.status === 401) {
+          window.location.reload();
+        }
+      },
+      headers,
+      ...opts,
+    })
+  );
 
-    // At this point all the `headers` passed by the user where correctly
-    // set in the defaults, now we will spread `options` to remove the
-    // `headers` attribute, so we don't spread it again in `useFetch`
-    const opts = options ? (({ headers, ...opts }) => opts)(options) : null;
-
-    const baseURL = !options?.baseURL ? apiRoute : options.baseURL;
-    const { data, refresh, error, pending } = await useAsyncData(key,
-        () => $fetch(url, {
-            baseURL: baseURL,
-            onResponseError({ request, response, options }) {
-                if (response.status === 401) {
-                    window.location.reload()
-                }
-            },
-            headers,
-            ...opts
-        })
-    );
-
-    return {
-        data: data.value,
-        error: error.value,
-        refresh,
-        pending
-    }
-
+  return {
+    data: data.value,
+    error: error.value,
+    refresh,
+    pending,
+  };
 };

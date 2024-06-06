@@ -45,11 +45,14 @@ const validationMail = async (payload) => {
 
 const sendOtp = async (payload) => {
   isLoading.value = true;
-  const { data, refresh, error, pending } = await useApi('https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=AIzaSyDT5goQg7ja2wF5VIyMR5ywgzEc_qUtacg', {
-    initialCache: false,
-    body: payload,
-    method: "POST",
-  });
+  const { data, refresh, error, pending } = await useApi(
+    "https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=AIzaSyDT5goQg7ja2wF5VIyMR5ywgzEc_qUtacg",
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
 
   isLoading.value = false;
   console.log(data);
@@ -78,7 +81,7 @@ const login = async (payload) => {
     cleanData = rest;
   }
 
-  if(payload.phone == ""){
+  if (payload.phone == "") {
     const { phone, ...rest } = payload;
     cleanData = rest;
   }
@@ -125,12 +128,26 @@ const resetPassword = async (payload) => {
   return { data, error, refresh, pending };
 };
 
+const logout = async () => {
+  const { data, refresh, error, pending } = await useApi(`/logout`, {
+    initialCache: false,
+    method: "POST",
+  });
+  if (data.success) {
+    //authStore.syncAuthUser(null);
+    const cookie = useCookie("user_access_token");
+    cookie.value = null;
+  }
+  await navigateTo('/auth/login')
+};
+
 export {
   register,
   validationMail,
   sendOtp,
   ResendValidationMail,
   login,
+  logout,
   forgotPassword,
   resetPassword,
   isLoading,

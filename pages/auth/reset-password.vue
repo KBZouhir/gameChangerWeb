@@ -7,6 +7,7 @@ import schema from '~/schemas/auth/resetPassword'
 definePageMeta({
     layout: 'guest',
     title: 'Login Page',
+    middleware: 'guest'
 })
 
 const route = useRoute()
@@ -44,9 +45,7 @@ async function onSubmit(event) {
     }
 
     if (result.data?.success) {
-        setTimeout(async () => {
-            await navigateTo({ path: '/' });
-        }, 1000);
+        await navigateTo({ path: '/' });
     }
 
     if (!result.data?.success) {

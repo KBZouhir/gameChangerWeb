@@ -2,10 +2,13 @@
 import { apiGetInterests, isLoading } from '~/composables/store/useInterests'
 import { apiGetDomains, apiGetDomainBySector } from '~/composables/store/useDomains'
 import { apiGetBusinessSectors } from '~/composables/store/useBusinessSectors'
+import { errorAlert } from "~/composables/useAlert";
+
 
 definePageMeta({
-    layout: 'guest',
+    layout: 'auth',
     title: 'Login Page',
+    middleware: 'auth'
 })
 
 const activeStep = ref(0)
@@ -34,8 +37,7 @@ const formData = reactive({
     }
 });
 
-
-onMounted(() => {
+onBeforeMount(() => {
     getInterests()
     getDomains()
     getBusinessSectors()
@@ -47,6 +49,7 @@ const getInterests = async () => {
         interests.value = data.data
     }
 }
+
 const getDomains = async () => {
     const { data, error } = await apiGetDomains()
     if (!error) {
@@ -57,7 +60,6 @@ const getDomains = async () => {
 const getBusinessSectors = async () => {
     const { data, error } = await apiGetBusinessSectors()
     if (!error) {
-        console.log(data.data);
         businessSectors.value = data.data
     }
 }
@@ -95,15 +97,35 @@ const selectDomain = (domain) => {
         selectedDomains.value.push(domain)
     } else {
         selectedDomains.value = selectedDomains.value.filter(d => d.id !== domain.id);
-        
+
     }
     selectedViewDomains.value = selectedDomains.value
+}
+
+const formValidation = () =>  {
+    formData.domains = selectedViewDomains.value
+
+    if (formData.interests.length == 0) {
+        errorAlert("Interests is required")
+        activeStep.value = 0
+        return
+    }
+    
+    if (formData.domains.length == 0) {
+        errorAlert("domains is required")
+        activeStep.value = 1
+        return
+    }
+}
+
+const submitForm = () => {
+    formValidation()
 }
 </script>
 
 <template>
-    <div class="grid grid-cols-5 gap-0 max-h-screen">
-        <div class="col-span-5 md:col-span-3 h-screen relative">
+    <div class="grid grid-cols-5 gap-0 ">
+        <div class="col-span-5 md:col-span-3 relative" :class="activeStep != 2 ? 'h-screen' : ''">
             <div class="mx-auto h-full flex flex-col max-w-7xl px-2 sm:px-6 lg:px-8 py-8">
                 <h1 class="text-3xl font-bold">Complete profile</h1>
 
@@ -142,35 +164,72 @@ const selectDomain = (domain) => {
                                 class="flex justify-between items-center space-x-4 px-4 py-2 my-2 bg-gray-200 rounded-xl"
                                 v-for="domain in selectedViewDomains">
                                 <span class="text-sm">{{ domain.translated_name }}</span>
-                                <UButton icon="i-heroicons-x-mark" size="2xs" color="red" @click="removeDomain(domain)" square variant="ghost" />
+                                <UButton icon="i-heroicons-x-mark" size="2xs" color="red" @click="removeDomain(domain)"
+                                    square variant="ghost" />
                             </span>
                         </div>
-                        
+
                         <div class="w-full mx-auto text-center px-4">
-                            <UButton size="lg" icon="i-heroicons-plus" color="#F0F0F0" variant="outline" @click="isOpen = true">Add domains</UButton>
+                            <UButton size="lg" icon="i-heroicons-plus" color="#F0F0F0" variant="outline"
+                                @click="isOpen = true">Add
+                                domains</UButton>
                         </div>
-                        
+
                     </div>
                 </div>
 
-                <div v-if="activeStep == 2" class="flex-1 overflow-hidden">
+                <div v-if="activeStep == 2" class="flex-1 overflow-auto">
                     <h1 class="text-2xl font-bold">Enter your address </h1>
                     <p class="text-[#989394]">
                         Select a few of your address to match with users who have similar things in common.
                     </p>
 
-                    <div class="flex space-x-4 my-8">
+                    <div class="pace-x-4 my-8">
+                        <Map v-model="formData.address" />
 
+                        <div class="space-y-4 p-4">
+                            <UFormGroup label="Country" name="country">
+                                <UInput size="lg" placeholder="Country" v-model="formData.address.country" />
+                            </UFormGroup>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <UFormGroup label="City" name="city">
+                                    <UInput size="lg" placeholder="City" v-model="formData.address.city" />
+                                </UFormGroup>
+
+                                <UFormGroup label="Zip code" name="zip_code">
+                                    <UInput size="lg" placeholder="Zip code" v-model="formData.address.zip_code" />
+                                </UFormGroup>
+                            </div>
+
+                            <UFormGroup label="Address" name="address">
+                                <UInput size="lg" placeholder="Address" v-model="formData.address.address" />
+                            </UFormGroup>
+
+                            <UFormGroup label="Lat" name="lat" class="hidden">
+                                <UInput size="lg" v-model="formData.address.lat" />
+                            </UFormGroup>
+
+                            <UFormGroup label="Lon" name="lon" class="hidden">
+                                <UInput size="lg" v-model="formData.address.lon" />
+                            </UFormGroup>
+                        </div>
                     </div>
                 </div>
+
 
                 <div class="flex justify-between space-x-4 my-8">
                     <UButton variant="ghost" @click="activeStep--" :disabled="activeStep <= 0"
                         class="px-6 py-3 text-[#0F1454]">
                         Previous
                     </UButton>
-                    <UButton @click="activeStep++" :disabled="activeStep >= steps - 1" class="px-6 py-3 bg-emerald-400">
+                    <UButton @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="activeStep >= steps - 1"
+                        class="px-6 py-3 bg-emerald-400">
                         Next
+                    </UButton>
+
+                    <UButton @click="submitForm" v-if="activeStep >= steps - 1" class="px-6 py-3 bg-emerald-400">
+                        Finish
                     </UButton>
                 </div>
             </div>
@@ -253,7 +312,9 @@ const selectDomain = (domain) => {
         </div>
         <div class="bg-[#F2F4F8] col-span-2 h-full flex-1 hidden md:flex justify-center items-center relative">
             <img class="absolute right-0 top-0" width="80%" src="~/assets/svg/particules/gradient.svg" alt="">
-            <img src="~/assets/svg/vectors/complete-profile.svg" draggable="false" width="50%">
+            <img src="~/assets/svg/vectors/complete-profile.svg" v-if="activeStep == 0" draggable="false" width="50%">
+            <img src="~/assets/svg/vectors/intelligence.svg" v-if="activeStep == 1" draggable="false" width="50%">
+            <img src="~/assets/svg/vectors/map.svg" v-if="activeStep == 2" draggable="false" width="50%">
         </div>
     </div>
 </template>

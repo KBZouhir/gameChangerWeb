@@ -7,7 +7,8 @@ import { useNuxtApp } from '#app';
 
 definePageMeta({
     layout: 'guest',
-    title: 'Login Page'
+    title: 'Login Page',
+    middleware: 'guest'
 })
 
 const { $auth, $RecaptchaVerifier } = useNuxtApp();
@@ -97,9 +98,7 @@ async function onSubmit(event) {
                 console.log("result", result);
             })
         }
-        //    setTimeout(async() => {
-        //     await navigateTo('/auth/validation', { external: true })
-        //    }, 1000);
+        await navigateTo('/auth/validation')
     }
 }
 
