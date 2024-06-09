@@ -5,7 +5,7 @@ const user = useCookie("current_user");
 
 
 
-const logoutUser = async() => {
+const logoutUser = async () => {
     const result = await logout();
     console.log(result);
 }
@@ -47,15 +47,26 @@ const items = [
                             class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Trainings</a>
                         <a href="#"
                             class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Ressources</a>
-                        <a href="#" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Contact
-                            us</a>
+                        <a href="#" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Contact us</a>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <UButton icon="i-heroicons-pencil-square" size="lg" square variant="soft" />
-                    <UButton icon="i-heroicons-pencil-square" size="lg" square variant="soft" />
-                    <UButton icon="i-heroicons-pencil-square" size="lg" square variant="soft" />
+                    <UButton size="lg" square variant="soft">
+                        <template #leading>
+                            <img src="/assets/svg/icons/search.svg">
+                        </template>
+                    </UButton>
+                    <UButton size="lg" square variant="soft">
+                        <template #leading>
+                            <img src="/assets/svg/icons/notification.svg">
+                        </template>
+                    </UButton>
+                    <UButton size="lg" square variant="soft">
+                        <template #leading>
+                            <img src="/assets/svg/icons/message.svg">
+                        </template>
+                    </UButton>
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                         :popper="{ placement: 'bottom-start' }">
                         <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
@@ -63,7 +74,7 @@ const items = [
                         <template #account="{ item }">
                             <div class="text-left">
                                 <p>
-                                    Signed in as  
+                                    Signed in as
                                 </p>
                                 <p class="truncate font-medium text-gray-900 dark:text-white">
                                     {{ item.label }}
@@ -74,7 +85,8 @@ const items = [
                         <template #item="{ item }">
                             <button class="flex justify-between items-center w-full" @click="item.function">
                                 <span class="truncate">{{ item.label }}</span>
-                                <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
+                                <UIcon :name="item.icon"
+                                    class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
                             </button>
                         </template>
                     </UDropdown>

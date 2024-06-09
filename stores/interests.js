@@ -8,7 +8,7 @@ export const useInterestsStore = defineStore('interestsStore', {
     getInterests: (state) => state.interests,
   },
   actions: {
-    ayscInterests(interests) {
+    setInterests(interests) {
       this.interests = interests;
     }
   },

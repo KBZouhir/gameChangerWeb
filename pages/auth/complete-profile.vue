@@ -2,21 +2,31 @@
 import { apiGetInterests, isLoading } from '~/composables/store/useInterests'
 import { apiGetDomains, apiGetDomainBySector } from '~/composables/store/useDomains'
 import { apiGetBusinessSectors } from '~/composables/store/useBusinessSectors'
+import { completeProfile } from '~/composables/store/useApiAuth'
 import { errorAlert } from "~/composables/useAlert";
+import { useInterestsStore } from "~/stores/interests";
 
 
 definePageMeta({
     layout: 'auth',
     title: 'Login Page',
-    middleware: 'auth'
+    middleware: ['auth',
+    async function (to) {
+        console.log(to);
+      await apiGetInterests();
+    //   await apiGetBusinessSectors()
+    }
+  ]
+    
 })
 
+const intrestStore = useInterestsStore();
 const activeStep = ref(0)
 const isOpen = ref(false)
 const showDomains = ref(false)
 const steps = ref(3)
 
-const interests = ref([])
+const interests = computed(()=>intrestStore.getInterests)
 const domains = ref([])
 const businessSectors = ref([])
 
@@ -37,37 +47,18 @@ const formData = reactive({
     }
 });
 
-onBeforeMount(() => {
-    getInterests()
-    getDomains()
-    getBusinessSectors()
-})
 
-const getInterests = async () => {
-    const { data, error } = await apiGetInterests()
-    if (!error) {
-        interests.value = data.data
-    }
+
+
+const getDataFromApi = async () => {
+    // await apiGetInterests()
 }
 
-const getDomains = async () => {
-    const { data, error } = await apiGetDomains()
-    if (!error) {
-        domains.value = data.data
-    }
-}
-
-const getBusinessSectors = async () => {
-    const { data, error } = await apiGetBusinessSectors()
-    if (!error) {
-        businessSectors.value = data.data
-    }
-}
 
 const getdomain = async (sector) => {
     selectedSector.value = sector
     const qurey = { business_sector: selectedSector.value.id }
-    const { data, error } = await apiGetDomainBySector(qurey)
+    await apiGetDomainBySector(qurey)
     if (!error) {
         domains.value = data.data
         showDomains.value = true
@@ -118,8 +109,33 @@ const formValidation = () =>  {
     }
 }
 
-const submitForm = () => {
+
+watchEffect(() => {
+    getDataFromApi();
+})
+
+const submitForm = async () => {
     formValidation()
+
+    let payload = {
+        address: null,
+        interests: [],
+        domains: [],
+    }
+
+    formData.interests.forEach((item) => {
+        payload.interests.push(item.id)
+    })
+
+    formData.domains.forEach((item) => {
+        payload.domains.push(item.id)
+    })
+
+    payload.address = formData.address
+
+    //console.log(payload);
+    const result = await completeProfile(payload)
+
 }
 </script>
 
@@ -247,7 +263,9 @@ const submitForm = () => {
 
                         <UInput placeholder="Search what you need..." size="xl" color="gray" class="my-4">
                             <template #trailing>
-                                <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
+                                <span class="text-gray-500 dark:text-gray-400 text-xs">
+                                    <img src="/assets/svg/icons/search.svg" alt="" srcset="">
+                                </span>
                             </template>
                         </UInput>
 

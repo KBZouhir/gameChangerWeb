@@ -66,7 +66,7 @@ const initializeAutocomplete = () => {
                 city: getAddressComponent('administrative_area_level_1'),
                 zip_code: getAddressComponent('postal_code') || getAddressComponent('administrative_area_level_5') || getAddressComponent('postal_code'),
                 lat: place.geometry.location ? place.geometry.location.lat() : null,
-                lng: place.geometry.location ? place.geometry.location.lng() : null,
+                lon: place.geometry.location ? place.geometry.location.lng() : null,
                 address: place.formatted_address
             }
 

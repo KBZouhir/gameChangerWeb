@@ -12,8 +12,9 @@ const apiGetInterests = async () => {
   });
 
   isLoading.value = false;
+console.log(data);
+  store.setInterests(data.data)
 
-  return { data, error, refresh, pending };
 };
 
 export {

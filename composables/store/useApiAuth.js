@@ -128,6 +128,20 @@ const resetPassword = async (payload) => {
   return { data, error, refresh, pending };
 };
 
+
+const completeProfile = async (payload) => {
+  isLoading.value = true;
+  const { data, refresh, error, pending } = await useApi(`/complete-profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  isLoading.value = false;
+
+  return { data, error, refresh, pending };
+};
+
 const logout = async () => {
   const { data, refresh, error, pending } = await useApi(`/logout`, {
     initialCache: false,
@@ -148,6 +162,7 @@ export {
   ResendValidationMail,
   login,
   logout,
+  completeProfile,
   forgotPassword,
   resetPassword,
   isLoading,
