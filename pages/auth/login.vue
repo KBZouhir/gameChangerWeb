@@ -1,7 +1,7 @@
 <script setup>
 import { useNuxtApp } from '#app';
 import { z } from "zod";
-import { login, ResendValidationMail, sendOtp, isLoading } from '~/composables/store/useApiAuth'
+import { login, ResendValidationMail, sendOtp } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
 const { $auth, $RecaptchaVerifier } = useNuxtApp();
 
@@ -20,6 +20,7 @@ const state = reactive({
 })
 
 let isPhoneInput = ref(false)
+let isLoading = ref(false)
 let recaptchaToken = ref(null);
 const form = ref()
 
@@ -80,8 +81,11 @@ const getRecaptchaToken = async () => {
 };
 
 async function onSubmit(event) {
+    isLoading.value = true;
     const { data } = event
     const result = await login(data);
+    isLoading.value = false;
+
     if (!result.data) {
         const error = handleApiError(result.error);
         if (error.status === 422) {
@@ -117,6 +121,7 @@ async function onSubmit(event) {
         }
 
     }
+
 }
 
 </script>

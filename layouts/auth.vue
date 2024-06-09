@@ -6,7 +6,6 @@
             <NuxtPage />
         </div>
 
-        <PartialsFooter/>
 
     </div>
 </template>

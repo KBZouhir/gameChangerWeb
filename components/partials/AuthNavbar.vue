@@ -1,8 +1,10 @@
 <script setup>
-import { logout, isLoading } from '~/composables/store/useApiAuth'
+import { logout } from '~/composables/store/useApiAuth'
+import { useAuthStore } from '~/stores/authStore'
 
-const user = useCookie("current_user");
-
+const authStore = useAuthStore();
+const user = computed(()=>authStore.getAuthUser);
+console.log(user);
 
 
 const logoutUser = async () => {
@@ -32,7 +34,7 @@ const items = [
 
 <template>
     <nav class="bg-white dark:bg-slate-800">
-        <div class="mx-auto max-w-8xl px-2 sm:px-6 lg:px-8">
+        <div class="mx-auto w-full max-w-screen-xl px-2">
             <div class="relative flex h-20 items-center justify-between">
                 <div class="flex items-center justify-center sm:items-stretch sm:justify-start">
                     <div class="flex flex-shrink-0 items-center dark:hidden">

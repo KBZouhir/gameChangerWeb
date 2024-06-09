@@ -1,10 +1,8 @@
 import { useApi } from "~/composables/useApi";
-import { successAlert } from "~/composables/useAlert";
-
-const isLoading = ref(false);
+import { successAlert, errorAlert } from "~/composables/useAlert";
+import { useAuthStore } from "~/stores/authStore";
 
 const register = async (payload) => {
-  isLoading.value = true;
   let cleanData = { ...payload };
   if (!payload.email || payload.email === "0") {
     const { email, ...rest } = payload;
@@ -16,26 +14,23 @@ const register = async (payload) => {
     method: "POST",
   });
 
-  isLoading.value = false;
   if (data) {
     successAlert(data.message);
     const userTokenCookie = useCookie("user_access_token");
-    const currentUserCookie = useCookie("current_user");
+    // const currentUserCookie = useCookie("current_user");
     userTokenCookie.value = data.token;
-    currentUserCookie.value = data.user;
+    // currentUserCookie.value = data.user;
   }
   return { data, error, refresh, pending };
 };
 
 const validationMail = async (payload) => {
-  isLoading.value = true;
   const { data, refresh, error, pending } = await useApi(`/email/verify`, {
     initialCache: false,
     body: payload,
     method: "POST",
   });
 
-  isLoading.value = false;
   if (data) {
     successAlert(data.message);
     //store.setSeason(data.season);
@@ -44,8 +39,7 @@ const validationMail = async (payload) => {
 };
 
 const sendOtp = async (payload) => {
-  isLoading.value = true;
-  const { data, refresh, error, pending } = await useApi(
+  return await useApi(
     "https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=AIzaSyDT5goQg7ja2wF5VIyMR5ywgzEc_qUtacg",
     {
       initialCache: false,
@@ -53,28 +47,18 @@ const sendOtp = async (payload) => {
       method: "POST",
     }
   );
-
-  isLoading.value = false;
-  console.log(data);
-  return { data, error, refresh, pending };
 };
 
 const ResendValidationMail = async () => {
-  isLoading.value = true;
-  const { data, refresh, error, pending } = await useApi(`/email/resend`, {
+  return await useApi(`/email/resend`, {
     initialCache: false,
     method: "POST",
   });
-
-  isLoading.value = false;
-  if (data) {
-    successAlert(data.message);
-  }
-  return { data, error, refresh, pending };
 };
 
 const login = async (payload) => {
-  isLoading.value = true;
+  const authStore = useAuthStore();
+
   let cleanData = { ...payload };
   if (!payload.email || payload.email === "0") {
     const { email, ...rest } = payload;
@@ -91,53 +75,43 @@ const login = async (payload) => {
     method: "POST",
   });
 
-  isLoading.value = false;
+ 
   if (data) {
     successAlert(data.message);
     const userTokenCookie = useCookie("user_access_token");
-    const currentUserCookie = useCookie("current_user");
     userTokenCookie.value = data.token;
-    currentUserCookie.value = data.user;
+
+    authStore.syncAuthUser(data.user);
   }
   return { data, error, refresh, pending };
 };
 
 const forgotPassword = async (payload) => {
-  isLoading.value = true;
   const { data, refresh, error, pending } = await useApi(`/forgot-password`, {
     initialCache: false,
     body: payload,
     method: "POST",
   });
 
-  isLoading.value = false;
-
   return { data, error, refresh, pending };
 };
 
 const resetPassword = async (payload) => {
-  isLoading.value = true;
   const { data, refresh, error, pending } = await useApi(`/password/reset`, {
     initialCache: false,
     body: payload,
     method: "POST",
   });
 
-  isLoading.value = false;
-
   return { data, error, refresh, pending };
 };
 
-
 const completeProfile = async (payload) => {
-  isLoading.value = true;
   const { data, refresh, error, pending } = await useApi(`/complete-profile`, {
     initialCache: false,
     body: payload,
     method: "POST",
   });
-
-  isLoading.value = false;
 
   return { data, error, refresh, pending };
 };
@@ -152,10 +126,34 @@ const logout = async () => {
     const cookie = useCookie("user_access_token");
     cookie.value = null;
   }
-  await navigateTo('/auth/login')
+  await navigateTo("/auth/login");
 };
+ async function useUser() {
+  const authStore = useAuthStore();
+  const cookie = useCookie("user_access_token");
+  const token = cookie.value;
+  let user = authStore.getAuthUser;
+  if (token && user == null) {
+    const key = `me-${(Math.random() + 1).toString(36).substring(7)}`;
+
+    const { data, error } = await useApi(`/me`, {
+      initialCache: false,
+    });
+
+    if (error) {
+      authStore.syncAuthUser(null);
+    }
+
+    if (data) {
+      authStore.syncAuthUser(data.user);
+    }
+  }
+  // return user;
+}
+
 
 export {
+  useUser,
   register,
   validationMail,
   sendOtp,
@@ -165,5 +163,4 @@ export {
   completeProfile,
   forgotPassword,
   resetPassword,
-  isLoading,
 };

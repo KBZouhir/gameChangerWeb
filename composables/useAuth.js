@@ -1,4 +1,4 @@
-import {useAuthStore} from "~/store/authStore";
+import {useAuthStore} from "~/stores/authStore";
 import {useApi} from "~/composables/useApi";
 
 export async function useUser() {
@@ -11,7 +11,8 @@ export async function useUser() {
       const key = `me-${(Math.random() + 1).toString(36).substring(7)}`;
 
       const { data, error } = await useApi(`/me`, {
-        initialCache: false,
+          initialCache: false,
+          key:key,
       }); 
         
         

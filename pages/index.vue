@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-      ffff
+      Landing page
   </div>
 </template>
 
