@@ -14,7 +14,7 @@ definePageMeta({
     async function (to) {
         console.log(to);
       await apiGetInterests();
-    //   await apiGetBusinessSectors()
+    //await apiGetBusinessSectors()
     }
   ]
     
