@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 export const useInterestsStore = defineStore('interestsStore', {
   state: () => ({
-    interests: null,
+    interests: [],
   }),
   getters: {
     getInterests: (state) => state.interests,

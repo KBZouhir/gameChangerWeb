@@ -2,13 +2,13 @@ import { defineStore } from 'pinia';
 
 export const useDomainsStore = defineStore('domainsStore', {
   state: () => ({
-    domains: null,
+    domains: [],
   }),
   getters: {
     getDomains: (state) => state.domains,
   },
   actions: {
-    ayscDomains(domains) {
+    setDomains(domains) {
       this.domains = domains;
     }
   },

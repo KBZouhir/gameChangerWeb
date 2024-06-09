@@ -128,7 +128,8 @@ const logout = async () => {
   }
   await navigateTo("/auth/login");
 };
- async function useUser() {
+
+async function useUser() {
   const authStore = useAuthStore();
   const cookie = useCookie("user_access_token");
   const token = cookie.value;

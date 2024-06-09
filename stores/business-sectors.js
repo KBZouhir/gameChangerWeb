@@ -1,15 +1,15 @@
 import { defineStore } from 'pinia';
 
-export const useBusinessSectorsStore = defineStore('BusinessSectorsStore', {
+export const useBusinessSectorsStore = defineStore("BusinessSectorsStore", {
   state: () => ({
-    businessSectors: null,
+    businessSectors: [],
   }),
   getters: {
-    getDomains: (state) => state.businessSectors,
+    getBusinessSectors: (state) => state.businessSectors,
   },
   actions: {
-    ayscDomains(businessSectors) {
+    setBusinessSectors(businessSectors) {
       this.businessSectors = businessSectors;
-    }
+    },
   },
 });

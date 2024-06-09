@@ -1,37 +1,22 @@
 import { useApi } from "~/composables/useApi";
 import { useDomainsStore } from "~/stores/domains";
 
-const isLoading = ref(false);
 
-const apiGetDomains = async () => {
+export const apiGetDomains = async () => {
   const store = useDomainsStore();
-  isLoading.value = true;
   const { data, refresh, error, pending } = await useApi(`/domains?per_page=0`, {
     initialCache: false,
     method: "GET",
   });
-
-  isLoading.value = false;
-
-  return { data, error, refresh, pending };
+  store.setDomains(data.data)
 };
 
-const apiGetDomainBySector = async (query = null) => {
-  const store = useDomainsStore();
-  isLoading.value = true;
+export const apiGetDomainBySector = async (query = null) => {
   const urlParams = new URLSearchParams(query).toString();
   const { data, refresh, error, pending } = await useApi(`/domains?per_page=0&${urlParams}`, {
     initialCache: false,
     method: "GET",
   });
-
-  isLoading.value = false;
-
-  return { data, error, refresh, pending };
+  store.setDomains(data.data);
 };
 
-export {
-    apiGetDomains,
-    apiGetDomainBySector,
-    isLoading,
-};

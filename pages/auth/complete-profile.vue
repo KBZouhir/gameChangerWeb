@@ -22,6 +22,7 @@ definePageMeta({
 const intrestStore = useInterestsStore();
 const activeStep = ref(0);
 const isOpen = ref(false);
+const isOpenMap = ref(true);
 const showDomains = ref(false);
 const isLoading = ref(false);
 const steps = ref(3);
@@ -223,9 +224,9 @@ const submitForm = async () => {
             </p>
 
             <div class="pace-x-4 my-8">
-              <Map v-model="formData.address" />
+              <Map v-model="formData.address"  :is-open-map="true"  />
 
-              <div class="space-y-4 p-4">
+              <div class="space-y-4 p-1 pt-4 " v-if="formData.address.address.length>0" >
                 <UFormGroup label="Country" name="country">
                   <UInput
                     size="lg"

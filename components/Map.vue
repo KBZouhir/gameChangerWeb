@@ -3,11 +3,15 @@
         <div class="relative">
             <input type="text" ref="autocompleteInput" autofocus placeholder="Enter an address"
                 class="relative block w-full disabled:cursor-not-allowed disabled:opacity-75 focus:outline-none border-0 form-input rounded-md placeholder-gray-400 dark:placeholder-gray-500 text-base px-3.5 py-2.5 shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 mb-3" />
-        </div>
-        <GMapMap :center="mapCenter" :zoom="12" style="width: 100%; height: 360px;border-radius:8px;overflow: hidden;">
-            <GMapMarker v-for="(marker, index) in markers" :key="index" :position="marker.position" :draggable="false"
-                @dragend="onMarkerDragEnd(index, $event)" />
+        
+        <GMapMap :center="mapCenter"  :zoom="12" :style="{width: '100%', height: isOpenMap?'360px':'200px',borderRadius:'8px',overflow: 'hidden'}">
+            <GMapMarker v-for="(marker, index) in markers"
+             :key="index"
+             :position="marker.position"
+             :draggable="true"
+              @dragend="onMarkerDragEnd(index, $event)" />
         </GMapMap>
+        </div>
     </div>
 </template>
 
@@ -17,6 +21,7 @@ const mapCenter = ref({ lat: 37.7749, lng: -122.4194 })
 
 const props = defineProps({
     modelValue: { type: [Array, Boolean] },
+    isOpenMap: { type: Boolean },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -42,6 +47,11 @@ const moveMarker = () => {
     markers.value[0].position.lng = addressComponents.value.lng
     mapCenter.value.lat = addressComponents.value.lat
     mapCenter.value.lng = addressComponents.value.lng
+}
+
+const onMarkerDragEnd = (index,event) => {
+    console.log(index,event.latLng);
+    
 }
 
 const initializeAutocomplete = () => {
