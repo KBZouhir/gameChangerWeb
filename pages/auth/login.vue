@@ -96,7 +96,7 @@ async function onSubmit(event) {
         const { is_completed, is_email_verified, is_phone_verified, phone, email } = result.data.user
         if (is_completed && (is_email_verified || is_phone_verified)) {
             // go to dashboard
-             navigateTo('dashboard')
+            navigateTo('dashboard')
             return
         }
 
@@ -121,7 +121,6 @@ async function onSubmit(event) {
         }
 
     }
-
 }
 
 </script>
@@ -130,23 +129,23 @@ async function onSubmit(event) {
     <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
             <UCard class="md:w-3/5 w-full p-8 relative z-50">
-                <h2 class="text-3xl font-bold">Welcome Back</h2>
-                <p class="text-blueGray-900 dark:text-slate-300">Please log in to continue</p>
+                <h2 class="text-3xl font-bold">{{ $t('login.welcome_back') }}</h2>
+                <p class="text-blueGray-900 dark:text-slate-300">{{ $t('login.please_log_in') }}</p>
 
                 <UForm ref="form" :schema="schema" :state="state" @submit="onSubmit" class="mt-8">
                     <div class="mt-8">
-                        <UFormGroup label="Email Address" name="email" v-if="!isPhoneInput">
-                            <UInput v-model="state.email" size="lg" autofocus placeholder="exmple@mail.com" />
+                        <UFormGroup :label="$t('login.email_address')" name="email" v-if="!isPhoneInput">
+                            <UInput v-model="state.email" size="lg" autofocus
+                                :placeholder="$t('login.example_email')" />
                         </UFormGroup>
                         <UFormGroup name="phone" v-else>
                             <IntlTelInput v-model="state.phone" @hidePhone="hidePhoneComp" />
                         </UFormGroup>
-
                     </div>
 
                     <div class="mt-4">
-                        <UFormGroup v-slot="{ error }" label="Password" name="password"
-                            help="It must be a combination of minimum 8 letters, numbers, and symbols.">
+                        <UFormGroup v-slot="{ error }" :label="$t('login.password')" name="password"
+                            :help="$t('login.password_help')">
                             <UInput :type="(showPassword) ? 'text' : 'password'" id="password" size="lg"
                                 v-model="state.password" placeholder="********" autocomplete>
                                 <template #trailing>
@@ -157,26 +156,25 @@ async function onSubmit(event) {
                                 </template>
                             </UInput>
                         </UFormGroup>
-
-
                     </div>
 
                     <div class="flex justify-between items-center mt-4">
-                        <UCheckbox class="text-sm" name="notifications" label="Remember me" />
+                        <UCheckbox class="text-sm" name="notifications" :label="$t('login.remember_me')" />
                         <NuxtLink to="forgotpassword"
                             class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
-                            Forgot Password?
+                            {{ $t('login.forgot_password') }}
                         </NuxtLink>
                     </div>
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400">Log
-                            In</UButton>
+                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400">{{
+                            $t('login.login_button') }}
+                        </UButton>
                     </div>
 
                     <UDivider label="" class="my-6 border-blueGray-700" />
 
-                    <p class="mb-6 mt-4 text-center text-sm">Or log in with:</p>
+                    <p class="mb-6 mt-4 text-center text-sm">{{ $t('login.or_log_in_with') }}</p>
                     <div class="grid grid-cols-2 gap-6">
                         <MediaButton type="google" @click="googleLogin()" />
                         <MediaButton type="twitter" />
@@ -186,7 +184,7 @@ async function onSubmit(event) {
                     <div class="text-center">
                         <NuxtLink to="/auth/register"
                             class="my-6 text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
-                            No account yet? Sign Up
+                            {{ $t('login.no_account') }}
                         </NuxtLink>
                     </div>
 

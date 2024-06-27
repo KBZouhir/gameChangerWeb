@@ -5,35 +5,39 @@ import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors";
 import { completeProfile } from "~/composables/store/useApiAuth";
 import { errorAlert } from "~/composables/useAlert";
 import { useInterestsStore } from "~/stores/interests";
+import { useBusinessSectorsStore } from "~/stores/business-sectors";
+import { useDomainsStore } from "~/stores/domains";
 
 definePageMeta({
   layout: "auth",
   title: "Login Page",
-  middleware: [
-    "auth",
-    async function (to) {
-      console.log(to);
-      await apiGetInterests();
-      //await apiGetBusinessSectors()
-    },
-  ],
 });
 
 const intrestStore = useInterestsStore();
+const intrestBusinessSectorStore = useBusinessSectorsStore();
+const intrestDomainsStore = useDomainsStore();
+
 const activeStep = ref(0);
 const isOpen = ref(false);
 const isOpenMap = ref(true);
 const showDomains = ref(false);
 const isLoading = ref(false);
 const steps = ref(3);
+const searchBuinessSector = ref();
+
 
 const interests = computed(() => intrestStore.getInterests);
-const domains = ref([]);
-const businessSectors = ref([]);
+const domains = computed(() => intrestDomainsStore.getDomains);
+const businessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
 
 const selectedSector = ref(null);
 const selectedDomains = ref([]);
 const selectedViewDomains = ref([]);
+const filteredBusinessSectors = ref([]);
+
+onMounted(()=> {
+  filteredBusinessSectors.value = intrestBusinessSectorStore.getBusinessSectors
+})
 
 const formData = reactive({
   interests: [],
@@ -49,17 +53,26 @@ const formData = reactive({
 });
 
 const getDataFromApi = async () => {
-  // await apiGetInterests()
+  await apiGetInterests();
+  await apiGetBusinessSectors()
 };
+
+watchEffect(() => {
+  getDataFromApi();
+});
+
+watch( () => searchBuinessSector.value, (val) => {
+  searchBuinessSectors(val);
+});
 
 const getdomain = async (sector) => {
   selectedSector.value = sector;
   const qurey = { business_sector: selectedSector.value.id };
-  await apiGetDomainBySector(qurey);
-  if (!error) {
-    domains.value = data.data;
-    showDomains.value = true;
-  }
+  isLoading.value = true;
+  await apiGetDomainBySector(qurey).then(()=> {
+    isLoading.value = false;
+  });
+  showDomains.value = true;
 };
 
 const isSelected = (domain) => {
@@ -91,6 +104,10 @@ const selectDomain = (domain) => {
   selectedViewDomains.value = selectedDomains.value;
 };
 
+const searchBuinessSectors = (name) => {
+  filteredBusinessSectors.value = businessSectors.value.filter((businessSector) => businessSector.translated_name.toLowerCase().includes(name.toLowerCase()));
+}
+
 const formValidation = () => {
   formData.domains = selectedViewDomains.value;
 
@@ -106,10 +123,6 @@ const formValidation = () => {
     return;
   }
 };
-
-watchEffect(() => {
-  getDataFromApi();
-});
 
 const submitForm = async () => {
   formValidation();
@@ -137,10 +150,8 @@ const submitForm = async () => {
 
 <template>
   <div class="relative bg-slate-50 dark:bg-slate-800">
-    <div
-      class="mx-auto max-w-s w-full max-w-screen-xl  h-full   grid grid-cols-5 gap-0 "
-      :class="activeStep != 2 ? 'h-screen' : ''"
-    >
+    <div class="mx-auto max-w-s w-full max-w-screen-xl  h-full   grid grid-cols-5 gap-0 "
+      :class="activeStep != 2 ? 'h-screen' : ''">
       <div class="flex justify-center items-center col-span-5 lg:col-span-3 ">
         <div class="h-full flex flex-col w-full px-4 sm:px-6 lg:px-2 py-8">
           <h1 class="text-3xl font-bold">Complete profile</h1>
@@ -156,11 +167,7 @@ const submitForm = async () => {
             <div class="h-full">
               <div class="flex flex-wrap gap-4 py-8 overflow-auto">
                 <template v-for="interest in interests" key="person.name">
-                  <CustomCheckbox
-                    :label="interest.name"
-                    v-model="formData.interests"
-                    :value="interest"
-                  />
+                  <CustomCheckbox :label="interest.name" v-model="formData.interests" :value="interest" />
                 </template>
               </div>
             </div>
@@ -173,45 +180,30 @@ const submitForm = async () => {
               things in common.
             </p>
 
-            <div
-              v-if="selectedViewDomains.length == 0"
-              class="flex flex-1 justify-center items-center gap-4 py-8 overflow-auto bg-slate-50 mt-4 border-dashed border-2 border-[#ABB7C8] rounded-md"
-            >
+            <div v-if="selectedViewDomains.length == 0"
+              class="flex flex-1 justify-center items-center gap-4 py-8 overflow-auto bg-slate-50 mt-4 border-dashed border-2 border-[#ABB7C8] rounded-md">
               <button class="flex space-x-4" @click="isOpen = true">
                 <p class="text-[#0F1454] text-md">Add domains</p>
               </button>
             </div>
 
-            <div
-              v-if="selectedViewDomains.length > 0"
-              class="flex flex-col flex-1 relative gap-4 py-8 overflow-auto bg-slate-50 mt-4 border-dashed border-2 border-[#ABB7C8] rounded-md"
-            >
-              <div class="flex flex-wrap items-start space-x-4 flex-1 px-4">
-                <span
-                  class="flex justify-between items-center space-x-4 px-4 py-2 my-2 bg-gray-200 rounded-xl"
-                  v-for="domain in selectedViewDomains"
-                >
-                  <span class="text-sm">{{ domain.translated_name }}</span>
-                  <UButton
-                    icon="i-heroicons-x-mark"
-                    size="2xs"
-                    color="red"
-                    @click="removeDomain(domain)"
-                    square
-                    variant="ghost"
-                  />
-                </span>
+            <div v-if="selectedViewDomains.length > 0"
+              class="flex flex-col flex-1 relative gap-4 py-8 overflow-auto bg-slate-50 mt-4 border-dashed border-2 border-[#ABB7C8] rounded-md">
+              <div class="flex flex-wrap">
+                <div class="flex flex-wrap items-start space-x-4 flex-1 px-4">
+                  <span class="flex justify-between items-center space-x-4 px-4 py-2 my-2 bg-gray-200 rounded-xl"
+                    v-for="domain in selectedViewDomains">
+                    <span class="text-sm">{{ domain.translated_name }}</span>
+                    <UButton icon="i-heroicons-x-mark" size="2xs" color="red" @click="removeDomain(domain)" square
+                      variant="ghost" />
+                  </span>
+                </div>
               </div>
 
               <div class="w-full mx-auto text-center px-4">
-                <UButton
-                  size="lg"
-                  icon="i-heroicons-plus"
-                  color="#F0F0F0"
-                  variant="outline"
-                  @click="isOpen = true"
-                  >Add domains</UButton
-                >
+                <UButton size="lg" icon="i-heroicons-plus" color="#F0F0F0" variant="outline" @click="isOpen = true">Add
+                  domains
+                </UButton>
               </div>
             </div>
           </div>
@@ -224,41 +216,25 @@ const submitForm = async () => {
             </p>
 
             <div class="pace-x-4 my-8">
-              <Map v-model="formData.address"  :is-open-map="true"  />
+              <Map v-model="formData.address" :is-open-map="true" />
 
-              <div class="space-y-4 p-1 pt-4 " v-if="formData.address.address.length>0" >
+              <div class="space-y-4 p-1 pt-4 " v-if="formData.address.address.length > 0">
                 <UFormGroup label="Country" name="country">
-                  <UInput
-                    size="lg"
-                    placeholder="Country"
-                    v-model="formData.address.country"
-                  />
+                  <UInput size="lg" placeholder="Country" v-model="formData.address.country" />
                 </UFormGroup>
 
                 <div class="grid grid-cols-2 gap-4">
                   <UFormGroup label="City" name="city">
-                    <UInput
-                      size="lg"
-                      placeholder="City"
-                      v-model="formData.address.city"
-                    />
+                    <UInput size="lg" placeholder="City" v-model="formData.address.city" />
                   </UFormGroup>
 
                   <UFormGroup label="Zip code" name="zip_code">
-                    <UInput
-                      size="lg"
-                      placeholder="Zip code"
-                      v-model="formData.address.zip_code"
-                    />
+                    <UInput size="lg" placeholder="Zip code" v-model="formData.address.zip_code" />
                   </UFormGroup>
                 </div>
 
                 <UFormGroup label="Address" name="address">
-                  <UInput
-                    size="lg"
-                    placeholder="Address"
-                    v-model="formData.address.address"
-                  />
+                  <UInput size="lg" placeholder="Address" v-model="formData.address.address" />
                 </UFormGroup>
 
                 <UFormGroup label="Lat" name="lat" class="hidden">
@@ -273,28 +249,15 @@ const submitForm = async () => {
           </div>
 
           <div class="flex justify-between space-x-4 my-8">
-            <UButton
-              variant="ghost"
-              @click="activeStep--"
-              :disabled="activeStep <= 0"
-              class="px-6 py-3 text-[#0F1454]"
-            >
+            <UButton variant="ghost" @click="activeStep--" :disabled="activeStep <= 0" class="px-6 py-3 text-[#0F1454]">
               Previous
             </UButton>
-            <UButton
-              @click="activeStep++"
-              v-if="activeStep + 1 != steps"
-              :disabled="activeStep >= steps - 1"
-              class="px-10 py-3 bg-emerald-400"
-            >
+            <UButton @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="activeStep >= steps - 1"
+              class="px-10 py-3 bg-emerald-400">
               Next
             </UButton>
 
-            <UButton
-              @click="submitForm"
-              v-if="activeStep >= steps - 1"
-              class="px-6 py-3 bg-emerald-400"
-            >
+            <UButton @click="submitForm" v-if="activeStep >= steps - 1" class="px-6 py-3 bg-emerald-400">
               Finish
             </UButton>
           </div>
@@ -302,17 +265,10 @@ const submitForm = async () => {
         <Loading v-model="isLoading" />
 
         <USlideover v-model="isOpen">
+          <Loading v-model="isLoading" />
           <div class="p-4 flex-1 overflow-y-auto">
-            <UButton
-              color="gray"
-              variant="ghost"
-              size="sm"
-              icon="i-heroicons-x-mark-20-solid"
-              class="flex sm:hidden absolute end-5 top-5 z-10"
-              square
-              padded
-              @click="isOpen = false"
-            />
+            <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
+              class="flex sm:hidden absolute end-5 top-5 z-10" square padded @click="isOpen = false" />
             <div class="flex flex-col p-2" v-if="!showDomains">
               <h1 class="text-2xl font-bold">Select your business sector</h1>
               <p class="text-[#989394]">
@@ -320,12 +276,7 @@ const submitForm = async () => {
                 things in common.
               </p>
 
-              <UInput
-                placeholder="Search what you need..."
-                size="xl"
-                color="gray"
-                class="my-4"
-              >
+              <UInput placeholder="Search what you need..." v-model="searchBuinessSector" size="xl" color="gray" class="my-4">
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-xs">
                     <img src="/assets/svg/icons/search.svg" alt="" srcset="" />
@@ -334,16 +285,11 @@ const submitForm = async () => {
               </UInput>
 
               <div class="flex-1 overscroll-y-auto">
-                <div
-                  v-for="businessSector in businessSectors"
-                  @click="getdomain(businessSector)"
-                  :class="
-                    isSectorOnDomain(businessSector)
-                      ? 'bg-green-100 hover:bg-green-200 border-green-300'
-                      : ''
+                <div v-for="businessSector in filteredBusinessSectors" @click="getdomain(businessSector)" :class="isSectorOnDomain(businessSector)
+                    ? 'bg-green-100 hover:bg-green-200 border-green-300'
+                    : ''
                   "
-                  class="border-[1px] border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer"
-                >
+                  class="border-[1px] border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer">
                   <div class="text-[#0F1454]">
                     <h3 class="font-bold text-xl">
                       {{ businessSector.translated_name }}
@@ -356,20 +302,9 @@ const submitForm = async () => {
                       </span>
                     </small>
                   </div>
-                  <svg
-                    width="10"
-                    height="18"
-                    viewBox="0 0 12 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2.19995 1.80078L10.36 9.96078L2.19995 18.1208"
-                      stroke="#0F172A"
-                      stroke-width="2.72"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
+                  <svg width="10" height="18" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.19995 1.80078L10.36 9.96078L2.19995 18.1208" stroke="#0F172A" stroke-width="2.72"
+                      stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </div>
               </div>
@@ -384,28 +319,16 @@ const submitForm = async () => {
                 Select a few of your working domain to match with things in common.
               </p>
 
-              <UInput
-                placeholder="Search what you need..."
-                size="xl"
-                color="gray"
-                class="my-4"
-              >
+              <UInput placeholder="Search what you need..." size="xl" color="gray" class="my-4">
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
                 </template>
               </UInput>
 
               <div class="flex-1 overscroll-y-auto">
-                <div
-                  v-for="domain in domains"
-                  @click="selectDomain(domain)"
-                  :class="
-                    isSelected(domain)
-                      ? 'bg-green-100 hover:bg-green-200 border-green-300'
-                      : ''
-                  "
-                  class="border-[1px] border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer"
-                >
+                <div v-for="domain in domains" @click="selectDomain(domain)"
+                  :class="isSelected(domain) ? 'bg-green-100 hover:bg-green-200 border-green-300' : ''"
+                  class="border-[1px] border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer">
                   <div class="text-[#0F1454]">
                     <h3 class="font-bold text-xl">{{ domain.translated_name }}</h3>
                   </div>
@@ -414,31 +337,24 @@ const submitForm = async () => {
               </div>
 
               <div class="grid grid-cols-2 gap-4 sticky bottom-0 bg-white py-4">
-                <UButton
-                  block
-                  color="primary"
-                  size="lg"
-                  @click="
+                <UButton block color="primary" size="lg" @click="
                     {
-                      selectedSector = null;
-                      showDomains = false;
-                    }
-                  "
-                  variant="outline"
-                  >Back</UButton
-                >
+                  selectedSector = null;
+                  showDomains = false;
+                }
+                  " variant="outline">Back</UButton>
                 <UButton block size="lg" label="Save" @click="dispalyDomains" />
               </div>
             </div>
           </div>
         </USlideover>
       </div>
-       <div class=" col-span-2 h-full flex-1 hidden lg:flex justify-center items-center relative">
-            <img class="absolute right-0 top-0" width="80%" src="~/assets/svg/particules/gradient.svg" alt="">
-            <img src="~/assets/svg/vectors/complete-profile.svg" v-if="activeStep == 0" draggable="false" width="50%">
-            <img src="~/assets/svg/vectors/intelligence.svg" v-if="activeStep == 1" draggable="false" width="50%">
-            <img src="~/assets/svg/vectors/map.svg" v-if="activeStep == 2" draggable="false" width="50%">
-        </div>
+      <div class=" col-span-2 h-full flex-1 hidden lg:flex justify-center items-center relative">
+        <img class="absolute right-0 top-0" width="80%" src="~/assets/svg/particules/gradient.svg" alt="">
+        <img src="~/assets/svg/vectors/complete-profile.svg" v-if="activeStep == 0" draggable="false" width="50%">
+        <img src="~/assets/svg/vectors/intelligence.svg" v-if="activeStep == 1" draggable="false" width="50%">
+        <img src="~/assets/svg/vectors/map.svg" v-if="activeStep == 2" draggable="false" width="50%">
+      </div>
     </div>
   </div>
 </template>

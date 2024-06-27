@@ -12,6 +12,7 @@ export const apiGetDomains = async () => {
 };
 
 export const apiGetDomainBySector = async (query = null) => {
+  const store = useDomainsStore();
   const urlParams = new URLSearchParams(query).toString();
   const { data, refresh, error, pending } = await useApi(`/domains?per_page=0&${urlParams}`, {
     initialCache: false,

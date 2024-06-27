@@ -4,7 +4,7 @@ import { useAuthStore } from '~/stores/authStore'
 
 const authStore = useAuthStore();
 const user = computed(()=>authStore.getAuthUser);
-console.log(user);
+console.log(user.value);
 
 
 const logoutUser = async () => {
@@ -14,7 +14,7 @@ const logoutUser = async () => {
 
 const items = [
     [{
-        label: user.value.full_name,
+        label: user.value?.full_name,
         slot: 'account',
         disabled: true
     }], [{

@@ -26,7 +26,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      googleMapsApiKey: 'AIzaSyCGknJpFjo7lwAIMDBruZgT56TdZYGotnA',  // Replace with your actual API key
+      googleMapsApiKey: 'AIzaSyCGknJpFjo7lwAIMDBruZgT56TdZYGotnA',
     }
   },
 
