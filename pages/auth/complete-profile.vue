@@ -24,20 +24,19 @@ const showDomains = ref(false);
 const isLoading = ref(false);
 const steps = ref(3);
 const searchBuinessSector = ref();
+const form = ref()
 
 
 const interests = computed(() => intrestStore.getInterests);
 const domains = computed(() => intrestDomainsStore.getDomains);
 const businessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
+const filteredBusinessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
+
 
 const selectedSector = ref(null);
 const selectedDomains = ref([]);
 const selectedViewDomains = ref([]);
-const filteredBusinessSectors = ref([]);
 
-onMounted(()=> {
-  filteredBusinessSectors.value = intrestBusinessSectorStore.getBusinessSectors
-})
 
 const formData = reactive({
   interests: [],
@@ -61,7 +60,7 @@ watchEffect(() => {
   getDataFromApi();
 });
 
-watch( () => searchBuinessSector.value, (val) => {
+watch(() => searchBuinessSector.value, (val) => {
   searchBuinessSectors(val);
 });
 
@@ -69,7 +68,7 @@ const getdomain = async (sector) => {
   selectedSector.value = sector;
   const qurey = { business_sector: selectedSector.value.id };
   isLoading.value = true;
-  await apiGetDomainBySector(qurey).then(()=> {
+  await apiGetDomainBySector(qurey).then(() => {
     isLoading.value = false;
   });
   showDomains.value = true;
@@ -145,6 +144,10 @@ const submitForm = async () => {
 
   //console.log(payload);
   const result = await completeProfile(payload);
+  console.log(result.error.data.errors);
+  result.error.data.errors.map((err) => {
+    console.log(err);
+  })
 };
 </script>
 
@@ -218,9 +221,9 @@ const submitForm = async () => {
             <div class="pace-x-4 my-8">
               <Map v-model="formData.address" :is-open-map="true" />
 
-              <div class="space-y-4 p-1 pt-4 " v-if="formData.address.address.length > 0">
-                <UFormGroup label="Country" name="country">
-                  <UInput size="lg" placeholder="Country" v-model="formData.address.country" />
+              <UForm ref="form" div class="space-y-4 p-1 pt-4 ">
+                <UFormGroup label="Address" name="address">
+                  <UInput size="lg" placeholder="Address" v-model="formData.address.address" />
                 </UFormGroup>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -228,13 +231,13 @@ const submitForm = async () => {
                     <UInput size="lg" placeholder="City" v-model="formData.address.city" />
                   </UFormGroup>
 
-                  <UFormGroup label="Zip code" name="zip_code">
-                    <UInput size="lg" placeholder="Zip code" v-model="formData.address.zip_code" />
+                  <UFormGroup label="Country" name="country">
+                    <UInput size="lg" placeholder="Country" v-model="formData.address.country" />
                   </UFormGroup>
                 </div>
 
-                <UFormGroup label="Address" name="address">
-                  <UInput size="lg" placeholder="Address" v-model="formData.address.address" />
+                <UFormGroup label="Zip code" name="zip_code">
+                  <UInput size="lg" placeholder="Zip code" v-model="formData.address.zip_code" />
                 </UFormGroup>
 
                 <UFormGroup label="Lat" name="lat" class="hidden">
@@ -244,7 +247,7 @@ const submitForm = async () => {
                 <UFormGroup label="Lon" name="lon" class="hidden">
                   <UInput size="lg" v-model="formData.address.lon" />
                 </UFormGroup>
-              </div>
+              </UForm>
             </div>
           </div>
 
@@ -276,7 +279,8 @@ const submitForm = async () => {
                 things in common.
               </p>
 
-              <UInput placeholder="Search what you need..." v-model="searchBuinessSector" size="xl" color="gray" class="my-4">
+              <UInput placeholder="Search what you need..." v-model="searchBuinessSector" size="xl" color="gray"
+                class="my-4">
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-xs">
                     <img src="/assets/svg/icons/search.svg" alt="" srcset="" />
@@ -286,8 +290,8 @@ const submitForm = async () => {
 
               <div class="flex-1 overscroll-y-auto">
                 <div v-for="businessSector in filteredBusinessSectors" @click="getdomain(businessSector)" :class="isSectorOnDomain(businessSector)
-                    ? 'bg-green-100 hover:bg-green-200 border-green-300'
-                    : ''
+                  ? 'bg-green-100 hover:bg-green-200 border-green-300'
+                  : ''
                   "
                   class="border-[1px] border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer">
                   <div class="text-[#0F1454]">

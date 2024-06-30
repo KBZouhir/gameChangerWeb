@@ -54,17 +54,17 @@ const items = [
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <UButton size="lg" square variant="soft">
+                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100" color="primary">
                         <template #leading>
                             <img src="/assets/svg/icons/search.svg">
                         </template>
                     </UButton>
-                    <UButton size="lg" square variant="soft">
+                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
                         <template #leading>
                             <img src="/assets/svg/icons/notification.svg">
                         </template>
                     </UButton>
-                    <UButton size="lg" square variant="soft">
+                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
                         <template #leading>
                             <img src="/assets/svg/icons/message.svg">
                         </template>

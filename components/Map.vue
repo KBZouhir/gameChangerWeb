@@ -113,5 +113,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Add your styles here */
+.pac-container.hdpi{
+    display: none !important;
+}
 </style>
