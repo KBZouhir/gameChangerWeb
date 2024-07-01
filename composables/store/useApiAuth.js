@@ -80,7 +80,7 @@ const login = async (payload) => {
     successAlert(data.message);
     const userTokenCookie = useCookie("user_access_token");
     userTokenCookie.value = data.token;
-
+    console.log(data.user);
     authStore.syncAuthUser(data.user);
   }
   return { data, error, refresh, pending };

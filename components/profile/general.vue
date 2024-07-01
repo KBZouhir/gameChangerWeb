@@ -1,11 +1,16 @@
 <script setup>
 
+import { useAuthStore } from '~/stores/authStore'
+const authStore = useAuthStore()
+const user = computed(()=>authStore.getAuthUser)
+
+
 const generalForm = reactive({
-    first_name: '',
-    last_name: '',
-    phone: undefined,
-    email: '',
-    bio: ''
+    first_name: user.value?.first_name,
+    last_name: user.value?.last_name,
+    phone: user.value?.phone,
+    email: user.value?.email,
+    bio: user.value?.bio
 })
 
 </script>

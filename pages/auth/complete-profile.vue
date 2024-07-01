@@ -252,7 +252,7 @@ const submitForm = async () => {
           </div>
 
           <div class="flex justify-between space-x-4 my-8">
-            <UButton variant="ghost" @click="activeStep--" :disabled="activeStep <= 0" class="px-6 py-3 text-[#0F1454]">
+            <UButton variant="ghost" @click="activeStep--" :disabled="activeStep <= 0" class="px-6 py-3 text-[#0F1454] hover:bg-white">
               Previous
             </UButton>
             <UButton @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="activeStep >= steps - 1"

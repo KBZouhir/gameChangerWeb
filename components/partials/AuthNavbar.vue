@@ -1,11 +1,14 @@
 <script setup>
-import { logout } from '~/composables/store/useApiAuth'
+import { logout, useUser } from '~/composables/store/useApiAuth'
 import { useAuthStore } from '~/stores/authStore'
 
 const authStore = useAuthStore();
-const user = computed(()=>authStore.getAuthUser);
-console.log(user.value);
+const user = computed(() => authStore.getAuthUser);
 
+
+watchEffect(() => {
+    useUser();
+});
 
 const logoutUser = async () => {
     const result = await logout();
@@ -16,13 +19,16 @@ const items = [
     [{
         label: user.value?.full_name,
         slot: 'account',
+        link: null,
         disabled: true
     }], [{
         label: 'Settings',
-        icon: 'i-heroicons-cog-8-tooth'
+        icon: 'i-heroicons-cog-8-tooth',
+        link: '/profile/update'
     }], [{
         label: 'Sign out',
         icon: 'i-heroicons-arrow-left-on-rectangle',
+        link: null,
         function: logoutUser
     }]
 ]
@@ -49,7 +55,8 @@ const items = [
                             class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Trainings</a>
                         <a href="#"
                             class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Ressources</a>
-                        <a href="#" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Contact us</a>
+                        <a href="#" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Contact
+                            us</a>
                     </div>
                 </div>
 
@@ -85,11 +92,18 @@ const items = [
                         </template>
 
                         <template #item="{ item }">
-                            <button class="flex justify-between items-center w-full" @click="item.function">
+                            <button class="flex justify-between items-center w-full" @click="item.function"
+                                v-if="!item?.link">
                                 <span class="truncate">{{ item.label }}</span>
                                 <UIcon :name="item.icon"
                                     class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
                             </button>
+
+                            <NuxtLink :to="item?.link" class="flex justify-between items-center w-full" v-else>
+                                <span class="truncate">{{ item.label }}</span>
+                                <UIcon :name="item.icon"
+                                    class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
+                            </NuxtLink>
                         </template>
                     </UDropdown>
                 </div>

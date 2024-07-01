@@ -136,7 +136,7 @@ async function onSubmit(event) {
                     <div class="mt-8">
                         <UFormGroup :label="$t('login.email_address')" name="email" v-if="!isPhoneInput">
                             <UInput v-model="state.email" size="lg" autofocus
-                                :placeholder="$t('login.example_email')" />
+                                placeholder="example@mail.com" />
                         </UFormGroup>
                         <UFormGroup name="phone" v-else>
                             <IntlTelInput v-model="state.phone" @hidePhone="hidePhoneComp" />

@@ -35,9 +35,9 @@ definePageMeta({
                                 </template>
                             </UButton>
                         </div>
-                        <div class="pb-4 pt-2 md:w-2/4 w-full max-h-32 overflow-hidden text-center md:text-start">
+                        <div class="pb-4 pt-2 md:w-2/4 w-full max-h-32 overflow-hidden text-center md:text-start mb-8">
                             <h1 class="font-bold text-xl">Zouhir Kouider </h1>
-                            <p class="text-xs">
+                            <p class="text-xs cut-text relative">
                                 I’m the most awesome person I know. A professional Product, Website and UI/UX Designer +
                                 God
                                 fearing.
@@ -71,10 +71,10 @@ definePageMeta({
                 <div class="space-x-4 items-center hidden md:flex">
                     <UButton icon="i-heroicons-plus" size="sm" class="py-2 px-4" color="primary" variant="solid"
                         label="Create" :trailing="false" />
-                    <nuxt-link to="update">
+                    <nuxtLink to="/profile/update">
                         <UButton icon="i-heroicons-pencil-square" class="hover:bg-primary/5 py-2 px-4" size="sm"
                         color="primary" variant="outline" label="Update profile" :trailing="false" />
-                    </nuxt-link>
+                    </nuxtLink>
                     <UButton icon="i-heroicons-ellipsis-horizontal" size="sm" class="hover:bg-primary/5 py-2 px-2"
                         color="primary" square variant="outline" />
                 </div>
@@ -82,3 +82,14 @@ definePageMeta({
         </div>
     </div>
 </template>
+
+<style>
+.cut-text::before{
+    content: '';
+    width: 100%;
+    position: absolute;
+    background: linear-gradient(0deg, white, transparent);
+    height: 50px;
+    bottom: 0;
+}
+</style>

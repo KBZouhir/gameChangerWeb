@@ -43,7 +43,7 @@ const currentStep = ref(0)
                         </div>
                         <div class="pb-4 pt-2 md:w-2/4 w-full max-h-32 overflow-hidden text-center md:text-start">
                             <h1 class="font-bold text-xl">Zouhir Kouider </h1>
-                            <p class="text-xs">
+                            <p class="text-xs cut-text relative">
                                 I’m the most awesome person I know. A professional Product, Website and UI/UX Designer +
                                 God
                                 fearing.
@@ -71,35 +71,35 @@ const currentStep = ref(0)
                 <div class="top-0 md:top-4 bg-white sticky md:w-3/12 w-full p-2 rounded-md shadow-sm z-50">
                     <div class="px-3 py-4 overflow-y-auto">
                         <ul class=" font-medium text-sm flex flex-row md:flex-col items-center">
-                            <li>
+                            <li class="w-full">
                                 <button @click="currentStep = 0"
                                     :class="currentStep == 0 ? 'text-gray-900' : 'text-[#666666]'"
                                     class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                     General
                                 </button>
                             </li>
-                            <li>
+                            <li class="w-full">
                                 <button @click="currentStep = 1"
                                     :class="currentStep == 1 ? 'text-gray-900' : 'text-[#666666]'"
                                     class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                     Password
                                 </button>
                             </li>
-                            <li>
+                            <li class="w-full">
                                 <button @click="currentStep = 2"
                                     :class="currentStep == 2 ? 'text-gray-900' : 'text-[#666666]'"
                                     class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                     Interests
                                 </button>
                             </li>
-                            <li>
+                            <li class="w-full">
                                 <button @click="currentStep = 3"
                                     :class="currentStep == 3 ? 'text-gray-900' : 'text-[#666666]'"
                                     class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                                     Domains
                                 </button>
                             </li>
-                            <li>
+                            <li class="w-full">
                                 <button @click="currentStep = 4"
                                     :class="currentStep == 4 ? 'text-gray-900' : 'text-[#666666]'"
                                     class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -133,11 +133,7 @@ const currentStep = ref(0)
                         <p class="text-xs text-[#989394]">
                             Select a few of your interest to match with users who have similar things in common.
                         </p>
-                        <div class="flex flex-wrap gap-4 py-8 overflow-auto">
-                            <template v-for="interest in interests" key="person.name">
-                                <CustomCheckbox :label="interest.name" v-model="formData.interests" :value="interest" />
-                            </template>
-                        </div>
+                        <profileInterests />
                     </div>
 
                     <div v-if="currentStep == 3" class="py-4">
@@ -147,8 +143,27 @@ const currentStep = ref(0)
                         </p>
                         <profileDomains />
                     </div>
+
+                    <div v-if="currentStep == 4" class="py-4">
+                        <h1 class="text-xl font-bold mb-2">Update your address</h1>
+                        <p class="text-xs text-[#989394] mb-4">
+                            Select a few of your interest to match with users who have similar things in common.
+                        </p>
+                        <Map />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.cut-text::before{
+    content: '';
+    width: 100%;
+    position: absolute;
+    background: linear-gradient(0deg, white, transparent);
+    height: 50px;
+    bottom: 0;
+}
+</style>
