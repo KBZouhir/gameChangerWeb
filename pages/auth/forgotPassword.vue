@@ -1,6 +1,6 @@
 <script setup>
 import schema from '~/schemas/auth/forgotpassword';
-import { forgotPassword, isLoading } from '~/composables/store/useApiAuth'
+import { forgotPassword } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
 import { warningAlert, successAlert } from '~/composables/useAlert'
 
