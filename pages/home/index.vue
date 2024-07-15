@@ -1,0 +1,244 @@
+<template>
+    <div class="grid grid-cols-4 gap-6 bg-[#F1F5F9] py-8">
+        <USkeleton class="h-screen sticky top-0">
+
+        </USkeleton>
+        <div class="col-span-2 mx-auto">
+            <div class="grid grid-cols-5 gap-6">
+                <div class="col-span-3 p-8 text-white bg-[#0F172A] rounded-lg flex flex-col justify-center space-y-4">
+                    <h2 class="text-2xl font-semibold">Service banner</h2>
+                    <p>In publishing and graphic design,
+                        Lorem ipsum is a placeholder text</p>
+                    <div>
+                        <UButton color="white" variant="solid">Discover ></UButton>
+                    </div>
+                </div>
+
+                <div class="col-span-2 p-8 text-white bg-[#FFBB0C] rounded-lg flex flex-col justify-center space-y-4">
+                    <h2 class="text-2xl font-semibold">Service banner</h2>
+                    <p>In publishing and graphic design,
+                        Lorem ipsum is a placeholder text</p>
+                    <div>
+                        <UButton color="white" variant="solid">Discover ></UButton>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white rounded-xl flex items-center space-x-4 mb-4 mt-8 shadow-sm">
+                <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
+                    <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
+                </div>
+                <button class="flex-1 text-start" @click="isOpen = true">
+                    <span class="pt-2 select-none">Write something ...</span>
+                </button>
+            </div>
+
+            <UCard v-for="i in 1" class="my-8">
+                <div class="flex justify-between items-center flex-wrap">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
+                            <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Game changer media</h4>
+                            <span>08:39 am</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4">
+
+                    </div>
+                </div>
+                <div class="my-4">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fringilla natoque id aenean. Lorem ipsum
+                        dolor sit amet, consectetur adipiscing elit. Fringilla natoque id aenean.</p>
+                </div>
+
+                <div>
+                    <div class="w-full grid  gap-3" :class="(images.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
+                        <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
+                            v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
+                            <div class="relative h-full">
+                                <img alt="gallery" draggable="false" v-if="index < 4"
+                                    class="block h-full w-full rounded-lg object-cover object-center" :src="image" />
+                                <div v-if="index == 3 && images.length > 4">
+                                    <div
+                                        class="absolute top-0 left-0 w-full h-full bg-slate-900 opacity-60 rounded-lg flex justify-center items-center">
+                                    </div>
+                                    <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center">
+                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4
+                                            }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" />
+
+                    <div class="flex items-center space-x-4 my-4 text-sm">
+                        <div class="flex items-center space-x-2  font-semibold">
+                            <img src="/assets/svg/icons/heart.svg">
+                            <span>1,964</span>
+                        </div>
+                        <div class="flex items-center space-x-2 font-semibold">
+                            <img src="/assets/svg/icons/comment.svg">
+                            <span>135</span>
+                        </div>
+                    </div>
+
+                    <div class="p-2 bg-[#F1F5F9] rounded-xl flex space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
+                            <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
+                        </div>
+                        <div class="flex-1">
+                            <UTextarea rows="0" :padded="false" autoresize placeholder="Write a comment" variant="none"
+                            class="w-full pt-2" />
+                        </div>
+                    </div>
+                </div>
+            </UCard>
+
+            <ClientOnly fallback-tag="div" fallback="">
+                <UModal v-model="isOpen" :ui="{ width: 'w-full sm:w-full' }" prevent-close>
+                    <UCard  :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                        <template #header >
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
+                                    Create publication
+                                </h3>
+                                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                                    @click="isOpen = false" />
+                            </div>
+                        </template>
+                        <div class="flex flex-col space-y-4">
+                            <!-- <div class="flex flex-col">
+                                <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
+                                    <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
+                                </div>
+                                <div class="text-sm">
+                                    <h4 class="font-bold">Game changer media</h4>
+                                    <UBadge color="green" size="xs" variant="soft">Entrepreneur</UBadge>
+                                </div>
+                            </div> -->
+                            <div class="relative">
+                                <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
+                                v-model:content="content" contentType="html" />
+                                <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold" :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">{{ charCount }} / {{ maxLength }}</p>
+                            </div>
+                        </div>
+                        <template #footer>
+                            <div class="flex justify-end">
+                                <UButton size="lg" class="px-4 py-2" icon="i-heroicons-arrow-right" trailing>Post </UButton>
+                            </div>
+                        </template>
+                    </UCard>
+                </UModal>
+            </ClientOnly>
+        </div>
+        <USkeleton class="h-screen sticky top-0">
+
+        </USkeleton>
+    </div>
+</template>
+
+
+<script setup>
+import FsLightbox from "fslightbox-vue/v3";
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.bubble.css';
+
+const toggler = ref(false)
+const slide = ref(1)
+const isOpen = ref(false)
+const maxLength = ref(20);
+const charCount = computed(() => countChars(content.value));
+const content = ref('');
+
+const options = ref({
+    modules: {
+    },
+    placeholder: 'What\'s on your mind?',
+    theme: 'bubble',
+})
+
+const images = ref([
+    'https://i.imgur.com/fsyrScY.jpg',
+    'https://i.imgur.com/fsyrScY.jpg',
+    'https://i.imgur.com/fsyrScY.jpg',
+    'https://i.imgur.com/fsyrScY.jpg',
+    'https://i.imgur.com/fsyrScY.jpg',
+
+])
+
+const conditionalClass = (index) => {
+    let classList = []
+    if (index > 3) {
+        classList.push('hidden')
+    }
+
+    if (index == images.value.length - 1 && images.value.length && images.value.length % 2 != 0) {
+        classList.push('col-span-2')
+    }
+
+    return classList
+}
+
+const openLightboxOnSlide = (number) => {
+    slide.value = number + 1;
+    toggler.value = !toggler.value;
+}
+
+defineShortcuts({
+    escape: {
+        usingInput: true,
+        whenever: [isOpen],
+        handler: () => { isOpen.value = false }
+    }
+})
+
+
+const countChars = (htmlString) => {
+    // Create a temporary DOM element to parse the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+
+    // Get the text content of the parsed HTML
+    const textContent = tempDiv.textContent || tempDiv.innerText || "";
+
+    // Return the length of the text content
+    return textContent.length;
+};
+
+const onTextChange = (delta, oldDelta, source) => {
+    if (charCount.value > maxLength.value) {
+        content.value = content.value.slice(0, maxLength.value);
+    }
+};
+
+onMounted(() => {
+
+})
+
+</script>
+
+<style scoped lang="css">
+:deep(.ql-editor) {
+    min-height: 200px;
+    border: 1px solid #f1f1f1;
+    border-radius: 8px;
+    padding-bottom: 26px;
+}
+
+:deep(.ql-container) {
+    font-size: 12px;
+}
+
+:deep(.ql-toolbar.ql-snow) {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+:deep(.ql-container.ql-snow) {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+</style>

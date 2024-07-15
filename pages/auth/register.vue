@@ -1,7 +1,7 @@
 <script setup>
 import schema from '~/schemas/auth/register';
 
-import { register, sendOtp, isLoading } from '~/composables/store/useApiAuth'
+import { register, sendOtp } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
 import { useNuxtApp } from '#app';
 

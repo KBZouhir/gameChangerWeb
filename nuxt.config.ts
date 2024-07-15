@@ -23,6 +23,8 @@ export default defineNuxtConfig({
     storesDirs: ["./stores/**"],
   },
 
+
+
   tailwindcss: {
     config: {
       theme: {
@@ -61,5 +63,18 @@ export default defineNuxtConfig({
     ],
     defaultLocale: "en",
     vueI18n: "./i18n.config.ts",
+  },
+
+  vite: {
+    optimizeDeps: {
+      exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
+    },
+    server: {
+      headers: {
+        "Cross-Origin-Opener-Policy": "*",
+        "Cross-Origin-Embedder-Policy": "require-corp",
+        "Access-Control-Allow-Origin": "*",
+      },
+    },
   },
 });
