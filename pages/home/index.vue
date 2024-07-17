@@ -126,31 +126,38 @@
                                     @click="isOpen = false" />
                             </div>
                         </template>
-                        <div class="flex flex-col space-y-4">
-                            <!-- <div class="flex flex-col">
-                                <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                                    <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
-                                </div>
-                                <div class="text-sm">
-                                    <h4 class="font-bold">Game changer media</h4>
-                                    <UBadge color="green" size="xs" variant="soft">Entrepreneur</UBadge>
-                                </div>
-                            </div> -->
+                        <div class="flex flex-col space-y-4 relative">
                             <div class="flex flex-col">
                                 <div class="relative">
                                     <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
                                         v-model:content="content" contentType="html" />
-                                    <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
-                                        :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">{{
-                                            charCount }} / {{
-                                            maxLength }}</p>
+                                    <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold" :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
+                                        {{ charCount }} / {{ maxLength }}
+                                    </p>
                                 </div>
-                                <div>
-                                    
+
+
+                                <div v-if="selectedFiles.length > 0" class="my-4">
+                                    <div class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
+                                        <div v-for="(file, index) in selectedFiles" :key="index"
+                                            class="relative group w-32 h-32 flex-none border-[1px] border-[##f1f1f1] rounded-md overflow-hidden transition-all duration-150 ease-in-out">
+                                            <div class="w-full h-full overflow-hidden border-e">
+                                                <img :src="file" alt="Selected Image"
+                                                    class="object-cover w-full h-full" />
+                                            </div>
+                                            <div
+                                                class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
+                                                <UButton @click="removeSelectedImage(index)" icon="i-heroicons-trash"
+                                                    class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs"
+                                                    size="2xs" color="primary" square variant="soft" />
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex space-x-4 items-center pt-4">
                                     <input ref="inputFileImage" type="file" id="file-input-image"
-                                        @change="onImageFileChange" accept="image/*" hidden />
+                                        @change="onImageFileChange" accept="image/*" hidden multiple />
                                     <UButton @click="triggerFileInput" icon="i-heroicons-photo" size="xs"
                                         color="primary" square variant="ghost"
                                         class="hover:bg-primary hover:text-white px-2" label="Image" />
@@ -164,8 +171,7 @@
                         <template #footer>
                             <div class="flex justify-end">
 
-                                <UButton size="lg" @click="submitForm" class="px-4 py-2" icon="i-heroicons-arrow-right"
-                                    trailing>Post </UButton>
+                                <UButton size="lg" @click="submitForm" class="px-4 py-2" icon="i-heroicons-arrow-right"trailing>Post</UButton>
                             </div>
                         </template>
                     </UCard>
@@ -187,10 +193,12 @@ import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 const toggler = ref(false)
 const slide = ref(1)
 const isOpen = ref(false)
-const maxLength = ref(20);
+const maxLength = ref(200);
 const charCount = computed(() => countChars(content.value));
 const content = ref('');
 const inputFileImage = ref()
+const selectedFiles = ref([])
+const isLoading = ref(false)
 
 const options = ref({
     modules: {
@@ -226,6 +234,11 @@ const openLightboxOnSlide = (number) => {
     toggler.value = !toggler.value;
 }
 
+
+const removeSelectedImage = (index) => {
+    selectedFiles.value.splice(index, 1);
+}
+
 defineShortcuts({
     escape: {
         usingInput: true,
@@ -255,9 +268,23 @@ const triggerFileInput = () => {
 }
 
 const onImageFileChange = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-        console.log(file);
+    if (event.target.files) {
+        Object.entries(event.target.files).forEach(([key, value]) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    selectedFiles.value.push(canvas.toDataURL('image/webp'))
+                };
+            }
+            reader.readAsDataURL(value);
+        });
     }
 }
 

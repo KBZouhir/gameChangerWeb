@@ -12,7 +12,7 @@ watchEffect(() => {
 
 const logoutUser = async () => {
     const result = await logout();
-    console.log(result);
+
 }
 
 const items = [
