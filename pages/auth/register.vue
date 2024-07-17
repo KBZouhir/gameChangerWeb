@@ -18,6 +18,7 @@ let showConfirmationPassword = ref(false)
 let isPhoneInput = ref(false)
 let setAutoFoucs = ref(false)
 let recaptchaToken = ref(null);
+let isLoading = ref(false)
 const form = ref()
 
 
@@ -75,7 +76,9 @@ watch(() => state.email, (newValue) => {
 
 async function onSubmit(event) {
     const { data } = event
+    isLoading.value = true
     const result = await register(data);
+    isLoading.value = false
 
     if (!result.data) {
         const error = handleApiError(result.error);

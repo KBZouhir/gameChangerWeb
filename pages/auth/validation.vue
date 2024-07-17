@@ -1,6 +1,7 @@
 <script setup>
 
-import { validationMail, ResendValidationMail, sendOtp, isLoading } from '~/composables/store/useApiAuth'
+import { validationMail, ResendValidationMail, sendOtp } from '~/composables/store/useApiAuth'
+import {useAuthStore} from "~/stores/authStore";
 import VOtpInput from "vue3-otp-input";
 
 
@@ -16,6 +17,8 @@ const error = ref(false)
 const timeLeft = ref(30)
 const form = ref()
 let intervalId = null
+
+const authStore = useAuthStore();
 
 const state = reactive({
     code: undefined,
@@ -50,8 +53,7 @@ const counter = () => {
 async function validationOtp() {
     form.value.setErrors([])
     const result = null
-    const currentUserCookie = useCookie("current_user");
-    const { is_email_verified, is_phone_verified, phone, email } = currentUserCookie.value
+    const { is_email_verified, is_phone_verified, phone, email } = authStore.user
 
     if (state.code.length <= 5) {
         error.value = true
@@ -59,19 +61,22 @@ async function validationOtp() {
     }
 
     if(!is_email_verified && email && !phone) {
+        console.log("validation mail");
         result = await validationMail(state);
+        console.log(result);
     }
 
-    if (!result.data) {
-        const error = handleApiError(result.error);
-        if (error.status === 422) {
-            form.value.setErrors(error.errors);
-        }
-    }
+    // if (!result.data) {
+    //     console.log("oioiezoipoipzaoizaeoizeaoizaeiopzaeopiezaopizaoizaopizeaoipezaoip");
+    //     const error = handleApiError(result.error);
+    //     if (error.status === 422) {
+    //         form.value.setErrors(error.errors);
+    //     }
+    // }
 
-    if (result.data?.success) {
-        await navigateTo({ path: '/' })
-    }
+    // if (result.data?.success) {
+    //     await navigateTo({ path: '/' })
+    // }
 }
 
 async function resendOtp() {

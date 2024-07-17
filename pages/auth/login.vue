@@ -22,6 +22,8 @@ const state = reactive({
 let isPhoneInput = ref(false)
 let isLoading = ref(false)
 let recaptchaToken = ref(null);
+
+
 const form = ref()
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -135,8 +137,7 @@ async function onSubmit(event) {
                 <UForm ref="form" :schema="schema" :state="state" @submit="onSubmit" class="mt-8">
                     <div class="mt-8">
                         <UFormGroup :label="$t('login.email_address')" name="email" v-if="!isPhoneInput">
-                            <UInput v-model="state.email" size="lg" autofocus
-                                placeholder="example@mail.com" />
+                            <UInput v-model="state.email" size="lg" autofocus placeholder="example@mail.com" />
                         </UFormGroup>
                         <UFormGroup name="phone" v-else>
                             <IntlTelInput v-model="state.phone" @hidePhone="hidePhoneComp" />

@@ -1,25 +1,35 @@
 <template>
     <div class="grid grid-cols-4 gap-6 bg-[#F1F5F9] py-8">
-        <USkeleton class="h-screen sticky top-0">
+        <div class="sticky top-0 hidden md:block">
 
-        </USkeleton>
-        <div class="col-span-2 mx-auto">
-            <div class="grid grid-cols-5 gap-6">
-                <div class="col-span-3 p-8 text-white bg-[#0F172A] rounded-lg flex flex-col justify-center space-y-4">
+        </div>
+        <div class="col-span-4 md:col-span-2 mx-auto p-2">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                <div
+                    class="md:col-span-3 p-8 text-white bg-[#0F172A] rounded-lg flex flex-col justify-center space-y-4">
                     <h2 class="text-2xl font-semibold">Service banner</h2>
                     <p>In publishing and graphic design,
                         Lorem ipsum is a placeholder text</p>
                     <div>
-                        <UButton color="white" variant="solid">Discover ></UButton>
+                        <UButton label="Discover" color="white" variant="solid" class="px-4">
+                            <template #trailing>
+                                <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
+                            </template>
+                        </UButton>
                     </div>
                 </div>
 
-                <div class="col-span-2 p-8 text-white bg-[#FFBB0C] rounded-lg flex flex-col justify-center space-y-4">
-                    <h2 class="text-2xl font-semibold">Service banner</h2>
-                    <p>In publishing and graphic design,
-                        Lorem ipsum is a placeholder text</p>
+                <div class="md:col-span-2 p-8  bg-[#FFBB0C] rounded-lg flex flex-col justify-center space-y-6">
                     <div>
-                        <UButton color="white" variant="solid">Discover ></UButton>
+                        <h2 class="text-2xl font-semibold">Offer</h2>
+                        <p class="text-4xl font-bold">Get 15%</p>
+                    </div>
+                    <div>
+                        <UButton label="Grab Offer" color="white" variant="solid" class="px-4">
+                            <template #trailing>
+                                <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
+                            </template>
+                        </UButton>
                     </div>
                 </div>
             </div>
@@ -30,6 +40,13 @@
                 </div>
                 <button class="flex-1 text-start" @click="isOpen = true">
                     <span class="pt-2 select-none">Write something ...</span>
+                </button>
+                <button @click="isOpen = true" type="button"
+                    class="rounded-full bg-primary p-2 text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path
+                            d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                    </svg>
                 </button>
             </div>
 
@@ -91,7 +108,7 @@
                         </div>
                         <div class="flex-1">
                             <UTextarea rows="0" :padded="false" autoresize placeholder="Write a comment" variant="none"
-                            class="w-full pt-2" />
+                                class="w-full pt-2" />
                         </div>
                     </div>
                 </div>
@@ -99,8 +116,8 @@
 
             <ClientOnly fallback-tag="div" fallback="">
                 <UModal v-model="isOpen" :ui="{ width: 'w-full sm:w-full' }" prevent-close>
-                    <UCard  :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-                        <template #header >
+                    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                        <template #header>
                             <div class="flex items-center justify-between">
                                 <h3 class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
                                     Create publication
@@ -119,22 +136,43 @@
                                     <UBadge color="green" size="xs" variant="soft">Entrepreneur</UBadge>
                                 </div>
                             </div> -->
-                            <div class="relative">
-                                <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
-                                v-model:content="content" contentType="html" />
-                                <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold" :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">{{ charCount }} / {{ maxLength }}</p>
+                            <div class="flex flex-col">
+                                <div class="relative">
+                                    <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
+                                        v-model:content="content" contentType="html" />
+                                    <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
+                                        :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">{{
+                                            charCount }} / {{
+                                            maxLength }}</p>
+                                </div>
+                                <div>
+                                    
+                                </div>
+                                <div class="flex space-x-4 items-center pt-4">
+                                    <input ref="inputFileImage" type="file" id="file-input-image"
+                                        @change="onImageFileChange" accept="image/*" hidden />
+                                    <UButton @click="triggerFileInput" icon="i-heroicons-photo" size="xs"
+                                        color="primary" square variant="ghost"
+                                        class="hover:bg-primary hover:text-white px-2" label="Image" />
+                                    <UButton icon="i-heroicons-video-camera" size="xs"
+                                        class="hover:bg-primary hover:text-white px-2" color="primary" square
+                                        variant="ghost" label="Video" />
+                                </div>
                             </div>
+
                         </div>
                         <template #footer>
                             <div class="flex justify-end">
-                                <UButton size="lg" class="px-4 py-2" icon="i-heroicons-arrow-right" trailing>Post </UButton>
+
+                                <UButton size="lg" @click="submitForm" class="px-4 py-2" icon="i-heroicons-arrow-right"
+                                    trailing>Post </UButton>
                             </div>
                         </template>
                     </UCard>
                 </UModal>
             </ClientOnly>
         </div>
-        <USkeleton class="h-screen sticky top-0">
+        <USkeleton class="h-screen sticky top-0 hidden md:block">
 
         </USkeleton>
     </div>
@@ -152,6 +190,7 @@ const isOpen = ref(false)
 const maxLength = ref(20);
 const charCount = computed(() => countChars(content.value));
 const content = ref('');
+const inputFileImage = ref()
 
 const options = ref({
     modules: {
@@ -197,22 +236,39 @@ defineShortcuts({
 
 
 const countChars = (htmlString) => {
-    // Create a temporary DOM element to parse the HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
 
-    // Get the text content of the parsed HTML
     const textContent = tempDiv.textContent || tempDiv.innerText || "";
 
-    // Return the length of the text content
     return textContent.length;
 };
 
 const onTextChange = (delta, oldDelta, source) => {
     if (charCount.value > maxLength.value) {
-        content.value = content.value.slice(0, maxLength.value);
+        return
     }
 };
+
+const triggerFileInput = () => {
+    inputFileImage.value.click()
+}
+
+const onImageFileChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        console.log(file);
+    }
+}
+
+
+const validationData = () => {
+
+}
+
+const submitForm = () => {
+    console.log(content.value);
+}
 
 onMounted(() => {
 

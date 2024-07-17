@@ -1,6 +1,6 @@
 <script setup>
 import { z } from "zod";
-import { resetPassword, isLoading } from '~/composables/store/useApiAuth'
+import { resetPassword } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
 import schema from '~/schemas/auth/resetPassword'
 
@@ -15,6 +15,8 @@ const route = useRoute()
 
 let showPassword = ref(false)
 let showConfirmationPassword = ref(false)
+
+let isLoading = ref(false)
 
 const state = reactive({
     token: route.query.token,
@@ -65,7 +67,7 @@ async function onSubmit(event) {
                 <UForm ref="form" :schema="schema" :state="state" @submit="onSubmit" class="mt-8">
                     <div class="mt-8">
                         <UFormGroup label="Email Address" name="email">
-                            <UInput v-model="state.email" disabled size="lg" autofocus placeholder="exmple@mail.com" />
+                            <UInput v-model="state.email" disabled size="lg" autofocus placeholder="example@mail.com" />
                         </UFormGroup>
                     </div>
 

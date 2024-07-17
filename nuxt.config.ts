@@ -17,10 +17,16 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt"],
+  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt", "nuxt-snackbar"],
 
   pinia: {
     storesDirs: ["./stores/**"],
+  },
+
+  snackbar: {
+    bottom: true,
+    right: true,
+    duration: 5000
   },
 
 

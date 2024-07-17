@@ -11,6 +11,7 @@ import { useDomainsStore } from "~/stores/domains";
 definePageMeta({
   layout: "auth",
   title: "Login Page",
+  middleware: ['auth']
 });
 
 const intrestStore = useInterestsStore();

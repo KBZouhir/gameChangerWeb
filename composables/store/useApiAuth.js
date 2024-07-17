@@ -15,7 +15,7 @@ const register = async (payload) => {
   });
 
   if (data) {
-    successAlert(data.message);
+    // successAlert(data.message);
     const userTokenCookie = useCookie("user_access_token");
     // const currentUserCookie = useCookie("current_user");
     userTokenCookie.value = data.token;
@@ -32,8 +32,8 @@ const validationMail = async (payload) => {
   });
 
   if (data) {
-    successAlert(data.message);
-    //store.setSeason(data.season);
+    // successAlert(data.message);
+    // store.setSeason(data.season);
   }
   return { data, error, refresh, pending };
 };
@@ -59,6 +59,7 @@ const ResendValidationMail = async () => {
 const login = async (payload) => {
   const authStore = useAuthStore();
 
+  
   let cleanData = { ...payload };
   if (!payload.email || payload.email === "0") {
     const { email, ...rest } = payload;
@@ -77,10 +78,9 @@ const login = async (payload) => {
 
  
   if (data) {
-    successAlert(data.message);
+    
     const userTokenCookie = useCookie("user_access_token");
     userTokenCookie.value = data.token;
-    console.log(data.user);
     authStore.syncAuthUser(data.user);
   }
   return { data, error, refresh, pending };
@@ -121,12 +121,11 @@ const logout = async () => {
     initialCache: false,
     method: "POST",
   });
-  if (data.success) {
-    //authStore.syncAuthUser(null);
-    const cookie = useCookie("user_access_token");
-    cookie.value = null;
-  }
-  await navigateTo("/auth/login");
+  authStore.syncAuthUser(null);
+  const cookie = useCookie("user_access_token");
+  cookie.value = null;
+  console.log(cookie.value);
+  useRouter().push("/auth/login")
 };
 
 async function useUser() {

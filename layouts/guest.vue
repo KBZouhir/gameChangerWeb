@@ -7,6 +7,6 @@
         </div>
 
         <PartialsFooter/>
-
+        <NuxtSnackbar />
     </div>
 </template>
