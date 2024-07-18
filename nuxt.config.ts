@@ -29,7 +29,9 @@ export default defineNuxtConfig({
     duration: 5000
   },
 
-
+  plugins: [
+    { src: '~/plugins/vue-tags-input', mode: 'client'}
+  ],
 
   tailwindcss: {
     config: {
@@ -73,14 +75,10 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
+      include: ['@sipec/vue3-tags-input'],
     },
-    server: {
-      headers: {
-        "Cross-Origin-Opener-Policy": "*",
-        "Cross-Origin-Embedder-Policy": "require-corp",
-        "Access-Control-Allow-Origin": "*",
-      },
+    ssr: {
+      noExternal: ['@sipec/vue3-tags-input'],
     },
   },
 });

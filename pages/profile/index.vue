@@ -2,6 +2,7 @@
 definePageMeta({
     layout: "auth",
     title: "Login Page",
+    middleware: ['auth']
 });
 
 </script>
@@ -84,12 +85,12 @@ definePageMeta({
 </template>
 
 <style>
-.cut-text::before{
+/* .cut-text::before{
     content: '';
     width: 100%;
     position: absolute;
     background: linear-gradient(0deg, white, transparent);
     height: 50px;
     bottom: 0;
-}
+} */
 </style>

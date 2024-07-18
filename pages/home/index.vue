@@ -3,6 +3,7 @@
         <div class="sticky top-0 hidden md:block">
 
         </div>
+
         <div class="col-span-4 md:col-span-2 mx-auto p-2">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div
@@ -131,14 +132,17 @@
                                 <div class="relative">
                                     <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
                                         v-model:content="content" contentType="html" />
-                                    <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold" :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
+                                    <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
+                                        :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
                                         {{ charCount }} / {{ maxLength }}
                                     </p>
                                 </div>
 
+                                <VueTagsInput v-model="tag" />
 
                                 <div v-if="selectedFiles.length > 0" class="my-4">
-                                    <div class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
+                                    <div
+                                        class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
                                         <div v-for="(file, index) in selectedFiles" :key="index"
                                             class="relative group w-32 h-32 flex-none border-[1px] border-[##f1f1f1] rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                                             <div class="w-full h-full overflow-hidden border-e">
@@ -171,7 +175,8 @@
                         <template #footer>
                             <div class="flex justify-end">
 
-                                <UButton size="lg" @click="submitForm" class="px-4 py-2" icon="i-heroicons-arrow-right"trailing>Post</UButton>
+                                <UButton size="lg" @click="submitForm" class="px-4 py-2" icon="i-heroicons-arrow-right"
+                                    trailing>Post</UButton>
                             </div>
                         </template>
                     </UCard>
@@ -192,7 +197,7 @@ import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 
 
 definePageMeta({
-    layout: 'guest',
+    layout: 'auth',
     title: 'Forgot password',
     middleware: []
 })
@@ -206,6 +211,7 @@ const content = ref('');
 const inputFileImage = ref()
 const selectedFiles = ref([])
 const isLoading = ref(false)
+const tag = ref()
 
 const options = ref({
     modules: {
@@ -330,5 +336,28 @@ onMounted(() => {
 :deep(.ql-container.ql-snow) {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+}
+:deep(.vue-tags-input.ti-focus){
+    max-width: 100% !important;
+}
+:deep(.vue-tags-input.ti-focus > .ti-input) {
+    margin-top: 10px !important;
+    border: 1px solid #f1f1f1 !important;
+    border-radius: 6px !important;
+}
+
+:deep(input.ti-valid.ti-new-tag-input) {
+    font-size: 10px !important;
+}
+:deep(.ti-valid.ti-tag){
+    background-color: #0f172a !important;
+}
+:deep(.ti-tag-center span){
+  font-size: 10px !important;
+  line-height: inherit !important;
+}
+
+:deep(.ti-icon-close:before){
+  font-size: 10px !important;
 }
 </style>

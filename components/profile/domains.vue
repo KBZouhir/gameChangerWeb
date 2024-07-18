@@ -1,10 +1,10 @@
 <script setup>
-import { apiGetInterests } from "~/composables/store/useInterests";
+// import { apiGetInterests } from "~/composables/store/useInterests";
 import { apiGetDomains, apiGetDomainBySector } from "~/composables/store/useDomains";
 import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors";
 import { completeProfile } from "~/composables/store/useApiAuth";
 import { errorAlert } from "~/composables/useAlert";
-import { useInterestsStore } from "~/stores/interests";
+// import { useInterestsStore } from "~/stores/interests";
 import { useBusinessSectorsStore } from "~/stores/business-sectors";
 import { useDomainsStore } from "~/stores/domains";
 
@@ -13,8 +13,8 @@ definePageMeta({
     title: "Login Page",
 });
 
-const intrestBusinessSectorStore = useBusinessSectorsStore();
-const intrestDomainsStore = useDomainsStore();
+const businessSectorStore = useBusinessSectorsStore();
+const domainsStore = useDomainsStore();
 
 const isOpen = ref(false);
 const showDomains = ref(false);
@@ -23,10 +23,11 @@ const searchBuinessSector = ref();
 const form = ref()
 
 
-const domains = computed(() => intrestDomainsStore.getDomains);
-const businessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
-const filteredBusinessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
+const domains = computed(() => domainsStore.getDomains);
+const businessSectors = computed(() => businessSectorStore.getBusinessSectors);
+const filteredBusinessSectors = computed(() => businessSectorStore.getBusinessSectors);
 
+console.log(businessSectors.value);
 
 const selectedSector = ref(null);
 const selectedDomains = ref([]);
@@ -35,7 +36,7 @@ const selectedViewDomains = ref([]);
 
 
 const getDataFromApi = async () => {
-    await apiGetInterests();
+    // await apiGetInterests();
     await apiGetBusinessSectors()
 };
 
@@ -89,8 +90,6 @@ const selectDomain = (domain) => {
 const searchBuinessSectors = (name) => {
     filteredBusinessSectors.value = businessSectors.value.filter((businessSector) => businessSector.translated_name.toLowerCase().includes(name.toLowerCase()));
 }
-
-
 
 </script>
 

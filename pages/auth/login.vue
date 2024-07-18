@@ -98,7 +98,7 @@ async function onSubmit(event) {
         const { is_completed, is_email_verified, is_phone_verified, phone, email } = result.data.user
         if (is_completed && (is_email_verified || is_phone_verified)) {
             // go to dashboard
-            navigateTo('dashboard')
+            navigateTo('/home')
             return
         }
 

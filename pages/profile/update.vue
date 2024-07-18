@@ -2,6 +2,7 @@
 definePageMeta({
     layout: "auth",
     title: "Login Page",
+    middleware: ['auth']
 });
 
 const currentStep = ref(0)
@@ -158,12 +159,12 @@ const currentStep = ref(0)
 </template>
 
 <style scoped>
-.cut-text::before{
+/* .cut-text::before{
     content: '';
     width: 100%;
     position: absolute;
     background: linear-gradient(0deg, white, transparent);
     height: 50px;
     bottom: 0;
-}
+} */
 </style>

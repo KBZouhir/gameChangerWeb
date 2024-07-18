@@ -23,12 +23,13 @@ const isOpen = ref(false);
 const isOpenMap = ref(true);
 const showDomains = ref(false);
 const isLoading = ref(false);
+const domainLoading = ref(false);
 const steps = ref(3);
 const searchBuinessSector = ref();
 const form = ref()
 
 
-const interests = computed(() => intrestStore.getInterests);
+// const interests = computed(() => intrestStore.getInterests);
 const domains = computed(() => intrestDomainsStore.getDomains);
 const businessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
 const filteredBusinessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
@@ -38,7 +39,7 @@ const selectedSector = ref(null);
 const selectedDomains = ref([]);
 const selectedViewDomains = ref([]);
 
-
+console.log(businessSectors.value);
 const formData = reactive({
   interests: [],
   domains: [],
@@ -53,7 +54,7 @@ const formData = reactive({
 });
 
 const getDataFromApi = async () => {
-  await apiGetInterests();
+  // await apiGetInterests();
   await apiGetBusinessSectors()
 };
 
@@ -68,9 +69,9 @@ watch(() => searchBuinessSector.value, (val) => {
 const getdomain = async (sector) => {
   selectedSector.value = sector;
   const qurey = { business_sector: selectedSector.value.id };
-  isLoading.value = true;
+  domainLoading.value = true;
   await apiGetDomainBySector(qurey).then(() => {
-    isLoading.value = false;
+    domainLoading.value = false;
   });
   showDomains.value = true;
 };
@@ -143,12 +144,23 @@ const submitForm = async () => {
 
   payload.address = formData.address;
 
-  //console.log(payload);
+  payload.address.lat = payload.address.lat.toString();
+  payload.address.lon = payload.address.lon.toString();
+
   const result = await completeProfile(payload);
   console.log(result.error.data.errors);
-  result.error.data.errors.map((err) => {
-    console.log(err);
-  })
+
+  for (const key in result.error.data.errors) {
+    if (result.error.data.errors.hasOwnProperty(key)) {
+      console.log(result.error.data.errors[key][0]);
+    }
+  }
+  if(result?.success){
+    await navigateTo('/home')
+  }
+  // result.error.data.errors.map((err) => {
+  //   console.log(err);
+  // })
 };
 </script>
 
@@ -156,7 +168,7 @@ const submitForm = async () => {
   <div class="relative bg-slate-50 dark:bg-slate-800">
     <div class="mx-auto max-w-s w-full max-w-screen-xl  h-full   grid grid-cols-5 gap-0 "
       :class="activeStep != 2 ? 'h-screen' : ''">
-      <div class="flex justify-center items-center col-span-5 lg:col-span-3 ">
+      <div class="flex bg-slate-50 justify-center items-center col-span-5 lg:col-span-3 ">
         <div class="h-full flex flex-col w-full px-4 sm:px-6 lg:px-2 py-8">
           <h1 class="text-3xl font-bold">Complete profile</h1>
 
@@ -170,8 +182,8 @@ const submitForm = async () => {
             </p>
             <div class="h-full">
               <div class="flex flex-wrap gap-4 py-8 overflow-auto">
-                <template v-for="interest in interests" key="person.name">
-                  <CustomCheckbox :label="interest.name" v-model="formData.interests" :value="interest" />
+                <template v-for="interest in businessSectors">
+                  <CustomCheckbox :label="interest.translated_name" v-model="formData.interests" :value="interest" />
                 </template>
               </div>
             </div>
@@ -253,7 +265,8 @@ const submitForm = async () => {
           </div>
 
           <div class="flex justify-between space-x-4 my-8">
-            <UButton variant="ghost" @click="activeStep--" :disabled="activeStep <= 0" class="px-6 py-3 text-[#0F1454] hover:bg-white">
+            <UButton variant="ghost" @click="activeStep--" :disabled="activeStep <= 0"
+              class="px-6 py-3 text-[#0F1454] hover:bg-white">
               Previous
             </UButton>
             <UButton @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="activeStep >= steps - 1"
@@ -269,7 +282,7 @@ const submitForm = async () => {
         <Loading v-model="isLoading" />
 
         <USlideover v-model="isOpen">
-          <Loading v-model="isLoading" />
+          <Loading v-model="domainLoading" />
           <div class="p-4 flex-1 overflow-y-auto">
             <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
               class="flex sm:hidden absolute end-5 top-5 z-10" square padded @click="isOpen = false" />
@@ -354,7 +367,7 @@ const submitForm = async () => {
           </div>
         </USlideover>
       </div>
-      <div class=" col-span-2 h-full flex-1 hidden lg:flex justify-center items-center relative">
+      <div class=" col-span-2 bg-slate-50 h-full flex-1 hidden lg:flex justify-center items-center relative">
         <img class="absolute right-0 top-0" width="80%" src="~/assets/svg/particules/gradient.svg" alt="">
         <img src="~/assets/svg/vectors/complete-profile.svg" v-if="activeStep == 0" draggable="false" width="50%">
         <img src="~/assets/svg/vectors/intelligence.svg" v-if="activeStep == 1" draggable="false" width="50%">
