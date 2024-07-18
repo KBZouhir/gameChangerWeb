@@ -121,13 +121,12 @@ const logout = async () => {
     initialCache: false,
     method: "POST",
   });
-  if (data.success) {
+  if (data?.success) {
     authStore.syncAuthUser(null);
     authStore.syncLoginState(false);
     const cookie = useCookie("user_access_token");
     cookie.value = null;
   }
-  useRouter().push("/auth/login")
 };
 
 async function useUser() {

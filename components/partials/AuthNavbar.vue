@@ -11,7 +11,8 @@ watchEffect(() => {
 });
 
 const logoutUser = async () => {
-    const result = await logout();
+    const result = await logout()
+    await navigateTo('/auth/login')
 
 }
 

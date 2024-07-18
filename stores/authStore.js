@@ -20,7 +20,7 @@ export const useAuthStore = defineStore("AuthStore", {
     },
     syncLoginState(state) {
       if (typeof state == "boolean") {
-        this.isLoggedIn = state;
+        this.loginState = state;
         return;
       }
 
