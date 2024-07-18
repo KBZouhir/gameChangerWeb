@@ -8,11 +8,12 @@ import { warningAlert, successAlert } from '~/composables/useAlert'
 definePageMeta({
     layout: 'guest',
     title: 'Forgot password',
-    middleware: 'guest'
+    middleware: ['guest']
 })
 
 const form = ref()
 const linkSend = ref(false)
+const isLoading = ref(false)
 const state = reactive({
     email: undefined,
     phone: undefined,

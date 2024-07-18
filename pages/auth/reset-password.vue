@@ -7,7 +7,7 @@ import schema from '~/schemas/auth/resetPassword'
 definePageMeta({
     layout: 'guest',
     title: 'Login Page',
-    middleware: 'guest'
+
 })
 
 const route = useRoute()

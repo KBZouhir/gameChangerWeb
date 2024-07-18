@@ -78,7 +78,6 @@ const login = async (payload) => {
 
  
   if (data) {
-    
     const userTokenCookie = useCookie("user_access_token");
     userTokenCookie.value = data.token;
     authStore.syncAuthUser(data.user);
@@ -117,16 +116,18 @@ const completeProfile = async (payload) => {
 };
 
 const logout = async () => {
+  const authStore = useAuthStore();
   const { data, refresh, error, pending } = await useApi(`/logout`, {
     initialCache: false,
     method: "POST",
   });
   if (data.success) {
     authStore.syncAuthUser(null);
+    authStore.syncLoginState(false);
     const cookie = useCookie("user_access_token");
     cookie.value = null;
   }
-  navigateTo("/auth/login");
+  useRouter().push("/auth/login")
 };
 
 async function useUser() {

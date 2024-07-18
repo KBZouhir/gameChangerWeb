@@ -190,6 +190,13 @@ import FsLightbox from "fslightbox-vue/v3";
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 
+
+definePageMeta({
+    layout: 'guest',
+    title: 'Forgot password',
+    middleware: ['auth']
+})
+
 const toggler = ref(false)
 const slide = ref(1)
 const isOpen = ref(false)
