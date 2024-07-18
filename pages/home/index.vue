@@ -194,7 +194,7 @@ import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 definePageMeta({
     layout: 'guest',
     title: 'Forgot password',
-    middleware: ['auth']
+    middleware: []
 })
 
 const toggler = ref(false)

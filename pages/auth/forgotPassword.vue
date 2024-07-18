@@ -23,6 +23,7 @@ const state = reactive({
 
 async function onSubmit(event) {
     let {data} = event;
+    isLoading.value = true
     const result = await forgotPassword(data);
     if (!result.data) {
         const error = handleApiError(result.error);
@@ -39,6 +40,8 @@ async function onSubmit(event) {
     if(result.data?.success == false){
         warningAlert(result.data?.status)
     }
+
+    isLoading.value = false
 }
 
 </script>
