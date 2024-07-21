@@ -129,16 +129,17 @@
                         </template>
                         <div class="flex flex-col space-y-4 relative">
                             <div class="flex flex-col">
-                                <div class="relative">
-                                    <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
+                                <div class="relative" :class="(keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == '') ? 'border-[1px] border-red-400 rounded-md' : ''">
+                                    <QuillEditor :options="options" theme="bubble"  @text-change="onTextChange"
                                         v-model:content="content" contentType="html" />
                                     <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                                         :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
                                         {{ charCount }} / {{ maxLength }}
                                     </p>
                                 </div>
+                                <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''" class="text-red-500 text-[10px] mb-2">Content can not be empty</p>
 
-                                <VueTagsInput v-model="tag" />
+                                <VueTagsInput v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags"/>
 
                                 <div v-if="selectedFiles.length > 0" class="my-4">
                                     <div
@@ -175,7 +176,7 @@
                         <template #footer>
                             <div class="flex justify-end">
 
-                                <UButton size="lg" @click="submitForm" class="px-4 py-2" icon="i-heroicons-arrow-right"
+                                <UButton size="lg" @click="submitForm" :loading="isLoading" class="px-4 py-2" icon="i-heroicons-arrow-right"
                                     trailing>Post</UButton>
                             </div>
                         </template>
@@ -191,6 +192,7 @@
 
 
 <script setup>
+import { create } from '~/composables/store/usePost'
 import FsLightbox from "fslightbox-vue/v3";
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
@@ -212,6 +214,9 @@ const inputFileImage = ref()
 const selectedFiles = ref([])
 const isLoading = ref(false)
 const tag = ref()
+const tags = ref([])
+
+const errors = ref([])
 
 const options = ref({
     modules: {
@@ -247,6 +252,9 @@ const openLightboxOnSlide = (number) => {
     toggler.value = !toggler.value;
 }
 
+const keyExists = (key) => {
+   return errors.value.some(error => error.key === key);
+}
 
 const removeSelectedImage = (index) => {
     selectedFiles.value.splice(index, 1);
@@ -303,16 +311,39 @@ const onImageFileChange = (event) => {
 
 
 const validationData = () => {
-
+    if(content.value.replace(/<[^>]*>/g, '').trim() == ""){
+        errors.value.push({key: 'content', value: 'Content can not be empty'})
+    }
 }
 
-const submitForm = () => {
-    console.log(content.value);
+
+const submitForm = async () => {
+    let hashtags = []
+    isLoading.value = true
+    validationData()
+    if(errors.value.length > 0){
+        isLoading.value = false
+        return
+    }
+
+    tags.value.forEach((tag) => {
+        hashtags.push(tag.text)
+    })
+
+    selectedFiles.value.forEach((file)=> {
+        console.log(file);
+    })
+    
+    let payload = {
+        'description' : content.value,
+        'hashtags' : hashtags
+    }
+    
+   const result = await create(payload)
+
+    isLoading.value = false
 }
 
-onMounted(() => {
-
-})
 
 </script>
 
@@ -323,6 +354,7 @@ onMounted(() => {
     border-radius: 8px;
     padding-bottom: 26px;
 }
+
 
 :deep(.ql-container) {
     font-size: 12px;
