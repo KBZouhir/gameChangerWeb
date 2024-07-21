@@ -19,4 +19,8 @@
   filter: blur(1rem);
 }
 
+.is-scrollbar-hidden{
+  scrollbar-width: none;
+}
+
 </style>

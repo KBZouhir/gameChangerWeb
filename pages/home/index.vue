@@ -1,10 +1,10 @@
 <template>
-    <div class="grid grid-cols-4 gap-6 bg-[#F1F5F9] py-8">
+    <div class="h-full grid grid-cols-4 gap-6 bg-[#F1F5F9] py-8">
         <div class="sticky top-0 hidden md:block">
 
         </div>
 
-        <div class="col-span-4 md:col-span-2 mx-auto p-2">
+        <div class="flex flex-col col-span-4 md:col-span-2 mx-auto p-2">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div
                     class="md:col-span-3 p-8 text-white bg-[#0F172A] rounded-lg flex flex-col justify-center space-y-4">
@@ -51,7 +51,7 @@
                 </button>
             </div>
 
-            <UCard v-for="i in 1" class="my-8">
+            <UCard v-for="post in posts" class="my-8">
                 <div class="flex justify-between items-center flex-wrap">
                     <div class="flex items-center space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
@@ -115,6 +115,12 @@
                 </div>
             </UCard>
 
+            <div v-if="!posts" class="flex flex-1 flex-col items-center justify-center py-4">
+                <img src="~/assets/svg/vectors/empty.svg" alt="" draggable="false">
+                <h2 class="font-semibold text-2xl">No data founds !</h2>
+                <p>You don't have any notification yet.</p>
+            </div>
+
             <ClientOnly fallback-tag="div" fallback="">
                 <UModal v-model="isOpen" :ui="{ width: 'w-full sm:w-full' }" prevent-close>
                     <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
@@ -129,22 +135,24 @@
                         </template>
                         <div class="flex flex-col space-y-4 relative">
                             <div class="flex flex-col">
-                                <div class="relative" :class="(keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == '') ? 'border-[1px] border-red-400 rounded-md' : ''">
-                                    <QuillEditor :options="options" theme="bubble"  @text-change="onTextChange"
+                                <div class="relative"
+                                    :class="(keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == '') ? 'border-[1px] border-red-400 rounded-md' : ''">
+                                    <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
                                         v-model:content="content" contentType="html" />
                                     <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                                         :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
                                         {{ charCount }} / {{ maxLength }}
                                     </p>
                                 </div>
-                                <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''" class="text-red-500 text-[10px] mb-2">Content can not be empty</p>
+                                <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
+                                    class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
-                                <VueTagsInput v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags"/>
+                                <VueTagsInput v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags" />
 
-                                <div v-if="selectedFiles.length > 0" class="my-4">
+                                <div v-if="selectedViewFiles.length > 0" class="my-4">
                                     <div
                                         class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
-                                        <div v-for="(file, index) in selectedFiles" :key="index"
+                                        <div v-for="(file, index) in selectedViewFiles" :key="index"
                                             class="relative group w-32 h-32 flex-none border-[1px] border-[##f1f1f1] rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                                             <div class="w-full h-full overflow-hidden border-e">
                                                 <img :src="file" alt="Selected Image"
@@ -176,15 +184,15 @@
                         <template #footer>
                             <div class="flex justify-end">
 
-                                <UButton size="lg" @click="submitForm" :loading="isLoading" class="px-4 py-2" icon="i-heroicons-arrow-right"
-                                    trailing>Post</UButton>
+                                <UButton size="lg" @click="submitForm" :loading="isLoading" class="px-4 py-2"
+                                    icon="i-heroicons-arrow-right" trailing>Post</UButton>
                             </div>
                         </template>
                     </UCard>
                 </UModal>
             </ClientOnly>
         </div>
-        <USkeleton class="h-screen sticky top-0 hidden md:block">
+        <USkeleton class="sticky top-0 hidden md:block">
 
         </USkeleton>
     </div>
@@ -192,10 +200,12 @@
 
 
 <script setup>
-import { create } from '~/composables/store/usePost'
+import { create, index } from '~/composables/store/usePost'
+import { usePostStore } from "~/stores/posts";
 import FsLightbox from "fslightbox-vue/v3";
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
+import Compressor from 'compressorjs';
 
 
 definePageMeta({
@@ -212,10 +222,10 @@ const charCount = computed(() => countChars(content.value));
 const content = ref('');
 const inputFileImage = ref()
 const selectedFiles = ref([])
+const selectedViewFiles = ref([])
 const isLoading = ref(false)
 const tag = ref()
 const tags = ref([])
-
 const errors = ref([])
 
 const options = ref({
@@ -225,14 +235,26 @@ const options = ref({
     theme: 'bubble',
 })
 
-const images = ref([
-    'https://i.imgur.com/fsyrScY.jpg',
-    'https://i.imgur.com/fsyrScY.jpg',
-    'https://i.imgur.com/fsyrScY.jpg',
-    'https://i.imgur.com/fsyrScY.jpg',
-    'https://i.imgur.com/fsyrScY.jpg',
+defineShortcuts({
+    escape: {
+        usingInput: true,
+        whenever: [isOpen],
+        handler: () => { isOpen.value = false }
+    }
+})
 
-])
+
+const postStore = usePostStore()
+
+const posts = computed(() => postStore.getPosts);
+
+const getDataFromApi = async () => {
+    await index()
+};
+
+watchEffect(() => {
+    getDataFromApi();
+});
 
 const conditionalClass = (index) => {
     let classList = []
@@ -253,21 +275,18 @@ const openLightboxOnSlide = (number) => {
 }
 
 const keyExists = (key) => {
-   return errors.value.some(error => error.key === key);
+    return errors.value.some(error => error.key === key)
+}
+
+const getErrorMessage = (key) => {
+    const error = errors.value.find(error => error.key === key)
+    return error ? error.value : ''
 }
 
 const removeSelectedImage = (index) => {
     selectedFiles.value.splice(index, 1);
+    selectedViewFiles.value.splice(index, 1);
 }
-
-defineShortcuts({
-    escape: {
-        usingInput: true,
-        whenever: [isOpen],
-        handler: () => { isOpen.value = false }
-    }
-})
-
 
 const countChars = (htmlString) => {
     const tempDiv = document.createElement('div');
@@ -291,37 +310,47 @@ const triggerFileInput = () => {
 const onImageFileChange = (event) => {
     if (event.target.files) {
         Object.entries(event.target.files).forEach(([key, value]) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    selectedFiles.value.push(canvas.toDataURL('image/webp'))
-                };
-            }
-            reader.readAsDataURL(value);
+            selectedFiles.value.push(value)
+            new Compressor(value, {
+                quality: 0.6,
+                success(result) {
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            selectedViewFiles.value.push(canvas.toDataURL('image/webp'))
+                        };
+                    }
+                    reader.readAsDataURL(value);
+
+                },
+                error(err) {
+                    console.log(err.message);
+                },
+            })
         });
     }
 }
 
 
 const validationData = () => {
-    if(content.value.replace(/<[^>]*>/g, '').trim() == ""){
-        errors.value.push({key: 'content', value: 'Content can not be empty'})
+    if (content.value.replace(/<[^>]*>/g, '').trim() == "") {
+        errors.value.push({ key: 'content', value: 'Content can not be empty' })
     }
 }
-
 
 const submitForm = async () => {
     let hashtags = []
     isLoading.value = true
     validationData()
-    if(errors.value.length > 0){
+    if (errors.value.length > 0) {
         isLoading.value = false
         return
     }
@@ -330,16 +359,12 @@ const submitForm = async () => {
         hashtags.push(tag.text)
     })
 
-    selectedFiles.value.forEach((file)=> {
-        console.log(file);
-    })
-    
-    let payload = {
-        'description' : content.value,
-        'hashtags' : hashtags
-    }
-    
-   const result = await create(payload)
+    let formData = new FormData();
+    formData.append('description', content.value);
+    formData.append('hashtags', hashtags);
+    formData.append('image', selectedFiles.value[0]);
+
+    const result = await create(formData)
 
     isLoading.value = false
 }
@@ -369,9 +394,11 @@ const submitForm = async () => {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-:deep(.vue-tags-input.ti-focus){
+
+:deep(.vue-tags-input.ti-focus) {
     max-width: 100% !important;
 }
+
 :deep(.vue-tags-input.ti-focus > .ti-input) {
     margin-top: 10px !important;
     border: 1px solid #f1f1f1 !important;
@@ -381,15 +408,17 @@ const submitForm = async () => {
 :deep(input.ti-valid.ti-new-tag-input) {
     font-size: 10px !important;
 }
-:deep(.ti-valid.ti-tag){
+
+:deep(.ti-valid.ti-tag) {
     background-color: #0f172a !important;
 }
-:deep(.ti-tag-center span){
-  font-size: 10px !important;
-  line-height: inherit !important;
+
+:deep(.ti-tag-center span) {
+    font-size: 10px !important;
+    line-height: inherit !important;
 }
 
-:deep(.ti-icon-close:before){
-  font-size: 10px !important;
+:deep(.ti-icon-close:before) {
+    font-size: 10px !important;
 }
 </style>

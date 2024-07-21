@@ -1,28 +1,25 @@
 import { useApi } from "~/composables/useApi";
-import { successAlert, errorAlert } from "~/composables/useAlert";
-import { useAuthStore } from "~/stores/authStore";
+import { usePostStore } from "~/stores/posts";
 
-
+const index = async () => {
+  let store = usePostStore();
+  const { data, refresh, error, pending } = await useApi(`/posts`, {
+    initialCache: false,
+    method: "GET",
+  });
+  if (data) {
+    store.setPosts(data.data)
+  }
+};
 
 const create = async (payload) => {
-  console.log('data here', payload);
-  // const { data, refresh, error, pending } = await useApi(`/posts`, {
-  //   initialCache: false,
-  //   body: payload,
-  //   method: "POST",
-  // });
+  const { data, refresh, error, pending } = await useApi(`/posts`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
 
-  // console.log(data);
-}
-
-
-const getPosts = async (payload) => {
-
+  console.log(data);
 };
 
-
-
-
-export {
-  create
-};
+export { index, create };
