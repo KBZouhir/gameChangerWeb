@@ -7,7 +7,7 @@ const FORBIDDEN_KEY = 'messages.errors.forbiddenError';
 import {errorAlert} from "~/composables/useAlert";
 
 
-export const handleApiError = error => {
+export const handleApiError = (error, prefix = null) => {
     // const {$__} = useNuxtApp();
     const status = error.statusCode;
     const apiError = {
@@ -49,7 +49,7 @@ export const handleApiError = error => {
     {
         const errors = error.data.errors;
         const formattedErrors = Object.entries(errors).flatMap(([key, messages]) =>
-            messages.map(message => ({ path: key, message }))
+            messages.map(message => ({ path: prefix ? `${prefix}.${key}` : key, message }))
         );
         apiError.status = 422;
         apiError.message = error.data.message;

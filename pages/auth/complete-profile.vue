@@ -1,12 +1,13 @@
 <script setup>
-import { apiGetInterests } from "~/composables/store/useInterests";
-import { apiGetDomains, apiGetDomainBySector } from "~/composables/store/useDomains";
-import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors";
-import { completeProfile } from "~/composables/store/useApiAuth";
-import { errorAlert } from "~/composables/useAlert";
-import { useInterestsStore } from "~/stores/interests";
-import { useBusinessSectorsStore } from "~/stores/business-sectors";
-import { useDomainsStore } from "~/stores/domains";
+import { apiGetInterests } from "~/composables/store/useInterests"
+import { apiGetDomains, apiGetDomainBySector } from "~/composables/store/useDomains"
+import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors"
+import { completeProfile } from "~/composables/store/useApiAuth"
+import { errorAlert } from "~/composables/useAlert"
+import { useInterestsStore } from "~/stores/interests"
+import { useBusinessSectorsStore } from "~/stores/business-sectors"
+import { useDomainsStore } from "~/stores/domains"
+import { handleApiError } from '~/composables/useApiError'
 
 definePageMeta({
   layout: "auth",
@@ -39,7 +40,6 @@ const selectedSector = ref(null);
 const selectedDomains = ref([]);
 const selectedViewDomains = ref([]);
 
-console.log(businessSectors.value);
 const formData = reactive({
   interests: [],
   domains: [],
@@ -148,19 +148,16 @@ const submitForm = async () => {
   payload.address.lon = payload.address.lon.toString();
 
   const result = await completeProfile(payload);
-  console.log(result.error.data.errors);
 
-  for (const key in result.error.data.errors) {
-    if (result.error.data.errors.hasOwnProperty(key)) {
-      console.log(result.error.data.errors[key][0]);
+  if (!result.data) {
+    const error = handleApiError(result.error);
+    if (error.status === 422) {
+      form.value.setErrors(error.errors);
     }
   }
-  if(result?.success){
+  if (result?.success) {
     await navigateTo('/home')
   }
-  // result.error.data.errors.map((err) => {
-  //   console.log(err);
-  // })
 };
 </script>
 
@@ -235,21 +232,21 @@ const submitForm = async () => {
               <Map v-model="formData.address" :is-open-map="true" />
 
               <UForm ref="form" div class="space-y-4 p-1 pt-4 ">
-                <UFormGroup label="Address" name="address">
+                <UFormGroup label="Address" name="address.address">
                   <UInput size="lg" placeholder="Address" v-model="formData.address.address" />
                 </UFormGroup>
 
                 <div class="grid grid-cols-2 gap-4">
-                  <UFormGroup label="City" name="city">
+                  <UFormGroup label="City" name="address.city">
                     <UInput size="lg" placeholder="City" v-model="formData.address.city" />
                   </UFormGroup>
 
-                  <UFormGroup label="Country" name="country">
+                  <UFormGroup label="Country" name="address.country">
                     <UInput size="lg" placeholder="Country" v-model="formData.address.country" />
                   </UFormGroup>
                 </div>
 
-                <UFormGroup label="Zip code" name="zip_code">
+                <UFormGroup label="Zip code" name="address.zip_code">
                   <UInput size="lg" placeholder="Zip code" v-model="formData.address.zip_code" />
                 </UFormGroup>
 
@@ -355,12 +352,7 @@ const submitForm = async () => {
               </div>
 
               <div class="grid grid-cols-2 gap-4 sticky bottom-0 bg-white py-4">
-                <UButton block color="primary" size="lg" @click="
-                    {
-                  selectedSector = null;
-                  showDomains = false;
-                }
-                  " variant="outline">Back</UButton>
+                <UButton block color="primary" size="lg" @click="{selectedSector = null;showDomains = false;}" variant="outline">Back</UButton>
                 <UButton block size="lg" label="Save" @click="dispalyDomains" />
               </div>
             </div>

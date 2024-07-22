@@ -66,7 +66,6 @@ const initializeAutocomplete = () => {
             const place = autocomplete.getPlace()
 
             const components = place.address_components
-            console.log(components);
             const getAddressComponent = (type) => {
                 return components.find(component => component.types.includes(type))?.long_name || ''
             }

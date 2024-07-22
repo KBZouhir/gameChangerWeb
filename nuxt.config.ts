@@ -26,12 +26,10 @@ export default defineNuxtConfig({
   snackbar: {
     bottom: true,
     right: true,
-    duration: 5000
+    duration: 5000,
   },
 
-  plugins: [
-    { src: '~/plugins/vue-tags-input', mode: 'client'}
-  ],
+  plugins: [{ src: "~/plugins/vue-tags-input", mode: "client" }],
 
   tailwindcss: {
     config: {
@@ -60,7 +58,14 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      googleMapsApiKey: "AIzaSyCGknJpFjo7lwAIMDBruZgT56TdZYGotnA",
+      googleMapsApiKey: process.env.GOOGLE_MAP_KEY,
+      apiKey: process.env.FIRE_APIKEY,
+      authDomain: process.env.FIRE_AUTHDOMAIN,
+      projectId: process.env.FIRE_PROJECTID,
+      storageBucket: process.env.FIRE_STORAGEBUCKET,
+      messagingSenderId: process.env.FIRE_MESSAGINGSENDERID,
+      appId: process.env.FIRE_APPID,
+      measurementId: process.env.FIRE_MEASUREMENTID,
     },
   },
 
@@ -75,10 +80,10 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: ['@sipec/vue3-tags-input'],
+      include: ["@sipec/vue3-tags-input"],
     },
     ssr: {
-      noExternal: ['@sipec/vue3-tags-input'],
+      noExternal: ["@sipec/vue3-tags-input"],
     },
   },
 });

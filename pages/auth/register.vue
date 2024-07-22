@@ -83,6 +83,7 @@ async function onSubmit(event) {
     if (!result.data) {
         const error = handleApiError(result.error);
         if (error.status === 422) {
+            console.log(error.errors);
             form.value.setErrors(error.errors);
         }
     }

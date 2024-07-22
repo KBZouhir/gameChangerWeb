@@ -76,7 +76,6 @@ const getRecaptchaToken = async () => {
         await window.recaptchaVerifier.render();
         const token = await window.recaptchaVerifier.verify();
         recaptchaToken.value = token;
-        console.log(token);
     } catch (error) {
         console.error('Error getting reCAPTCHA token:', error);
     }

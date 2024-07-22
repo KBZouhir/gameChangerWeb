@@ -7,7 +7,7 @@ export const infoAlert = (message) => {
 }
 
 export const errorAlert = (message) => {
-    // useNuxtApp().$toast.error(message);
+    //useNuxtApp().$toast.error(message);
 }
 
 export const warningAlert = (message) => {

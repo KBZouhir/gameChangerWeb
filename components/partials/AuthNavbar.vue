@@ -72,11 +72,13 @@ const items = [
                             <img src="/assets/svg/icons/notification.svg">
                         </template>
                     </UButton>
-                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
-                        <template #leading>
-                            <img src="/assets/svg/icons/message.svg">
-                        </template>
-                    </UButton>
+                    <nuxt-link to="/chat">
+                        <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
+                            <template #leading>
+                                <img src="/assets/svg/icons/message.svg">
+                            </template>
+                        </UButton>
+                    </nuxt-link>
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                         :popper="{ placement: 'bottom-start' }">
                         <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
