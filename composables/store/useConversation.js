@@ -20,7 +20,6 @@ export const getConversations = async () => {
       (conversation) => conversation.id
     );
 
-
   } catch (error) {
     console.error("Error fetching conversations:", error)
   }

@@ -57,9 +57,9 @@
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                             <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
                         </div>
-                        <div>
+                        <div class="flex flex-col">
                             <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>
-                            <span class="text-xs -mt-1">{{ $moment(post.created_at).fromNow()}}</span>
+                            <span class="text-xs -mt-[0.5px]">{{ $moment(post.created_at).fromNow()}}</span>
                         </div>
                     </div>
                     <div class="flex space-x-4">
@@ -67,7 +67,7 @@
                     </div>
                 </div>
                 <div class="my-4">
-                    <div v-html="post.description"></div>
+                    <MoreAndLess :description="post.description" :number="200" />
                 </div>
 
                 <div>
@@ -82,8 +82,7 @@
                                         class="absolute top-0 left-0 w-full h-full bg-slate-900 opacity-60 rounded-lg flex justify-center items-center">
                                     </div>
                                     <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center">
-                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4
-                                            }}</span>
+                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4 }}</span>
                                     </div>
                                 </div>
                             </div>

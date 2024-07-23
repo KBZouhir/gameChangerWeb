@@ -12,7 +12,7 @@ import { handleApiError } from '~/composables/useApiError'
 definePageMeta({
   layout: "auth",
   title: "Login Page",
-  middleware: ['auth']
+  middleware: ['auth', 'valid']
 });
 
 const intrestStore = useInterestsStore();
