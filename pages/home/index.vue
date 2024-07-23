@@ -51,15 +51,15 @@
                 </button>
             </div>
 
-            <UCard v-for="post in posts" class="my-8">
+            <UCard v-for="post in posts" class="my-2">
                 <div class="flex justify-between items-center flex-wrap">
                     <div class="flex items-center space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                             <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
                         </div>
                         <div>
-                            <h4 class="font-bold">Game changer media</h4>
-                            <span>08:39 am</span>
+                            <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>
+                            <span class="text-xs -mt-1">{{ $moment(post.created_at).fromNow()}}</span>
                         </div>
                     </div>
                     <div class="flex space-x-4">
@@ -67,12 +67,11 @@
                     </div>
                 </div>
                 <div class="my-4">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fringilla natoque id aenean. Lorem ipsum
-                        dolor sit amet, consectetur adipiscing elit. Fringilla natoque id aenean.</p>
+                    <div v-html="post.description"></div>
                 </div>
 
                 <div>
-                    <div class="w-full grid  gap-3" :class="(images.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
+                    <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
                             v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
                             <div class="relative h-full">
@@ -95,11 +94,11 @@
                     <div class="flex items-center space-x-4 my-4 text-sm">
                         <div class="flex items-center space-x-2  font-semibold">
                             <img src="/assets/svg/icons/heart.svg">
-                            <span>1,964</span>
+                            <span>{{ post.reactions_count }}</span>
                         </div>
                         <div class="flex items-center space-x-2 font-semibold">
                             <img src="/assets/svg/icons/comment.svg">
-                            <span>135</span>
+                            <span>{{ post.comments_count }}</span>
                         </div>
                     </div>
 
@@ -247,6 +246,7 @@ defineShortcuts({
 const postStore = usePostStore()
 
 const posts = computed(() => postStore.getPosts);
+console.log(posts.value);
 
 const getDataFromApi = async () => {
     await index()
