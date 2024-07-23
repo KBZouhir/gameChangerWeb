@@ -62,14 +62,17 @@
                             <span class="text-xs -mt-[0.5px]">{{ $moment(post.created_at).fromNow()}}</span>
                         </div>
                     </div>
-                    <div class="flex space-x-4">
-
+                    <div class="flex space-x-4" v-if="post.author.id == user.id">
+                        {{user.full_name}}
                     </div>
                 </div>
                 <div class="my-4">
                     <MoreAndLess :description="post.description" :number="200" />
                 </div>
 
+                <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
+                    <VideoPlayer :videoSrc="post.video.url" poster="https://example.com/poster.jpg" />
+                </ClientOnly>
                 <div>
                     <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
@@ -199,12 +202,15 @@
 
 <script setup>
 import { create, index } from '~/composables/store/usePost'
-import { usePostStore } from "~/stores/posts";
-import FsLightbox from "fslightbox-vue/v3";
-import { QuillEditor } from '@vueup/vue-quill';
-import '@vueup/vue-quill/dist/vue-quill.bubble.css';
-import Compressor from 'compressorjs';
+import { usePostStore } from "~/stores/posts"
+import FsLightbox from "fslightbox-vue/v3"
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import Compressor from 'compressorjs'
+import { useAuthStore } from "~/stores/authStore"
 
+
+const authStore = useAuthStore()
 
 definePageMeta({
     layout: 'auth',
@@ -217,6 +223,7 @@ const slide = ref(1)
 const isOpen = ref(false)
 const maxLength = ref(200);
 const charCount = computed(() => countChars(content.value));
+const user = computed(() => authStore.getAuthUser);
 const content = ref('');
 const inputFileImage = ref()
 const selectedFiles = ref([])
