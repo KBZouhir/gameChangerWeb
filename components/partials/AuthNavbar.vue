@@ -45,7 +45,9 @@ const items = [
             <div class="relative flex h-20 items-center justify-between">
                 <div class="flex items-center justify-center sm:items-stretch sm:justify-start">
                     <div class="flex flex-shrink-0 items-center dark:hidden">
-                        <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
+                        <nuxt-link to="/home">
+                            <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
+                        </nuxt-link>
                     </div>
                 </div>
 
@@ -81,7 +83,7 @@ const items = [
                     </nuxt-link>
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                         :popper="{ placement: 'bottom-start' }">
-                        <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
+                        <UAvatar :src="user.image_url" />
 
                         <template #account="{ item }">
                             <div class="text-left">

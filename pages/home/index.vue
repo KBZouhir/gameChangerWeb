@@ -7,16 +7,21 @@
         <div class="flex flex-col col-span-4 md:col-span-2 mx-auto p-2">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div
-                    class="md:col-span-3 p-8 text-white bg-[#0F172A] rounded-lg flex flex-col justify-center space-y-4">
-                    <h2 class="text-2xl font-semibold">Service banner</h2>
-                    <p>In publishing and graphic design,
-                        Lorem ipsum is a placeholder text</p>
-                    <div>
-                        <UButton label="Discover" color="white" variant="solid" class="px-4">
-                            <template #trailing>
-                                <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
-                            </template>
-                        </UButton>
+                    class="md:col-span-3 text-white bg-[url('~/assets/img/announcent.webp')] bg-cover rounded-lg overflow-hidden">
+                    <div class="p-8 w-full h-full flex flex-col space-y-4 bg-gradient-to-r from-primary to-transparent">
+                        <div>
+                            <span class="text-xs">Game changer media </span>
+                            <h2 class="text-2xl font-bold">Service banner</h2>
+                        </div>
+                        <p class="text-sm">In publishing and graphic design, Lorem ipsum is a placeholder text</p>
+                        <div>
+                            <UButton label="Discover" :ui="{ rounded: 'rounded-full' }" color="white" variant="solid"
+                                class="px-4 py-2">
+                                <template #trailing>
+                                    <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
+                                </template>
+                            </UButton>
+                        </div>
                     </div>
                 </div>
 
@@ -26,7 +31,8 @@
                         <p class="text-4xl font-bold">Get 15%</p>
                     </div>
                     <div>
-                        <UButton label="Grab Offer" color="white" variant="solid" class="px-4">
+                        <UButton label="Grab Offer" :ui="{ rounded: 'rounded-full' }" color="white" variant="solid"
+                            class="px-4 py-2">
                             <template #trailing>
                                 <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
                             </template>
@@ -37,7 +43,7 @@
 
             <div class="p-4 bg-white rounded-xl flex items-center space-x-4 mb-4 mt-8 shadow-sm">
                 <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                    <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
+                    <img :src="user.image_url" class="object-cover" alt="" srcset="">
                 </div>
                 <button class="flex-1 text-start" @click="isOpen = true">
                     <span class="pt-2 select-none">Write something ...</span>
@@ -55,15 +61,15 @@
                 <div class="flex justify-between items-center flex-wrap">
                     <div class="flex items-center space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                            <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
+                            <img :src="post.author.image_url" class="object-cover" alt="" srcset="">
                         </div>
                         <div class="flex flex-col">
                             <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>
-                            <span class="text-xs -mt-[0.5px]">{{ $moment(post.created_at).fromNow()}}</span>
+                            <span class="text-xs -mt-[0.5px]">{{ $moment(post.created_at).fromNow() }}</span>
                         </div>
                     </div>
                     <div class="flex space-x-4" v-if="post.author.id == user.id">
-                        {{user.full_name}}
+                        {{ user.full_name }}
                     </div>
                 </div>
                 <div class="my-4">
@@ -71,7 +77,7 @@
                 </div>
 
                 <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
-                    <VideoPlayer :videoSrc="post.video.url" poster="https://example.com/poster.jpg" />
+                    <VideoPlayer :videoSrc="`${post.video.url}${post.video.path}`" :poster="post.video.thumbnail_url" />
                 </ClientOnly>
                 <div>
                     <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
@@ -85,7 +91,8 @@
                                         class="absolute top-0 left-0 w-full h-full bg-slate-900 opacity-60 rounded-lg flex justify-center items-center">
                                     </div>
                                     <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center">
-                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4 }}</span>
+                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4
+                                            }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -94,10 +101,38 @@
                     <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" />
 
                     <div class="flex items-center space-x-4 my-4 text-sm">
-                        <div class="flex items-center space-x-2  font-semibold">
-                            <img src="/assets/svg/icons/heart.svg">
-                            <span>{{ post.reactions_count }}</span>
-                        </div>
+                        <UPopover mode="hover" :popper="{ placement: 'top-start' }">
+                            <div class="flex items-center space-x-2 font-semibold">
+                                <img src="/assets/svg/icons/heart.svg">
+                                <span>{{ post.reactions_count }}</span>
+                            </div>
+
+                            <template #panel>
+                                <div class="p-2 flex space-x-2">
+                                    <div class="flex flex-col items-center" v-for="reaction in settings.reaction.type">
+                                        <UTooltip text="Like">
+                                            <UButton icon="i-heroicons-hand-thumb-up" size="sm" color="primary" square variant="link" />
+                                        </UTooltip>
+
+                                    </div>
+
+                                    <div class="flex flex-col items-center">
+                                        <UTooltip text="Love">
+                                            <UButton icon="i-heroicons-heart" size="sm" color="primary" square variant="link" />
+                                        </UTooltip>
+                                        
+                                    </div>
+
+                                    <div class="flex flex-col items-center">
+                                        <UTooltip text="Haha">
+                                            <UButton icon="i-heroicons-face-smile" size="sm" color="primary" square variant="link" />
+                                        </UTooltip>
+                                    </div>
+
+                                </div>
+                            </template>
+                        </UPopover>
+
                         <div class="flex items-center space-x-2 font-semibold">
                             <img src="/assets/svg/icons/comment.svg">
                             <span>{{ post.comments_count }}</span>
@@ -106,7 +141,7 @@
 
                     <div class="p-2 bg-[#F1F5F9] rounded-xl flex space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                            <img src="https://i.pravatar.cc/" class="object-cover" alt="" srcset="">
+                            <img :src="user.image_url" class="object-cover" alt="" srcset="">
                         </div>
                         <div class="flex-1">
                             <UTextarea rows="0" :padded="false" autoresize placeholder="Write a comment" variant="none"
@@ -208,9 +243,12 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import Compressor from 'compressorjs'
 import { useAuthStore } from "~/stores/authStore"
+import { useSettings } from "~/stores/settings";
 
 
 const authStore = useAuthStore()
+const settingStore = useSettings()
+const postStore = usePostStore()
 
 definePageMeta({
     layout: 'auth',
@@ -224,6 +262,7 @@ const isOpen = ref(false)
 const maxLength = ref(200);
 const charCount = computed(() => countChars(content.value));
 const user = computed(() => authStore.getAuthUser);
+const settings = computed(() => settingStore.getSettings);
 const content = ref('');
 const inputFileImage = ref()
 const selectedFiles = ref([])
@@ -248,11 +287,8 @@ defineShortcuts({
     }
 })
 
-
-const postStore = usePostStore()
-
 const posts = computed(() => postStore.getPosts);
-console.log(posts.value);
+console.log(user.value);
 
 const getDataFromApi = async () => {
     await index()

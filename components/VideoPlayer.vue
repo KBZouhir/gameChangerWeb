@@ -8,8 +8,10 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { get } from "~/composables/store/useMedia"
 import { useNuxtApp } from '#app'
+
+
+const userTokenCookie = useCookie("user_access_token");
 
 const props = defineProps({
     videoSrc: {
@@ -23,23 +25,39 @@ const props = defineProps({
 })
 
 const videoPlayer = ref(null)
-const videoSrc = ref()
 const { $videojs } = useNuxtApp()
 
 onMounted(async () => {
+
     const player = $videojs(videoPlayer.value, {
         autoplay: false,
         controls: true,
         responsive: true,
         fluid: true
     })
+
+    player.ready(() => {
+        const tech = player.tech({ IWillNotUseThisInPlugins: true })
+        if (tech && tech.constructor.name === 'Html5') {
+            const xhr = tech.options_.xhr
+            xhr.beforeRequest = (options) => {
+                options.headers = {
+                    ...options.headers,
+                    'Authorization': `Bearer ${userTokenCookie.value}`
+                }
+                return options
+            }
+        }
+    })
+
+    onBeforeUnmount(() => {
+        if (player) {
+            player.dispose()
+        }
+    })
 })
 
-onBeforeUnmount(() => {
-    if (player) {
-        player.dispose()
-    }
-})
+
 </script>
 
 <style scoped>

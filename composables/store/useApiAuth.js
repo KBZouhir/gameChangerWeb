@@ -1,6 +1,8 @@
 import { useApi } from "~/composables/useApi";
 import { successAlert, errorAlert } from "~/composables/useAlert";
 import { useAuthStore } from "~/stores/authStore";
+import { useSettings } from "~/stores/settings";
+import { excludeKeys } from '~/utils/excludeKeys'
 
 const register = async (payload) => {
   let cleanData = { ...payload };
@@ -134,6 +136,7 @@ async function useUser() {
   const cookie = useCookie("user_access_token");
   const token = cookie.value;
   let user = authStore.getAuthUser;
+  getSettings()
   if (token && user == null) {
     const key = `me-${(Math.random() + 1).toString(36).substring(7)}`;
 
@@ -150,6 +153,19 @@ async function useUser() {
     }
   }
   // return user;
+}
+
+
+async function getSettings() {
+
+  const settingStore = useSettings();
+  const { data, error } = await useApi(`/settings`, {
+    initialCache: false,
+  });
+
+  if(data.success){
+    settingStore.setSettings(excludeKeys(data, ['success', 'message']))
+  }
 }
 
 

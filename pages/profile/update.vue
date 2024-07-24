@@ -1,4 +1,12 @@
 <script setup>
+import { useAuthStore } from '~/stores/authStore'
+
+const authStore = useAuthStore();
+const user = computed(() => authStore.getAuthUser);
+
+import fallbackImage from '~/assets/img/profile-cover.webp'
+
+
 definePageMeta({
     layout: "auth",
     title: "Login Page",
@@ -17,8 +25,8 @@ const currentStep = ref(0)
             <div class="flex flex-col">
                 <div class="rounded-tr-md rounded-tl-md h-96 w-full overflow-hidden relative">
                     <div class="h-full w-full ">
-                        <img src="https://random-image-pepebigotes.vercel.app/api/random-image"
-                            class="w-full h-full object-cover" alt="">
+                        <img :src="user.cover_image_urls || fallbackImage"
+                            class="w-full h-full object-cover" draggable="false" alt="">
                     </div>
                     <div
                         class="flex space-x-3 absolute  bottom-4 right-4 rounded-full hover:bg-primary text-xs cursor-pointer transition-all duration-150 hover:shadow-md px-4 py-2 backdrop-blur-md bg-white/30">
@@ -32,7 +40,7 @@ const currentStep = ref(0)
                         class="flex md:flex-row flex-col items-center md:items-start space-x-4 space-y-2 w-3/4 mx-auto ">
                         <div
                             class="w-32 h-32 bg-white shadow-sm p-1 rounded-2xl relative -mt-12 md:mx-0 mx-auto md:block">
-                            <img src="https://random-image-pepebigotes.vercel.app/api/random-image"
+                            <img :src="user.image_url"
                                 class="w-full h-full object-cover rounded-2xl" alt="">
                             <UButton :ui="{ rounded: 'rounded-full' }" icon="i-heroicons-pencil-square" size="xs"
                                 class="absolute bottom-0 right-0 backdrop-blur-md bg-white/30 hover:bg-primary" square
@@ -43,17 +51,9 @@ const currentStep = ref(0)
                             </UButton>
                         </div>
                         <div class="pb-4 pt-2 md:w-2/4 w-full max-h-32 overflow-hidden text-center md:text-start">
-                            <h1 class="font-bold text-xl">Zouhir Kouider </h1>
+                            <h1 class="font-bold text-xl">{{ user.full_name }}</h1>
                             <p class="text-xs cut-text relative">
-                                I’m the most awesome person I know. A professional Product, Website and UI/UX Designer +
-                                God
-                                fearing.
-                                I’m the most awesome person I know. A professional Product, Website and UI/UX Designer +
-                                God
-                                fearing.
-                                I’m the most awesome person I know. A professional Product, Website and UI/UX Designer +
-                                God
-                                fearing.
+                                {{ user.bio }}
                             </p>
                         </div>
 
