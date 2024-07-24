@@ -40,7 +40,7 @@ const items = [
 
 
 <template>
-    <nav class="bg-white dark:bg-slate-800">
+    <!-- <nav class="bg-white dark:bg-slate-800">
         <div class="mx-auto w-full max-w-screen-xl px-2">
             <div class="relative flex h-20 items-center justify-between">
                 <div class="flex items-center justify-center sm:items-stretch sm:justify-start">
@@ -130,5 +130,5 @@ const items = [
                 </div>
             </div>
         </div>
-    </nav>
+    </nav> -->
 </template>

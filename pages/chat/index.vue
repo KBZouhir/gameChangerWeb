@@ -1,11 +1,11 @@
 <template>
     <div class="mx-auto w-full h-full">
         <div class="overflow-hidden h-full grid grid-cols-5 bg-[#F1F5F9]">
-            <div class="bg-white border-r border-t flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
+            <div class="bg-white dark:bg-[#111827] dark:border-[#0d121d] border-r border-t flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
                 <div class="p-4">
-                    <UInput size="lg" placeholder="Search..." color="gray">
+                    <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
                         <template #leading>
-                            <UButton icon="i-heroicons-arrow-left" color="primary" class="p-0" square
+                            <UButton icon="i-heroicons-arrow-left" color="primary" class="p-0 dark:text-white" square
                                 variant="link" />
                         </template>
 
@@ -22,7 +22,7 @@
                                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                                 alt="avatar">
                             <div
-                                class="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
+                                class="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-white dark:border-[#0d121d] bg-slate-300 dark:border-navy-700">
                             </div>
                         </div>
                         <div class="flex flex-1 flex-col">
@@ -43,7 +43,7 @@
             </div>
 
             <div class="flex flex-col col-span-4">
-                <div class="h-16 flex justify-between items-center border-y bg-white">
+                <div class="h-16 flex justify-between items-center border-y bg-white dark:border-[#0d121d] dark:bg-[#111827]">
                     <div class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
                         <span class="relative inline-block">
                             <img class="h-10 w-10 rounded-full"
@@ -52,19 +52,19 @@
                             <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-400 ring-2 ring-white"></span>
                         </span>
                         <div class="flex flex-col">
-                            <span>{{ user?.full_name }}</span>
+                            <span class="dark:text-white">{{ user?.full_name }}</span>
                             <span class="text-xs text-gray-400 font-light -mt-1">Active now</span>
                         </div>
                     </div>
                     <ul class="flex space-x-4 pr-4">
-                        <UButton icon="i-heroicons-phone" size="sm" color="primary" square variant="link" />
-                        <UButton icon="i-heroicons-video-camera" size="sm" color="primary" square variant="link" />
-                        <UButton @click="openSidebar = !openSidebar" icon="i-heroicons-information-circle" size="sm"
+                        <UButton icon="i-heroicons-phone" class="dark:text-white dark:hover:text-white/70" size="sm" color="primary" square variant="link" />
+                        <UButton icon="i-heroicons-video-camera" class="dark:text-white dark:hover:text-white/70" size="sm" color="primary" square variant="link" />
+                        <UButton @click="openSidebar = !openSidebar" class="dark:text-white dark:hover:text-white/70" icon="i-heroicons-information-circle" size="sm"
                             color="primary" square variant="link" />
                     </ul>
                 </div>
                 <div class="relative h-[calc(100vh-13rem)] bg-cover bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
-                    <div class="relative min-h-full bg-white/95">
+                    <div class="relative min-h-full bg-white/95 dark:bg-[#111827]/95">
                         <div class="p-4" v-for="message in messages">
                             <div v-if="message.id_sender == 1" class="flex items-start space-x-2.5 sm:space-x-5 ">
                                 <div class="flex flex-col items-start space-y-3.5">
@@ -97,11 +97,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center h-16 border-t bg-white px-4 space-x-4">
+                <div class="flex items-center h-16 border-t bg-white dark:border-[#0d121d] dark:bg-[#111827] px-4 space-x-4">
                     <UInput v-model="message" class="flex-1" variant="none" placeholder="Write your message"
                         @keyup.enter="" />
-                    <UButton icon="i-heroicons-photo" size="sm" color="primary" square variant="link" />
-                    <UButton icon="i-heroicons-paper-clip" size="sm" color="primary" square variant="link" />
+                    <UButton icon="i-heroicons-photo" class="dark:text-white dark:hover:text-white/70" size="sm" color="primary" square variant="link" />
+                    <UButton icon="i-heroicons-paper-clip" class="dark:text-white dark:hover:text-white/70" size="sm" color="primary" square variant="link" />
                 </div>
             </div>
 
@@ -125,13 +125,13 @@
 
                         <div class="flex justify-between items-center space-x-3 relative z-50">
                             <UButton icon="i-heroicons-user" :ui="{ rounded: 'rounded-full' }"
-                                class="bg-white/30 hover:bg-white/65 text-white" size="lg" color="primary" square
+                                class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white" size="lg" color="primary" square
                                 variant="soft" />
                             <UButton icon="i-heroicons-video-camera" :ui="{ rounded: 'rounded-full' }"
-                                class="bg-white/30 hover:bg-white/65 text-white" size="lg" color="primary" square
+                                class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white" size="lg" color="primary" square
                                 variant="soft" />
                             <UButton icon="i-heroicons-phone" :ui="{ rounded: 'rounded-full' }"
-                                class="bg-white/30 hover:bg-white/65 text-white" size="lg" color="primary" square
+                                class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white" size="lg" color="primary" square
                                 variant="soft" />
                         </div>
 
@@ -188,7 +188,7 @@ const messages = ref([
 definePageMeta({
     layout: 'auth',
     title: 'Forgot password',
-    middleware: ['auth']
+    middleware: ''
 })
 
 watchEffect(() => {

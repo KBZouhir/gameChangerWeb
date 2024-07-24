@@ -63,7 +63,7 @@ async function onSubmit(event) {
 
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400">Send Reset Link</UButton>
+                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500">Send Reset Link</UButton>
                     </div>
 
                     <UDivider label="" class="my-6" />

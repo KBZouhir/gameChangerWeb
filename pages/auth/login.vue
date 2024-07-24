@@ -167,8 +167,8 @@ async function onSubmit(event) {
                     </div>
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400">{{
-                            $t('login.login_button') }}
+                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500">
+                            {{ $t('login.login_button') }}
                         </UButton>
                     </div>
 
