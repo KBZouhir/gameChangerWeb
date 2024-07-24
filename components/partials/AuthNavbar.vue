@@ -66,18 +66,18 @@ const items = [
                 <div class="flex items-center space-x-4">
                     <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100" color="primary">
                         <template #leading>
-                            <img src="/assets/svg/icons/search.svg">
+                            <Icon name="tabler:search" size="20" style="color: #354052;"/>
                         </template>
                     </UButton>
                     <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
                         <template #leading>
-                            <img src="/assets/svg/icons/notification.svg">
+                            <Icon name="tabler:bell" size="20" style="color: #354052;"/>
                         </template>
                     </UButton>
                     <nuxt-link to="/chat">
                         <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
                             <template #leading>
-                                <img src="/assets/svg/icons/message.svg">
+                                <Icon name="tabler:message" size="20" style="color: #354052;"/>
                             </template>
                         </UButton>
                     </nuxt-link>

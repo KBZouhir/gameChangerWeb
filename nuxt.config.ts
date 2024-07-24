@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   colorMode: {
-    preference: "light",
+    preference: "dark",
   },
 
   app: {
@@ -17,7 +17,16 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt", "nuxt-snackbar"],
+  icon: {
+    customCollections: [
+      {
+        prefix: 'my-icon',
+        dir: './assets/svg/icons'
+      },
+    ],
+  },
+
+  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt", "nuxt-snackbar", "@nuxt/icon"],
 
   pinia: {
     storesDirs: ["./stores/**"],

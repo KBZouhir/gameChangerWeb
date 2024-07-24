@@ -75,7 +75,7 @@
                 <div class="my-4">
                     <MoreAndLess :description="post.description" :number="200" />
                 </div>
-
+                
                 <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
                     <VideoPlayer :videoSrc="`${post.video.url}${post.video.path}`" :poster="post.video.thumbnail_url" />
                 </ClientOnly>
@@ -91,8 +91,7 @@
                                         class="absolute top-0 left-0 w-full h-full bg-slate-900 opacity-60 rounded-lg flex justify-center items-center">
                                     </div>
                                     <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center">
-                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4
-                                            }}</span>
+                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4 }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -101,40 +100,30 @@
                     <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" />
 
                     <div class="flex items-center space-x-4 my-4 text-sm">
-                        <UPopover mode="hover" :popper="{ placement: 'top-start' }">
-                            <div class="flex items-center space-x-2 font-semibold">
-                                <img src="/assets/svg/icons/heart.svg">
-                                <span>{{ post.reactions_count }}</span>
-                            </div>
-
-                            <template #panel>
-                                <div class="p-2 flex space-x-2">
-                                    <div class="flex flex-col items-center" v-for="reaction in settings.reaction.type">
-                                        <UTooltip text="Like">
-                                            <UButton icon="i-heroicons-hand-thumb-up" size="sm" color="primary" square variant="link" />
-                                        </UTooltip>
-
-                                    </div>
-
-                                    <div class="flex flex-col items-center">
-                                        <UTooltip text="Love">
-                                            <UButton icon="i-heroicons-heart" size="sm" color="primary" square variant="link" />
-                                        </UTooltip>
-                                        
-                                    </div>
-
-                                    <div class="flex flex-col items-center">
-                                        <UTooltip text="Haha">
-                                            <UButton icon="i-heroicons-face-smile" size="sm" color="primary" square variant="link" />
-                                        </UTooltip>
-                                    </div>
-
+                        <div class="flex items-center">
+                            <UPopover mode="hover" :popper="{ placement: 'top-start' }">
+                                <div class="flex items-center space-x-2 font-semibold">
+                                    <Icon name="tabler:heart" size="22" />
+                                    <span>{{ post.reactions_count }}</span>
                                 </div>
-                            </template>
-                        </UPopover>
+
+                                <template #panel>
+                                    <div class="p-2 flex space-x-2">
+                                        <div class="flex flex-col items-center"
+                                            v-for="reaction in settings.reaction.type">
+                                            <UTooltip :text="reaction.label">
+                                                <UButton size="sm" color="primary" square variant="link">
+                                                    <Icon name="my-icon:video" size="22" />
+                                                </UButton>
+                                            </UTooltip>
+                                        </div>
+                                    </div>
+                                </template>
+                            </UPopover>
+                        </div>
 
                         <div class="flex items-center space-x-2 font-semibold">
-                            <img src="/assets/svg/icons/comment.svg">
+                            <Icon name="tabler:message-dots" size="22" />
                             <span>{{ post.comments_count }}</span>
                         </div>
                     </div>
