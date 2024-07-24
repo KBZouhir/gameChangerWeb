@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   colorMode: {
-    preference: "dark",
+    preference: "light",
   },
 
   postcss: {

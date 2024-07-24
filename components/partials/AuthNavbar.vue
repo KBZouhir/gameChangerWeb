@@ -49,6 +49,12 @@ const items = [
                             <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
                         </nuxt-link>
                     </div>
+
+                    <div class="flex flex-shrink-0 items-center dark:block">
+                        <nuxt-link to="/home">
+                            <img class="h-6 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Game changer">
+                        </nuxt-link>
+                    </div>
                 </div>
 
                 <div class="hidden sm:ml-16 sm:flex items-center">
@@ -64,28 +70,38 @@ const items = [
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100" color="primary">
+                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5" color="primary">
                         <template #leading>
-                            <Icon name="tabler:search" size="20" style="color: #354052;"/>
+                            <Icon name="tabler:search" size="20" class="dark:text-white text-primary"/>
                         </template>
                     </UButton>
-                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
+                    <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                         <template #leading>
-                            <Icon name="tabler:bell" size="20" style="color: #354052;"/>
+                            <Icon name="tabler:bell" size="20" class="dark:text-white text-primary"/>
                         </template>
                     </UButton>
                     <nuxt-link to="/chat">
-                        <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100">
+                        <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
-                                <Icon name="tabler:message" size="20" style="color: #354052;"/>
+                                <Icon name="tabler:message" size="20" class="dark:text-white text-primary"/>
                             </template>
                         </UButton>
                     </nuxt-link>
-                    <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                        :popper="{ placement: 'bottom-start' }">
+                    <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }" :popper="{ placement: 'bottom-start' }">
                         <UAvatar :src="user.image_url" />
-
+                        
                         <template #account="{ item }">
+                            <div class="text-left">
+                                <p>
+                                    Signed in as
+                                </p>
+                                <p class="truncate font-medium text-gray-900 dark:text-white">
+                                    {{ item.label }}
+                                </p>
+                            </div>
+                        </template>
+
+                        <template #dark="{ item }">
                             <div class="text-left">
                                 <p>
                                     Signed in as

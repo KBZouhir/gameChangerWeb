@@ -32,6 +32,7 @@
     "nuxt": "^3.11.2",
     "nuxt-snackbar": "^1.0.4",
     "pinia": "^2.1.7",
+    "quill-hashtag": "^1.0.2",
     "video.js": "^8.16.1",
     "vue": "^3.4.27",
     "vue-filepond": "^7.0.4",

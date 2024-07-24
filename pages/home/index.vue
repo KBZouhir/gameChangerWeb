@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full grid grid-cols-4 gap-6 bg-[#F1F5F9] py-8">
+    <div class="h-full grid grid-cols-4 gap-6 dark:bg-[#0f172a] bg-[#F1F5F9] py-8">
         <div class="sticky top-0 hidden md:block">
 
         </div>
@@ -41,12 +41,12 @@
                 </div>
             </div>
 
-            <div class="p-4 bg-white rounded-xl flex items-center space-x-4 mb-4 mt-8 shadow-sm">
+            <div class="p-4 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex items-center space-x-4 mb-4 mt-8">
                 <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                     <img :src="user?.image_url" class="object-cover" alt="" srcset="">
                 </div>
                 <button class="flex-1 text-start" @click="isOpen = true">
-                    <span class="pt-2 select-none">Write something ...</span>
+                    <span class="pt-2 select-none text-sm">Write something ...</span>
                 </button>
                 <button @click="isOpen = true" type="button"
                     class="rounded-full bg-primary p-2 text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
@@ -104,7 +104,7 @@
                             <UPopover mode="hover" :popper="{ placement: 'top-start' }">
                                 <div class="flex items-center space-x-0 font-semibold">
                                     <UButton size="sm" color="primary" square variant="link">
-                                        <Icon name="tabler:heart" size="22" />
+                                        <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
                                     </UButton>
                                     <span>{{ post.reactions_count }}</span>
                                 </div>
@@ -115,7 +115,7 @@
                                             v-for="reaction in settings.reaction.type">
                                             <UTooltip :text="reaction.label">
                                                 <UButton size="sm" color="primary" square variant="link">
-                                                    <Icon name="tabler:video" size="22" />
+                                                    <Icon name="tabler:video" class="dark:text-white text-primary" size="22" />
                                                 </UButton>
                                             </UTooltip>
                                         </div>
@@ -126,13 +126,13 @@
 
                         <div class="flex items-center space-x-0 font-semibold">
                             <UButton size="sm" color="primary" square variant="link">
-                                <Icon name="tabler:message-dots" size="22" />
+                                <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
                             </UButton>
                             <span>{{ post.comments_count }}</span>
                         </div>
                     </div>
 
-                    <div class="p-2 bg-[#F1F5F9] rounded-xl flex space-x-4">
+                    <div class="p-2 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                             <img :src="user?.image_url" class="object-cover" alt="" srcset="">
                         </div>
@@ -182,7 +182,7 @@
                                     <div
                                         class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
                                         <div v-for="(file, index) in selectedViewFiles" :key="index"
-                                            class="relative group w-32 h-32 flex-none border-[1px] border-[##f1f1f1] rounded-md overflow-hidden transition-all duration-150 ease-in-out">
+                                            class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                                             <div class="w-full h-full overflow-hidden border-e">
                                                 <img :src="file" alt="Selected Image"
                                                     class="object-cover w-full h-full" />
@@ -190,7 +190,7 @@
                                             <div
                                                 class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
                                                 <UButton @click="removeSelectedImage(index)" icon="i-heroicons-trash"
-                                                    class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs"
+                                                    class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
                                                     size="2xs" color="primary" square variant="soft" />
 
                                             </div>
@@ -200,11 +200,10 @@
                                 <div class="flex space-x-4 items-center pt-4">
                                     <input ref="inputFileImage" type="file" id="file-input-image"
                                         @change="onImageFileChange" accept="image/*" hidden multiple />
-                                    <UButton @click="triggerFileInput" icon="i-heroicons-photo" size="xs"
-                                        color="primary" square variant="ghost"
-                                        class="hover:bg-primary hover:text-white px-2" label="Image" />
+                                    <UButton @click="triggerFileInput" icon="i-heroicons-photo" size="xs" color="primary" square variant="ghost" 
+                                        class="hover:bg-primary dark:text-white hover:text-white px-2" label="Image" />
                                     <UButton icon="i-heroicons-video-camera" size="xs"
-                                        class="hover:bg-primary hover:text-white px-2" color="primary" square
+                                        class="hover:bg-primary dark:text-white hover:text-white px-2" color="primary" square
                                         variant="ghost" label="Video" />
                                 </div>
                             </div>
@@ -221,9 +220,9 @@
                 </UModal>
             </ClientOnly>
         </div>
-        <USkeleton class="sticky top-0 hidden md:block">
+        <div class="sticky top-0 hidden md:block">
 
-        </USkeleton>
+        </div>
     </div>
 </template>
 
@@ -281,7 +280,6 @@ defineShortcuts({
 })
 
 const posts = computed(() => postStore.getPosts);
-console.log(user.value);
 
 const getDataFromApi = async () => {
     await index()
@@ -410,11 +408,10 @@ const submitForm = async () => {
 <style scoped lang="css">
 :deep(.ql-editor) {
     min-height: 200px;
-    border: 1px solid #f1f1f1;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding-bottom: 26px;
 }
-
 
 :deep(.ql-container) {
     font-size: 12px;
