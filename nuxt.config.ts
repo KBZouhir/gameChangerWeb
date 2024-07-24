@@ -6,16 +6,14 @@ export default defineNuxtConfig({
     preference: "dark",
   },
 
-  app: {
-    pageTransition: { name: "page", mode: "out-in" },
-  },
-
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
   },
+
+  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt", "nuxt-snackbar"],
 
   icon: {
     customCollections: [
@@ -25,8 +23,6 @@ export default defineNuxtConfig({
       },
     ],
   },
-
-  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt", "nuxt-snackbar", "@nuxt/icon"],
 
   pinia: {
     storesDirs: ["./stores/**"],

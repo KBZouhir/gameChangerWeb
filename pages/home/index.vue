@@ -43,7 +43,7 @@
 
             <div class="p-4 bg-white rounded-xl flex items-center space-x-4 mb-4 mt-8 shadow-sm">
                 <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                    <img :src="user.image_url" class="object-cover" alt="" srcset="">
+                    <img :src="user?.image_url" class="object-cover" alt="" srcset="">
                 </div>
                 <button class="flex-1 text-start" @click="isOpen = true">
                     <span class="pt-2 select-none">Write something ...</span>
@@ -61,7 +61,7 @@
                 <div class="flex justify-between items-center flex-wrap">
                     <div class="flex items-center space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                            <img :src="post.author.image_url" class="object-cover" alt="" srcset="">
+                            <img :src="post.author?.image_url" class="object-cover" alt="" srcset="">
                         </div>
                         <div class="flex flex-col">
                             <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>
@@ -75,12 +75,12 @@
                 <div class="my-4">
                     <MoreAndLess :description="post.description" :number="200" />
                 </div>
-                
+
                 <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
                     <VideoPlayer :videoSrc="`${post.video.url}${post.video.path}`" :poster="post.video.thumbnail_url" />
                 </ClientOnly>
                 <div>
-                    <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
+                    <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
                             v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
                             <div class="relative h-full">
@@ -97,13 +97,15 @@
                             </div>
                         </button>
                     </div>
-                    <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" />
+                    <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" /> -->
 
                     <div class="flex items-center space-x-4 my-4 text-sm">
                         <div class="flex items-center">
                             <UPopover mode="hover" :popper="{ placement: 'top-start' }">
-                                <div class="flex items-center space-x-2 font-semibold">
-                                    <Icon name="tabler:heart" size="22" />
+                                <div class="flex items-center space-x-0 font-semibold">
+                                    <UButton size="sm" color="primary" square variant="link">
+                                        <Icon name="tabler:heart" size="22" />
+                                    </UButton>
                                     <span>{{ post.reactions_count }}</span>
                                 </div>
 
@@ -113,7 +115,7 @@
                                             v-for="reaction in settings.reaction.type">
                                             <UTooltip :text="reaction.label">
                                                 <UButton size="sm" color="primary" square variant="link">
-                                                    <Icon name="my-icon:video" size="22" />
+                                                    <Icon name="tabler:video" size="22" />
                                                 </UButton>
                                             </UTooltip>
                                         </div>
@@ -122,18 +124,20 @@
                             </UPopover>
                         </div>
 
-                        <div class="flex items-center space-x-2 font-semibold">
-                            <Icon name="tabler:message-dots" size="22" />
+                        <div class="flex items-center space-x-0 font-semibold">
+                            <UButton size="sm" color="primary" square variant="link">
+                                <Icon name="tabler:message-dots" size="22" />
+                            </UButton>
                             <span>{{ post.comments_count }}</span>
                         </div>
                     </div>
 
                     <div class="p-2 bg-[#F1F5F9] rounded-xl flex space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                            <img :src="user.image_url" class="object-cover" alt="" srcset="">
+                            <img :src="user?.image_url" class="object-cover" alt="" srcset="">
                         </div>
                         <div class="flex-1">
-                            <UTextarea rows="0" :padded="false" autoresize placeholder="Write a comment" variant="none"
+                            <UTextarea :rows="0" :padded="false" autoresize placeholder="Write a comment" variant="none"
                                 class="w-full pt-2" />
                         </div>
                     </div>
