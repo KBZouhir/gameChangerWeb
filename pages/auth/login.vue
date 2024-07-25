@@ -167,7 +167,8 @@ async function onSubmit(event) {
                     </div>
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500">
+                        <UButton type="submit" block :loading="isLoading"
+                            class="px-6 py-3 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500">
                             {{ $t('login.login_button') }}
                         </UButton>
                     </div>
@@ -175,9 +176,27 @@ async function onSubmit(event) {
                     <UDivider label="" class="my-6 border-blueGray-700" />
 
                     <p class="mb-6 mt-4 text-center text-sm">{{ $t('login.or_log_in_with') }}</p>
-                    <div class="grid grid-cols-2 gap-6">
-                        <MediaButton type="google" @click="googleLogin()" />
-                        <MediaButton type="twitter" />
+                    <div class="flex justify-center space-x-4">
+                        <UButton size="lg" square class="bg-[#d14938] hover:bg-[#d14938] dark:bg-transparent dark:hover:bg-white/5">
+                            <template #leading>
+                                <Icon name="tabler:brand-google" size="20" class="text-white" />
+                            </template>
+                        </UButton>
+
+                        <UButton size="lg" square class="bg-[#1877f2] hover:bg-[#1877f2] dark:bg-transparent dark:hover:bg-white/5">
+                            <template #leading>
+                                <Icon name="tabler:brand-facebook" size="20" class="dark:text-white text-white" />
+                            </template>
+                        </UButton>
+
+                        <UButton size="lg" square class="bg-[#0f6ac5] hover:bg-[#0f6ac5] dark:bg-transparent dark:hover:bg-white/5">
+                            <template #leading>
+                                <Icon name="tabler:brand-linkedin" size="20" class="text-white" />
+                            </template>
+                        </UButton>
+                        
+                        <!-- <MediaButton type="google" @click="googleLogin()" />
+                        <MediaButton type="twitter" /> -->
                     </div>
 
                     <UDivider label="" class="my-6" />

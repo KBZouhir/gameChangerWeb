@@ -12,6 +12,7 @@ const isDark = computed({
 <template>
   <ClientOnly>
     <UButton
+      class="text-primary hover:bg-slate-100 dark:hover:bg-white/5 dark:bg-transparent bg-slate-50 hover:bg-transparent"
       :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
       color="gray"
       variant="ghost"

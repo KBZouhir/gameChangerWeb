@@ -28,21 +28,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-    <!-- <div v-if="compressedFiles.length">
-      <h3>Image Previews:</h3>
-      <div v-for="(file, index) in compressedFiles" :key="index" class="preview">
-        <img :src="file.preview" :alt="`Image Preview ${index + 1}`" />
-        <div class="progress-container">
-          <div class="progress-bar" :style="{ width: `${file.progress}%` }"></div>
-        </div>
-        <button @click="removeImage(index)">Remove</button>
-      </div>
-    </div> -->
-    <button @click="uploadImages" :disabled="!compressedFiles.length">Upload Images</button>
   </div>
 </template>
 

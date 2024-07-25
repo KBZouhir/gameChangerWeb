@@ -41,7 +41,8 @@
                 </div>
             </div>
 
-            <div class="p-4 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex items-center space-x-4 mb-4 mt-8">
+            <div
+                class="p-4 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex items-center space-x-4 mb-4 mt-8">
                 <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                     <img :src="user?.image_url" class="object-cover" alt="" srcset="">
                 </div>
@@ -80,6 +81,7 @@
                     <VideoPlayer :videoSrc="`${post.video.url}${post.video.path}`" :poster="post.video.thumbnail_url" />
                 </ClientOnly>
                 <div>
+                    {{ post.image?.path }}
                     <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
                             v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
@@ -111,11 +113,12 @@
 
                                 <template #panel>
                                     <div class="p-2 flex space-x-2">
-                                        <div class="flex flex-col items-center"
-                                            v-for="reaction in settings.reaction.type">
+                                        <div class="flex flex-col items-center" v-for="reaction in settings.reaction.type">
                                             <UTooltip :text="reaction.label">
                                                 <UButton size="sm" color="primary" square variant="link">
-                                                    <Icon name="tabler:video" class="dark:text-white text-primary" size="22" />
+                                                    <Icon v-if="reaction.case == 'LIKE'" name="tabler:thumb-up" class="dark:text-white text-green-600" size="22" />
+                                                    <Icon v-if="reaction.case == 'LOVE'" name="tabler:heart" class="dark:text-white text-red-600" size="22" />
+                                                    <Icon v-if="reaction.case == 'HAHA'" name="tabler:mood-smile" class="dark:text-white text-orange-500" size="22" />
                                                 </UButton>
                                             </UTooltip>
                                         </div>
@@ -132,7 +135,8 @@
                         </div>
                     </div>
 
-                    <div class="p-2 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex space-x-4">
+                    <div
+                        class="p-2 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                             <img :src="user?.image_url" class="object-cover" alt="" srcset="">
                         </div>
@@ -178,33 +182,38 @@
 
                                 <VueTagsInput v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags" />
 
-                                <div v-if="selectedViewFiles.length > 0" class="my-4">
+                                <div v-if="compressedFiles.length > 0" class="my-4">
                                     <div
                                         class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
-                                        <div v-for="(file, index) in selectedViewFiles" :key="index"
+                                        <div v-for="(file, index) in compressedFiles" :key="index"
                                             class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                                             <div class="w-full h-full overflow-hidden border-e">
-                                                <img :src="file" alt="Selected Image"
+                                                <img :src="file.preview" alt="Selected Image"
                                                     class="object-cover w-full h-full" />
+                                            </div>
+                                            <div v-if="file.progress < 100"
+                                                class="absolute w-full h-full bg-white/80 top-0 left-0 flex justify-center items-center">
+                                                <UButton loading variant="link" disabled>Compressing...</UButton>
                                             </div>
                                             <div
                                                 class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
-                                                <UButton @click="removeSelectedImage(index)" icon="i-heroicons-trash"
+                                                <UButton @click="removeImage(index)" icon="i-heroicons-trash"
                                                     class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
                                                     size="2xs" color="primary" square variant="soft" />
-
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="flex space-x-4 items-center pt-4">
                                     <input ref="inputFileImage" type="file" id="file-input-image"
-                                        @change="onImageFileChange" accept="image/*" hidden multiple />
-                                    <UButton @click="triggerFileInput" icon="i-heroicons-photo" size="xs" color="primary" square variant="ghost" 
-                                        class="hover:bg-primary dark:text-white hover:text-white px-2" label="Image" />
+                                        @change="onImageFileChange" accept="image/*" hidden :multiple="multiple" />
+                                    <UButton @click="triggerFileInput" icon="i-heroicons-photo" size="xs"
+                                        color="primary" square variant="ghost"
+                                        class="hover:bg-primary dark:text-white transition-all duration-300 ease-in-out hover:text-white px-2"
+                                        label="Image" />
                                     <UButton icon="i-heroicons-video-camera" size="xs"
-                                        class="hover:bg-primary dark:text-white hover:text-white px-2" color="primary" square
-                                        variant="ghost" label="Video" />
+                                        class="hover:bg-primary dark:text-white transition-all duration-300 ease-in-out hover:text-white px-2"
+                                        color="primary" square variant="ghost" label="Video" />
                                 </div>
                             </div>
 
@@ -233,7 +242,7 @@ import { usePostStore } from "~/stores/posts"
 import FsLightbox from "fslightbox-vue/v3"
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
-import Compressor from 'compressorjs'
+import imageCompression from 'browser-image-compression'
 import { useAuthStore } from "~/stores/authStore"
 import { useSettings } from "~/stores/settings";
 
@@ -255,14 +264,15 @@ const maxLength = ref(200);
 const charCount = computed(() => countChars(content.value));
 const user = computed(() => authStore.getAuthUser);
 const settings = computed(() => settingStore.getSettings);
+const posts = computed(() => postStore.getPosts);
 const content = ref('');
-const inputFileImage = ref()
-const selectedFiles = ref([])
-const selectedViewFiles = ref([])
+const inputFileImage = ref(null)
 const isLoading = ref(false)
 const tag = ref()
 const tags = ref([])
 const errors = ref([])
+const compressedFiles = ref([])
+const multiple = ref(false)
 
 const options = ref({
     modules: {
@@ -279,7 +289,6 @@ defineShortcuts({
     }
 })
 
-const posts = computed(() => postStore.getPosts);
 
 const getDataFromApi = async () => {
     await index()
@@ -316,10 +325,17 @@ const getErrorMessage = (key) => {
     return error ? error.value : ''
 }
 
-const removeSelectedImage = (index) => {
-    selectedFiles.value.splice(index, 1);
-    selectedViewFiles.value.splice(index, 1);
-}
+const resetFileInput = () => {
+    inputFileImage.value.value = null;
+};
+
+const removeImage = (index) => {
+  compressedFiles.value.splice(index, 1);
+  
+  if (compressedFiles.value.length === 0) {
+    resetFileInput();
+  }
+};
 
 const countChars = (htmlString) => {
     const tempDiv = document.createElement('div');
@@ -340,38 +356,37 @@ const triggerFileInput = () => {
     inputFileImage.value.click()
 }
 
-const onImageFileChange = (event) => {
-    if (event.target.files) {
-        Object.entries(event.target.files).forEach(([key, value]) => {
-            selectedFiles.value.push(value)
-            new Compressor(value, {
-                quality: 0.6,
-                success(result) {
-                    const reader = new FileReader();
+const onImageFileChange = async (event) => {
+    const selectedFiles = Array.from(event.target.files)
 
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.src = e.target.result;
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            selectedViewFiles.value.push(canvas.toDataURL('image/webp'))
-                        };
-                    }
-                    reader.readAsDataURL(value);
+    for (const file of selectedFiles) {
+        const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            fileType: 'image/webp',
+            onProgress: (progress) => {
+                const index = compressedFiles.value.findIndex(f => f.originalFile === file)
+                if (index !== -1) {
+                    compressedFiles.value[index].progress = progress
+                }
+            }
+        };
 
-                },
-                error(err) {
-                    console.log(err.message);
-                },
-            })
-        });
+        const newFileObj = { originalFile: file, progress: 0, preview: '' }
+        compressedFiles.value.push(newFileObj)
+
+        try {
+            const index = compressedFiles.value.findIndex(f => f.originalFile === file)
+            const preview = URL.createObjectURL(file)
+            compressedFiles.value[index].preview = preview
+            const compressedFile = await imageCompression(file, options)
+            compressedFiles.value[index].file = compressedFile
+        } catch (error) {
+            console.error('Error compressing file:', error);
+        }
     }
 }
-
 
 const validationData = () => {
     if (content.value.replace(/<[^>]*>/g, '').trim() == "") {
@@ -393,12 +408,18 @@ const submitForm = async () => {
     })
 
     let formData = new FormData();
-    formData.append('description', content.value);
-    formData.append('hashtags', hashtags);
-    formData.append('image', selectedFiles.value[0]);
+    formData.append('description', content.value)
+
+    if(hashtags.length > 0){
+        formData.append('hashtags', hashtags);
+    }
+
+    if(compressedFiles.value[0].file){
+        formData.append('image', compressedFiles.value[0].file)
+    }
 
     const result = await create(formData)
-
+    console.log(result);
     isLoading.value = false
 }
 
@@ -452,5 +473,8 @@ const submitForm = async () => {
 
 :deep(.ti-icon-close:before) {
     font-size: 10px !important;
+}
+.blog-content > .th-btn.btn-sm{
+    background: var(--theme-color);
 }
 </style>

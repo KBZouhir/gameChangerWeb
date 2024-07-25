@@ -188,7 +188,7 @@ const messages = ref([
 definePageMeta({
     layout: 'auth',
     title: 'Forgot password',
-    middleware: ''
+    middleware: ['auth']
 })
 
 watchEffect(() => {

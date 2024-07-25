@@ -40,7 +40,7 @@ const items = [
 
 
 <template>
-    <!-- <nav class="bg-white dark:bg-slate-800">
+    <nav class="bg-white dark:bg-slate-800">
         <div class="mx-auto w-full max-w-screen-xl px-2">
             <div class="relative flex h-20 items-center justify-between">
                 <div class="flex items-center justify-center sm:items-stretch sm:justify-start">
@@ -80,6 +80,7 @@ const items = [
                             <Icon name="tabler:bell" size="20" class="dark:text-white text-primary"/>
                         </template>
                     </UButton>
+                    <SwitchMode/>
                     <nuxt-link to="/chat">
                         <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
@@ -130,5 +131,5 @@ const items = [
                 </div>
             </div>
         </div>
-    </nav> -->
+    </nav>
 </template>
