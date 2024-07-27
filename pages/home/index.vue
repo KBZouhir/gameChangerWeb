@@ -59,7 +59,8 @@
             </div>
 
             <UCard v-for="post in posts" class="my-2">
-                <div class="flex justify-between items-center flex-wrap">
+                <div  v-if="post?.image" >
+                    <div class="flex justify-between items-center flex-wrap">
                     <div class="flex items-center space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                             <img :src="post.author?.image_url" class="object-cover" alt="" srcset="">
@@ -81,7 +82,7 @@
                     <VideoPlayer :videoSrc="`${post.video.url}${post.video.path}`" :poster="post.video.thumbnail_url" />
                 </ClientOnly>
                 <div>
-                    {{ post.image?.path }}
+                    <ImageView v-if="post.image" :image="`${post.image.url}${post.image.path}`"/>
                     <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
                             v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
@@ -146,6 +147,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </UCard>
 
             <div v-if="!posts" class="flex flex-1 flex-col items-center justify-center py-4">
@@ -170,7 +172,7 @@
                             <div class="flex flex-col">
                                 <div class="relative"
                                     :class="(keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == '') ? 'border-[1px] border-red-400 rounded-md' : ''">
-                                    <QuillEditor :options="options" theme="bubble" @text-change="onTextChange"
+                                    <QuillEditor :class="(colorMode.value == 'dark' ? 'dark-theme': '')" :options="options" theme="bubble" @text-change="onTextChange"
                                         v-model:content="content" contentType="html" />
                                     <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                                         :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
@@ -180,7 +182,7 @@
                                 <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
                                     class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
-                                <VueTagsInput v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags" />
+                                <!-- <VueTagsInput v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags" /> -->
 
                                 <div v-if="compressedFiles.length > 0" class="my-4">
                                     <div
@@ -192,8 +194,8 @@
                                                     class="object-cover w-full h-full" />
                                             </div>
                                             <div v-if="file.progress < 100"
-                                                class="absolute w-full h-full bg-white/80 top-0 left-0 flex justify-center items-center">
-                                                <UButton loading variant="link" disabled>Compressing...</UButton>
+                                                class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
+                                                <UButton loading variant="link" class="dark:text-white" disabled>Compressing...</UButton>
                                             </div>
                                             <div
                                                 class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
@@ -221,7 +223,8 @@
                         <template #footer>
                             <div class="flex justify-end">
 
-                                <UButton size="lg" @click="submitForm" :loading="isLoading" class="px-4 py-2"
+                                <UButton size="lg" @click="submitForm" :loading="isLoading" 
+                                class="dark:bg-emerald-500 dark:text-white px-4 py-2"
                                     icon="i-heroicons-arrow-right" trailing>Post</UButton>
                             </div>
                         </template>
@@ -244,7 +247,9 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import imageCompression from 'browser-image-compression'
 import { useAuthStore } from "~/stores/authStore"
-import { useSettings } from "~/stores/settings";
+import { useSettings } from "~/stores/settings"
+
+const colorMode = useColorMode()
 
 
 const authStore = useAuthStore()
@@ -429,14 +434,28 @@ const submitForm = async () => {
 <style scoped lang="css">
 :deep(.ql-editor) {
     min-height: 200px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e5e7eb; /* 1f2937 */
     border-radius: 8px;
     padding-bottom: 26px;
+}
+
+:deep(.ql-editor.ql-blank::before){
+    color: #4e4e4e !important;
+}
+
+:deep(.dark-theme > .ql-editor.ql-blank::before){
+    color: #a8a8a8 !important;
+}
+
+:deep(.dark-theme > .ql-editor) {
+    border: 1px solid #1f2937;
 }
 
 :deep(.ql-container) {
     font-size: 12px;
 }
+
+
 
 :deep(.ql-toolbar.ql-snow) {
     border-top-left-radius: 5px;
