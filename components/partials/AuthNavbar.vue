@@ -50,7 +50,7 @@ const items = [
                         </nuxt-link>
                     </div>
 
-                    <div class="flex flex-shrink-0 items-center dark:block">
+                    <div class="hidden flex-shrink-0 items-center dark:flex">
                         <nuxt-link to="/home">
                             <img class="h-6 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Game changer">
                         </nuxt-link>

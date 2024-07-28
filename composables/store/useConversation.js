@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore"
+import { collection, getDocs, query, where, doc, getDoc, orderBy } from "firebase/firestore"
 import { useAuthStore } from "~/stores/authStore"
 import { useConversationStore } from '~/stores/conversations'
 
@@ -10,31 +10,35 @@ export const getConversations = async (page = 1) => {
 
   try {
     const conversationsCollection = collection($db, "conversations")
-    const q = query(conversationsCollection,where("participants", "array-contains", user.firebase_uuid))
+    const q = query(
+      conversationsCollection,
+      where("participants", "array-contains", user.firebase_uuid)
+    );
+
     const querySnapshot = await getDocs(q);
     const conversations = [];
 
     querySnapshot.forEach((doc) => {
-        conversations.push({ id: doc.id, ...doc.data() })
+      conversations.push({ id: doc.id, ...doc.data() })
     });
 
     const conversationIds = conversations.map(
       (conversation) => conversation.id
     );
 
-    if(conversationIds){
-      var payload = { 'conversations' : conversationIds}
+    if (conversationIds) {
+      var payload = { 'conversations': conversationIds }
       const { data, refresh, error, pending } = await useApi(`conversations/get-conversations-users?page=${page}`, {
         initialCache: false,
         body: payload,
         method: "POST",
       });
 
-      if(data?.success){
+      if (data?.success) {
         let conversationsUsers = []
-        data.users.forEach((user)=> {
+        data.users.forEach((user) => {
           conversations.forEach((conversation) => {
-            if(conversation.participants.includes(user.firebase_uuid)){
+            if (conversation.participants.includes(user.firebase_uuid)) {
               conversationsUsers.push(
                 {
                   user: user,
@@ -55,30 +59,31 @@ export const getConversations = async (page = 1) => {
   }
 };
 
+export const getOrCreateConversation = async (id) => {
+  const { data, refresh, error, pending } = await useApi(`conversations/get-conversation`, {
+    initialCache: false,
+    body: { 'type': 1, 'recipient_id': id },
+    method: "POST",
+  });
+  if (data.success) {
+    let messages = await getMessagesForConversation(data.data.id)
+    return messages
+  }
+};
 
-// export const getConversation = async (conversationId) => {
-//   const { $db } = useNuxtApp();
-//   console.log(conversationId);
-//   try {
-//     const conversationDocRef = doc($db, 'conversations', conversationId);
-//     const conversationSnapshot = await getDoc(conversationDocRef);
+export const getMessagesForConversation = async (conversationId) => {
+  const { $db } = useNuxtApp()
+  try {
+    const messagesCollectionRef = collection($db, "conversations", conversationId, "messages");
+    const messagesQuery = query(messagesCollectionRef, orderBy("created_at", "asc"));
+    const messagesSnapshot = await getDocs(messagesQuery);
+    const messages = messagesSnapshot.docs.map(doc => doc.data());
+    return messages
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    return [];
+  }
+};
 
-//     if (conversationSnapshot.exists()) {
-
-//       const messagesCollection = collection(conversationDocRef, 'messages');
-//       const lastMessageQuery = query(messagesCollection, orderBy('timestamp', 'desc'), limitToLast(1));
-//       const lastMessageSnapshot = await getDocs(lastMessageQuery);
-
-
-//     }else{
-//       console.log('Conversation not found.');
-//       return null;
-//     }
-
-//   }catch (error) {
-//     console.error('Error fetching conversation details:', error);
-//     return null;
-//   }
-// };
 
 

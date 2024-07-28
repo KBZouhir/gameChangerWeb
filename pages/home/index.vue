@@ -63,7 +63,7 @@
                     <div class="flex justify-between items-center flex-wrap">
                     <div class="flex items-center space-x-4">
                         <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                            <img :src="post.author?.image_url" class="object-cover" alt="" srcset="">
+                            <img :src="post.author?.image_url" class="object-cover w-full h-full" alt="" srcset="">
                         </div>
                         <div class="flex flex-col">
                             <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>

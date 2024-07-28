@@ -90,15 +90,6 @@ export default defineNuxtConfig({
     ssr: {
       noExternal: ["@sipec/vue3-tags-input"],
     },
-  },
-  nitro: {
-    routeRules: {
-      '/**': {
-        headers: {
-          'Cross-Origin-Opener-Policy': 'same-origin',
-          'Cross-Origin-Embedder-Policy': 'require-corp',
-        },
-      },
-    },
-  },
+  }
+  
 });

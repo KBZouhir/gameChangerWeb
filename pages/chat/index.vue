@@ -1,8 +1,7 @@
 <template>
     <div class="mx-auto w-full h-full">
         <div class="overflow-hidden h-full grid grid-cols-5 bg-[#F1F5F9]">
-            <div
-                class="bg-white dark:bg-[#111827] dark:border-[#0d121d] border-r border-t flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
+            <div class="bg-white hidden dark:bg-[#111827] dark:border-[#0d121d] border-r border-t md:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
                 <div class="p-4">
                     <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
                         <template #leading>
@@ -15,11 +14,12 @@
                         </template>
                     </UInput>
                 </div>
+
                 <div class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-700">
-                    <div v-for="user in UsersConversations" :key="user.id"
-                        class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600 ">
+                    <div v-for="user in UsersConversations" :key="user.id" @click="getConversation(user.user)" class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600 ">
+
                         <div class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
-                            <img v-if="user.user.image_url" class="rounded-full" :src="user.user.image_url" alt="avatar">
+                            <img v-if="user.user.image_url" class="rounded-full object-cover w-full h-full" :src="user.user.image_url" alt="avatar">
                             <span v-else class="text-xs dark:text-white">{{ getInitials(user.user.full_name) }}</span>
                         </div>
                         <div class="flex flex-1 flex-col">
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-center items-center w-full h-full bg-white/5" v-if="loadConversations">
+                    <div class="flex justify-center items-center w-full h-full bg-white/5" v-if="UsersConversations.length <= 0">
                         <svg aria-hidden="true"
                             class="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                             viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -53,20 +53,19 @@
                 </div>
             </div>
 
-            <div class="flex flex-col col-span-4">
-                <div
-                    class="h-16 flex justify-between items-center border-y bg-white dark:border-[#0d121d] dark:bg-[#111827]">
+            <div v-if="selectedUser" class="flex flex-col col-span-5 md:col-span-4">
+                <div class="h-16 flex justify-between items-center border-y bg-white dark:border-[#0d121d] dark:bg-[#111827]">
+
                     <div class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
-                        <span class="relative inline-block">
-                            <img class="h-10 w-10 rounded-full"
-                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                alt="">
-                            <span
-                                class="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-400 ring-2 ring-white"></span>
-                        </span>
+                        <div class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
+                            <img v-if="selectedUser?.image_url" class="rounded-full object-cover w-full h-full" :src="selectedUser?.image_url" alt="avatar">
+                            <span v-else class="text-xs dark:text-white">{{ getInitials(selectedUser?.full_name) }}</span>
+                        </div>
+
+
                         <div class="flex flex-col">
-                            <span class="dark:text-white">{{ user?.full_name }}</span>
-                            <span class="text-xs text-gray-400 font-light -mt-1">Active now</span>
+                            <span class="dark:text-white">{{ selectedUser?.full_name }}</span>
+                            <span class="text-xs text-gray-400 font-light -mt-1">Last seen </span>
                         </div>
                     </div>
                     <ul class="flex space-x-4 pr-4">
@@ -78,16 +77,15 @@
                             icon="i-heroicons-information-circle" size="sm" color="primary" square variant="link" />
                     </ul>
                 </div>
-                <div
-                    class="relative h-[calc(100vh-13rem)] bg-cover bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
-                    <div class="relative min-h-full bg-white/95 dark:bg-[#111827]/95">
+                <div class="relative h-[calc(100vh-13rem)] bg-cover bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
+                    <div ref="scrollContainer" class="relative min-h-full bg-white/95 dark:bg-[#111827]/95">
                         <div class="p-4" v-for="message in messages">
-                            <div v-if="message.id_sender == 1" class="flex items-start space-x-2.5 sm:space-x-5 ">
-                                <div class="flex flex-col items-start space-y-3.5">
+                            <div v-if="message.sender_uid != user.firebase_uuid" class="flex items-start space-x-2.5 sm:space-x-5 ">
+                                <div class="flex flex-col justify-end items-end space-y-3.5">
                                     <div class="mr-4 max-w-lg sm:mr-10">
                                         <div
-                                            class="rounded-2xl bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
-                                            {{ message.message }}
+                                            class="rounded-2xl bg-indigo-100 p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
+                                            {{ message.content }}
                                         </div>
                                         <p class="ml-auto mt-1 text-right text-xs text-slate-400 dark:text-navy-300">
                                             {{ message.time }}
@@ -96,16 +94,15 @@
                                 </div>
                             </div>
 
-                            <div v-if="message.id_sender == 2"
+                            <div v-else
                                 class="flex items-start justify-end space-x-2.5 sm:space-x-5">
                                 <div class="flex flex-col items-end space-y-3.5">
-                                    <div class="ml-4 max-w-lg sm:ml-10">
-                                        <div
-                                            class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
-                                            {{ message.message }}
-                                        </div>
+                                    <div class="flex flex-col justify-end items-end ml-4 max-w-lg sm:ml-10">
+                                        <span class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
+                                            {{ message.content }}
+                                        </span>
                                         <p class="ml-auto mt-1 text-left text-xs text-slate-400 dark:text-navy-300">
-                                            {{ message.time }}
+                                            {{firebaseTimeGo(message.created_at)  }}
                                         </p>
                                     </div>
                                 </div>
@@ -124,6 +121,14 @@
                 </div>
             </div>
 
+            <div v-else class="dark:bg-slate-900 flex flex-col justify-center items-center col-span-4">
+                <div>
+                    <img class="w-16 mx-auto mb-4" src="~/assets/svg/logos/game-changer-icon-logo.svg" alt="" srcset="">
+                    <h2 class="uppercase font-extrabold text-4xl text-primary">game changer</h2>
+                    <p class="text-right text-primary text-xl">Connet</p>
+                </div>
+            </div>
+
             <USlideover v-model="openSidebar">
                 <div class="p-0 flex-1">
                     <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
@@ -139,7 +144,6 @@
                                     alt="">
                             </span>
                             <h2 class="text-xl font-semibold text-white">Lina Krouse</h2>
-                            <span class="text-sm text-white">@linakrouse</span>
                         </div>
 
                         <div class="flex justify-between items-center space-x-3 relative z-50">
@@ -156,7 +160,7 @@
 
                     </div>
 
-                    <div class="flex flex-col space-y-6 p-6">
+                    <!-- <div class="flex flex-col space-y-6 p-6">
                         <div class="flex flex-col">
                             <label class="text-[#797C7B]" for="">Display Name</label>
                             <h2 class="font-semibold">Jhon Abraham</h2>
@@ -176,7 +180,7 @@
                             <label class="text-[#797C7B]" for="">Phone Number</label>
                             <h2 class="font-semibold">(320) 555-0104</h2>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </USlideover>
         </div>
@@ -188,7 +192,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/authStore';
-import { getConversations } from '~/composables/store/useConversation';
+import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation';
 import { useConversationStore } from '~/stores/conversations';
 
 const authStore = useAuthStore();
@@ -202,19 +206,13 @@ const UsersConversations = computed(() => conversationStore.getUsersConversation
 const message = ref();
 const openSidebar = ref(false);
 const scrollTrigger = ref(null);
+const scrollContainer = ref(null);
 const loadConversations = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
+const selectedUser = ref(null)
 
-console.log(UsersConversations.value);
-const messages = ref([
-    {
-        id: 0,
-        message: 'test',
-        time: '08:45',
-        id_sender: Math.floor(Math.random() * 2) + 1
-    },
-]);
+const messages = ref([]);
 
 const getInitials = (name) => {
     const nameParts = name.split(' ');
@@ -255,6 +253,18 @@ const fetchMoreUsersConversations = async () => {
 
     loadConversations.value = false
 }
+
+const getConversation = async (user) => {
+    selectedUser.value = user
+    messages.value = await getOrCreateConversation(user.id)
+    
+    await nextTick();
+
+    if (scrollContainer.value) {
+        scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+    }
+}
+
 
 const firebaseTimeGo = (timestamp) => {
     const millisecondsFromNanoseconds = timestamp.nanoseconds / 1000000;
