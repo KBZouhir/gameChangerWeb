@@ -1,7 +1,28 @@
 <template>
     <div class="h-full grid grid-cols-4 gap-6 dark:bg-[#0f172a] bg-[#F1F5F9] py-8">
-        <div class="sticky top-0 hidden md:block">
-
+        <div class="sticky top-0 hidden md:block p-2">
+            <!-- <UCard :ui="{ body: 'p-0' }" class="overflow-hidden">
+                <div :class="`h-24 rounded-lg bg-cover`" :style="`background-image: url(${user.cover_image_url});`">
+                </div>
+                <div class="px-4 py-5 -mt-[38px]">
+                    <div class="flex items-center space-x-4">
+                        <div class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
+                            <img v-if="user.image_url" class="rounded-full object-cover w-full h-full"
+                                :src="user.image_url" alt="avatar">
+                            <span v-else class="text-xs dark:text-white">{{ getInitials(user.full_name) }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-red-500 text-white py-3 px-2">
+                    <div class="flex items-center">
+                        <div class="flex items-center text-xs flex-1 space-x-2">
+                            <Icon name="tabler:user-circle" size="20" />
+                            <span>Please complete your profile</span>
+                        </div>
+                        <Icon name="tabler:arrow-right" size="20" />
+                    </div>
+                </div>
+            </UCard> -->
         </div>
 
         <div class="flex flex-col col-span-4 md:col-span-2 mx-auto p-2">
@@ -42,48 +63,64 @@
             </div>
 
             <div
-                class="p-4 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex items-center space-x-4 mb-4 mt-8">
-                <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                    <img :src="user?.image_url" class="object-cover" alt="" srcset="">
+                class="p-4 px-6 ring-1 relative overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4 mt-8">
+                <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt=""
+                    srcset="">
+                <div>
+                    <h2>Hello {{ user.first_name }} 👋</h2>
+                    <h1 class="text-2xl font-bold">What are you looking for today?</h1>
                 </div>
-                <button class="flex-1 text-start" @click="isOpen = true">
-                    <span class="pt-2 select-none text-sm">Write something ...</span>
-                </button>
-                <button @click="isOpen = true" type="button"
-                    class="rounded-full bg-primary p-2 text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path
-                            d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                    </svg>
-                </button>
+
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
+                        <img :src="user?.image_url" class="object-cover" alt="" srcset="">
+                    </div>
+                    <button class="flex-1 text-start bg-slate-100 dark:bg-white/5 py-3 px-4 rounded-lg"
+                        @click="isOpen = true">
+                        <span class="pt-2 select-none text-sm">Write something ...</span>
+                    </button>
+                    <button @click="isOpen = true" type="button"
+                        class="rounded-full bg-primary dark:bg-emerald-500 p-2 text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path
+                                d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <UCard v-for="post in posts" class="my-2">
-                <div  v-if="post?.image" >
-                    <div class="flex justify-between items-center flex-wrap">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                            <img :src="post.author?.image_url" class="object-cover w-full h-full" alt="" srcset="">
-                        </div>
-                        <div class="flex flex-col">
-                            <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>
-                            <span class="text-xs -mt-[0.5px]">{{ $moment(post.created_at).fromNow() }}</span>
-                        </div>
-                    </div>
-                    <div class="flex space-x-4" v-if="post.author.id == user.id">
-                        {{ user.full_name }}
-                    </div>
-                </div>
-                <div class="my-4">
-                    <MoreAndLess :description="post.description" :number="200" />
-                </div>
-
-                <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
-                    <VideoPlayer :videoSrc="`${post.video.url}${post.video.path}`" :poster="post.video.thumbnail_url" />
-                </ClientOnly>
                 <div>
-                    <ImageView v-if="post.image" :image="`${post.image.url}${post.image.path}`"/>
-                    <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
+                    <div class="flex justify-between items-center flex-wrap">
+                        <div class="flex items-center space-x-4">
+                            <div
+                                class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
+                                <img v-if="post.author.image_url" class="rounded-full object-cover w-full h-full"
+                                    :src="post.author.image_url" alt="avatar">
+                                <span v-else class="text-xs dark:text-white">{{ getInitials(post.author.full_name)
+                                    }}</span>
+                            </div>
+
+                            <div class="flex flex-col">
+                                <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>
+                                <span class="text-xs -mt-[0.5px]">{{ $moment(post.created_at).fromNow() }}</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4" v-if="post.author.id == user.id">
+                            {{ user.full_name }}
+                        </div>
+                    </div>
+                    <div class="my-4">
+                        <MoreAndLess :description="post.description" :number="200" />
+                    </div>
+
+                    <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
+                        <VideoPlayer :videoSrc="`${post.video.url}${post.video.path}`"
+                            :poster="post.video.thumbnail_url" />
+                    </ClientOnly>
+                    <div>
+                        <ImageView v-if="post.image" :image="`${post.image.url}${post.image.path}`" />
+                        <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
                             v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
                             <div class="relative h-full">
@@ -102,51 +139,55 @@
                     </div>
                     <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" /> -->
 
-                    <div class="flex items-center space-x-4 my-4 text-sm">
-                        <div class="flex items-center">
-                            <UPopover mode="hover" :popper="{ placement: 'top-start' }">
-                                <div class="flex items-center space-x-0 font-semibold">
-                                    <UButton size="sm" color="primary" square variant="link">
-                                        <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
-                                    </UButton>
-                                    <span>{{ post.reactions_count }}</span>
-                                </div>
-
-                                <template #panel>
-                                    <div class="p-2 flex space-x-2">
-                                        <div class="flex flex-col items-center" v-for="reaction in settings.reaction.type">
-                                            <UTooltip :text="reaction.label">
-                                                <UButton size="sm" color="primary" square variant="link">
-                                                    <Icon v-if="reaction.case == 'LIKE'" name="tabler:thumb-up" class="dark:text-white text-green-600" size="22" />
-                                                    <Icon v-if="reaction.case == 'LOVE'" name="tabler:heart" class="dark:text-white text-red-600" size="22" />
-                                                    <Icon v-if="reaction.case == 'HAHA'" name="tabler:mood-smile" class="dark:text-white text-orange-500" size="22" />
-                                                </UButton>
-                                            </UTooltip>
-                                        </div>
+                        <div class="flex items-center space-x-4 my-4 text-sm">
+                            <div class="flex items-center">
+                                <UPopover mode="hover" :popper="{ placement: 'top-start' }">
+                                    <div class="flex items-center space-x-0 font-semibold">
+                                        <UButton size="sm" color="primary" square variant="link">
+                                            <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
+                                        </UButton>
+                                        <span>{{ post.reactions_count }}</span>
                                     </div>
-                                </template>
-                            </UPopover>
+
+                                    <template #panel>
+                                        <div class="p-2 flex space-x-2">
+                                            <div class="flex flex-col items-center"
+                                                v-for="reaction in settings.reaction.type">
+                                                <UTooltip :text="reaction.label">
+                                                    <UButton size="sm" color="primary" square variant="link">
+                                                        <Icon v-if="reaction.case == 'LIKE'" name="tabler:thumb-up"
+                                                            class="dark:text-white text-green-600" size="22" />
+                                                        <Icon v-if="reaction.case == 'LOVE'" name="tabler:heart"
+                                                            class="dark:text-white text-red-600" size="22" />
+                                                        <Icon v-if="reaction.case == 'HAHA'" name="tabler:mood-smile"
+                                                            class="dark:text-white text-orange-500" size="22" />
+                                                    </UButton>
+                                                </UTooltip>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </UPopover>
+                            </div>
+
+                            <div class="flex items-center space-x-0 font-semibold">
+                                <UButton size="sm" color="primary" square variant="link">
+                                    <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
+                                </UButton>
+                                <span>{{ post.comments_count }}</span>
+                            </div>
                         </div>
 
-                        <div class="flex items-center space-x-0 font-semibold">
-                            <UButton size="sm" color="primary" square variant="link">
-                                <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
-                            </UButton>
-                            <span>{{ post.comments_count }}</span>
+                        <div
+                            class="p-2 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex space-x-4">
+                            <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
+                                <img :src="user?.image_url" class="object-cover" alt="" srcset="">
+                            </div>
+                            <div class="flex-1">
+                                <UTextarea :rows="0" :padded="false" autoresize placeholder="Write a comment"
+                                    variant="none" class="w-full pt-2" />
+                            </div>
                         </div>
                     </div>
-
-                    <div
-                        class="p-2 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex space-x-4">
-                        <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                            <img :src="user?.image_url" class="object-cover" alt="" srcset="">
-                        </div>
-                        <div class="flex-1">
-                            <UTextarea :rows="0" :padded="false" autoresize placeholder="Write a comment" variant="none"
-                                class="w-full pt-2" />
-                        </div>
-                    </div>
-                </div>
                 </div>
             </UCard>
 
@@ -172,7 +213,8 @@
                             <div class="flex flex-col">
                                 <div class="relative"
                                     :class="(keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == '') ? 'border-[1px] border-red-400 rounded-md' : ''">
-                                    <QuillEditor :class="(colorMode.value == 'dark' ? 'dark-theme': '')" :options="options" theme="bubble" @text-change="onTextChange"
+                                    <QuillEditor :class="(colorMode.value == 'dark' ? 'dark-theme' : '')"
+                                        :options="options" theme="bubble" @text-change="onTextChange"
                                         v-model:content="content" contentType="html" />
                                     <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                                         :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
@@ -195,7 +237,9 @@
                                             </div>
                                             <div v-if="file.progress < 100"
                                                 class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
-                                                <UButton loading variant="link" class="dark:text-white" disabled>Compressing...</UButton>
+                                                <UButton loading variant="link" class="dark:text-white" disabled>
+                                                    Compressing...
+                                                </UButton>
                                             </div>
                                             <div
                                                 class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
@@ -223,9 +267,9 @@
                         <template #footer>
                             <div class="flex justify-end">
 
-                                <UButton size="lg" @click="submitForm" :loading="isLoading" 
-                                class="dark:bg-emerald-500 dark:text-white px-4 py-2"
-                                    icon="i-heroicons-arrow-right" trailing>Post</UButton>
+                                <UButton size="lg" @click="submitForm" :loading="isLoading"
+                                    class="dark:bg-emerald-500 dark:text-white px-4 py-2" icon="i-heroicons-arrow-right"
+                                    trailing>Post</UButton>
                             </div>
                         </template>
                     </UCard>
@@ -335,11 +379,17 @@ const resetFileInput = () => {
 };
 
 const removeImage = (index) => {
-  compressedFiles.value.splice(index, 1);
-  
-  if (compressedFiles.value.length === 0) {
-    resetFileInput();
-  }
+    compressedFiles.value.splice(index, 1);
+
+    if (compressedFiles.value.length === 0) {
+        resetFileInput();
+    }
+};
+
+const getInitials = (name) => {
+    const nameParts = name.split(' ');
+    const initials = nameParts.map(part => part[0]).join('');
+    return initials;
 };
 
 const countChars = (htmlString) => {
@@ -415,11 +465,11 @@ const submitForm = async () => {
     let formData = new FormData();
     formData.append('description', content.value)
 
-    if(hashtags.length > 0){
+    if (hashtags.length > 0) {
         formData.append('hashtags', hashtags);
     }
 
-    if(compressedFiles.value[0].file){
+    if (compressedFiles.value[0].file) {
         formData.append('image', compressedFiles.value[0].file)
     }
 
@@ -434,16 +484,17 @@ const submitForm = async () => {
 <style scoped lang="css">
 :deep(.ql-editor) {
     min-height: 200px;
-    border: 1px solid #e5e7eb; /* 1f2937 */
+    border: 1px solid #e5e7eb;
+    /* 1f2937 */
     border-radius: 8px;
     padding-bottom: 26px;
 }
 
-:deep(.ql-editor.ql-blank::before){
+:deep(.ql-editor.ql-blank::before) {
     color: #4e4e4e !important;
 }
 
-:deep(.dark-theme > .ql-editor.ql-blank::before){
+:deep(.dark-theme > .ql-editor.ql-blank::before) {
     color: #a8a8a8 !important;
 }
 
@@ -493,7 +544,8 @@ const submitForm = async () => {
 :deep(.ti-icon-close:before) {
     font-size: 10px !important;
 }
-.blog-content > .th-btn.btn-sm{
+
+.blog-content>.th-btn.btn-sm {
     background: var(--theme-color);
 }
 </style>

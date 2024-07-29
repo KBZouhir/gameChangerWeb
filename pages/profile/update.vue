@@ -25,7 +25,7 @@ const currentStep = ref(0)
             <div class="flex flex-col">
                 <div class="rounded-tr-md rounded-tl-md h-96 w-full overflow-hidden relative">
                     <div class="h-full w-full ">
-                        <img :src="user.cover_image_urls || fallbackImage"
+                        <img :src="user.cover_image_url || fallbackImage"
                             class="w-full h-full object-cover" draggable="false" alt="">
                     </div>
                     <div

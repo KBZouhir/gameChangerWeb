@@ -2,7 +2,7 @@
     <div class="card-text">
         <div v-if="displayDescription.length > number">
             <div class="relative line-clamp-4" v-if="!readMore">
-                {{ displayDescription }} 
+                <div v-html="displayDescription"></div>
                 <div class="absolute w-full h-12 bg-red bottom-0 bg-gradient-to-t dark:from-[#111827] from-white to-transparent"></div>
             </div>
             <div v-if="readMore" v-html="htmlDescription"></div>
@@ -16,6 +16,7 @@
                 </a>
             </div>
         </div>
+
         <div v-else v-html="description"></div>
     </div>
 </template>

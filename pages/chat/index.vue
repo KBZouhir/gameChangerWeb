@@ -1,7 +1,8 @@
 <template>
     <div class="mx-auto w-full h-full">
         <div class="overflow-hidden h-full grid grid-cols-5 bg-[#F1F5F9]">
-            <div class="bg-white hidden dark:bg-[#111827] dark:border-[#0d121d] border-r border-t md:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
+            <div
+                class="bg-white hidden dark:bg-[#111827] dark:border-[#0d121d] border-r border-t lg:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
                 <div class="p-4">
                     <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
                         <template #leading>
@@ -15,19 +16,25 @@
                     </UInput>
                 </div>
 
-                <div class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-700">
-                    <div v-for="user in UsersConversations" :key="user.id" @click="getConversation(user.user)" class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600 ">
-
-                        <div class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
-                            <img v-if="user.user.image_url" class="rounded-full object-cover w-full h-full" :src="user.user.image_url" alt="avatar">
+                <div
+                    class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
+                    <div v-if="UsersConversations.length > 0 || loadConversations" v-for="user in UsersConversations"
+                        :key="user.id" @click="getConversation(user.user)"
+                        class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600 ">
+                        <div
+                            class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
+                            <img v-if="user.user.image_url" class="rounded-full object-cover w-full h-full"
+                                :src="user.user.image_url" alt="avatar">
                             <span v-else class="text-xs dark:text-white">{{ getInitials(user.user.full_name) }}</span>
                         </div>
                         <div class="flex flex-1 flex-col">
                             <div class="flex items-baseline justify-between space-x-1.5">
-                                <p class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
+                                <p
+                                    class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
                                     {{ user.user.full_name }}
                                 </p>
-                                <span class="text-xs text-slate-400 dark:text-navy-300"> {{ firebaseTimeGo(user.conversation.last_message.created_at) }}</span>
+                                <span class="text-xs text-slate-400 dark:text-navy-300"> {{
+                                    firebaseTimeGo(user.conversation.last_message.created_at) }}</span>
                             </div>
                             <div class="mt-1 flex items-center justify-between space-x-1">
                                 <p class="line-clamp-1 text-xs text-slate-400 dark:text-navy-300">
@@ -36,7 +43,30 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-center items-center w-full h-full bg-white/5" v-if="UsersConversations.length <= 0">
+                    <template v-else>
+                        <div v-for="i in 10"
+                            class="flex items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+                            <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
+                            <div class="flex flex-1 flex-col space-y-3">
+                                <USkeleton class="h-4" />
+                                <USkeleton class="h-4 w-2/5" />
+                            </div>
+                        </div>
+                    </template>
+
+
+                    <!-- <div v-for="i in 10"  class="flex flex-col px-4 py-2.5">
+                        <div class="flex items-center space-x-4">
+                            <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
+                            <div class="space-y-2">
+                                <USkeleton class="h-4 w-[250px]" />
+                                <USkeleton class="h-4 w-[200px]" />
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <!-- <div class="flex justify-center items-center w-full h-full bg-white/5"
+                        >
                         <svg aria-hidden="true"
                             class="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                             viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -48,20 +78,23 @@
                                 fill="currentFill" />
                         </svg>
                         <span class="sr-only">Loading...</span>
-                    </div>
+                    </div> -->
                     <div ref="scrollTrigger" class="py-3"></div>
                 </div>
             </div>
 
-            <div v-if="selectedUser" class="flex flex-col col-span-5 md:col-span-4">
-                <div class="h-16 flex justify-between items-center border-y bg-white dark:border-[#0d121d] dark:bg-[#111827]">
-
+            <div v-if="selectedUser" class="flex flex-col col-span-5 lg:col-span-4">
+                <div
+                    class="h-16 flex justify-between items-center border-y bg-white dark:border-[#0d121d] dark:bg-[#111827]">
                     <div class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
-                        <div class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
-                            <img v-if="selectedUser?.image_url" class="rounded-full object-cover w-full h-full" :src="selectedUser?.image_url" alt="avatar">
-                            <span v-else class="text-xs dark:text-white">{{ getInitials(selectedUser?.full_name) }}</span>
+                        <div
+                            class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
+                            <img v-if="selectedUser?.image_url" class="rounded-full object-cover w-full h-full"
+                                :src="selectedUser?.image_url" alt="avatar">
+                            <span v-else class="text-xs dark:text-white">
+                                {{ getInitials(selectedUser?.full_name) }}
+                            </span>
                         </div>
-
 
                         <div class="flex flex-col">
                             <span class="dark:text-white">{{ selectedUser?.full_name }}</span>
@@ -77,33 +110,40 @@
                             icon="i-heroicons-information-circle" size="sm" color="primary" square variant="link" />
                     </ul>
                 </div>
-                <div class="relative h-[calc(100vh-13rem)] bg-cover bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
+                <div
+                    class="relative h-[calc(100vh-13rem)] bg-cover bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
                     <div ref="scrollContainer" class="relative min-h-full bg-white/95 dark:bg-[#111827]/95">
-                        <div class="p-4" v-for="message in messages">
-                            <div v-if="message.sender_uid != user.firebase_uuid" class="flex items-start space-x-2.5 sm:space-x-5 ">
-                                <div class="flex flex-col justify-end items-end space-y-3.5">
-                                    <div class="mr-4 max-w-lg sm:mr-10">
-                                        <div
-                                            class="rounded-2xl bg-indigo-100 p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
-                                            {{ message.content }}
+                        <div v-for="(listMessages, date) in messages" :key="date" class="p-4">
+                            <UDivider :label="date" size="2xs"/>
+
+                            <div v-for="message in listMessages">
+                                <div v-if="message.sender_uid != user.firebase_uuid"
+                                    class="flex items-start space-x-2.5 sm:space-x-5 mb-3">
+                                    <div class="flex flex-col justify-end items-end space-y-3.5">
+                                        <div class="mr-4 max-w-lg sm:mr-10">
+                                            <div
+                                                class="rounded-2xl bg-indigo-100 p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
+                                                {{ message.content }}
+                                            </div>
+                                            <p
+                                                class="ml-auto mt-1 text-right text-xs text-slate-400 dark:text-navy-300">
+                                                {{ message.time }}
+                                            </p>
                                         </div>
-                                        <p class="ml-auto mt-1 text-right text-xs text-slate-400 dark:text-navy-300">
-                                            {{ message.time }}
-                                        </p>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div v-else
-                                class="flex items-start justify-end space-x-2.5 sm:space-x-5">
-                                <div class="flex flex-col items-end space-y-3.5">
-                                    <div class="flex flex-col justify-end items-end ml-4 max-w-lg sm:ml-10">
-                                        <span class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
-                                            {{ message.content }}
-                                        </span>
-                                        <p class="ml-auto mt-1 text-left text-xs text-slate-400 dark:text-navy-300">
-                                            {{firebaseTimeGo(message.created_at)  }}
-                                        </p>
+                                <div v-else class="flex items-start justify-end space-x-2.5 sm:space-x-5 mb-3">
+                                    <div class="flex flex-col items-end space-y-3.5">
+                                        <div class="flex flex-col justify-end items-end ml-4 max-w-lg sm:ml-10">
+                                            <span
+                                                class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
+                                                {{ message.content }}
+                                            </span>
+                                            <p class="ml-auto mt-1 text-left text-xs text-slate-400 dark:text-navy-300">
+                                                {{ firebaseTimeGo(message.created_at) }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -123,9 +163,12 @@
 
             <div v-else class="dark:bg-slate-900 flex flex-col justify-center items-center col-span-4">
                 <div>
-                    <img class="w-16 mx-auto mb-4" src="~/assets/svg/logos/game-changer-icon-logo.svg" alt="" srcset="">
-                    <h2 class="uppercase font-extrabold text-4xl text-primary">game changer</h2>
-                    <p class="text-right text-primary text-xl">Connet</p>
+                    <img class="w-32 mx-auto mb-4 dark:hidden flex" src="~/assets/svg/vectors/chat-illustration.svg"
+                        alt="" srcset="">
+                    <img class="w-32 mx-auto mb-4 dark:flex hidden"
+                        src="~/assets/svg/vectors/chat-illustration-white.svg" alt="" srcset="">
+                    <h2 class="uppercase font-extrabold text-4xl dark:text-white text-primary">game changer</h2>
+                    <p class="text-right text-primary dark:text-white text-xl">Connect</p>
                 </div>
             </div>
 
@@ -191,13 +234,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { collection, getDocs, query, where, doc, getDoc, orderBy, onSnapshot  } from "firebase/firestore"
 import { useAuthStore } from '~/stores/authStore';
-import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation';
-import { useConversationStore } from '~/stores/conversations';
+import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation'
+import { useConversationStore } from '~/stores/conversations'
 
 const authStore = useAuthStore();
 const conversationStore = useConversationStore();
 
+const { $db } = useNuxtApp()
 const { $moment } = useNuxtApp()
 
 const user = computed(() => authStore.getAuthUser);
@@ -211,8 +256,39 @@ const loadConversations = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
 const selectedUser = ref(null)
-
 const messages = ref([]);
+
+definePageMeta({
+    layout: 'auth',
+    title: 'Chat',
+    middleware: ['auth']
+})
+
+
+const getConversationsData = async () => {
+    try {
+        const conversationsCollection = collection($db, "conversations")
+        const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid), orderBy("last_message.created_at", "desc"))
+        onSnapshot(q, async (querySnapshot) => {
+            const conversations = []
+
+            querySnapshot.forEach((doc) => {
+                conversations.push({ id: doc.id, ...doc.data() })
+            })
+
+            const conversationIds = conversations.map(
+                (conversation) => conversation.id
+            )
+
+            await getConversations(1, conversationIds, conversations, false)
+
+            UsersConversations.value = conversationStore.getUsersConversations
+            page.value += 1
+        })
+    } catch (error) {
+        console.error("Error fetching conversations:", error)
+    }
+}
 
 const getInitials = (name) => {
     const nameParts = name.split(' ');
@@ -220,34 +296,34 @@ const getInitials = (name) => {
     return initials;
 };
 
-definePageMeta({
-    layout: 'auth',
-    title: 'Forgot password',
-    middleware: ['auth']
-});
-
-const fetchUsersConversations = async () => {
-    loadConversations.value = true
-    if (hasMore.value) {
-        const result = await getConversations(page.value);
-        if (result.length < 10) {
-            hasMore.value = false
-        } else {
-            page.value += 1
-        }
-    }
-
-    loadConversations.value = false
-}
 
 const fetchMoreUsersConversations = async () => {
     loadConversations.value = true
+   
     if (hasMore.value && page.value != 1) {
-        const result = await getConversations(page.value);
-        if (result.length < 10) {
-            hasMore.value = false
-        } else {
-            page.value += 1
+        try {
+            const conversationsCollection = collection($db, "conversations")
+            const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid),orderBy("last_message.created_at", "desc"))
+
+            const querySnapshot = await getDocs(q)
+            const conversations = []
+
+            querySnapshot.forEach((doc) => {
+                conversations.push({ id: doc.id, ...doc.data() })
+            })
+
+            const conversationIds = conversations.map(
+                (conversation) => conversation.id
+            )
+            
+            const result = await getConversations(page.value, conversationIds, conversations,true);
+            if (result.length < 10) {
+                hasMore.value = false
+            } else {
+                page.value += 1
+            }
+        } catch (error) {
+            console.error("Error fetching conversations:", error)
         }
     }
 
@@ -257,7 +333,7 @@ const fetchMoreUsersConversations = async () => {
 const getConversation = async (user) => {
     selectedUser.value = user
     messages.value = await getOrCreateConversation(user.id)
-    
+
     await nextTick();
 
     if (scrollContainer.value) {
@@ -265,16 +341,16 @@ const getConversation = async (user) => {
     }
 }
 
-
 const firebaseTimeGo = (timestamp) => {
     const millisecondsFromNanoseconds = timestamp.nanoseconds / 1000000;
     const totalMilliseconds = (timestamp.seconds * 1000) + millisecondsFromNanoseconds;
     return $moment(totalMilliseconds).fromNow();
 }
 
+
 watchEffect(() => {
-    fetchUsersConversations()
-});
+    getConversationsData()
+})
 
 onMounted(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -289,5 +365,5 @@ onMounted(() => {
     if (scrollTrigger.value) {
         observer.observe(scrollTrigger.value);
     }
-});
+})
 </script>
