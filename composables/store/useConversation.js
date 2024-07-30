@@ -44,41 +44,6 @@ export const getOrCreateConversation = async (id) => {
     }
   )
   if (data.success) {
-    let messages = await getMessagesForConversation(data.data.id);
-    return messages;
+    return data.data.id;
   }
 }
-
-export const getMessagesForConversation = async (conversationId) => {
-  const { $db } = useNuxtApp();
-  try {
-    const messagesCollectionRef = collection(
-      $db,
-      "conversations",
-      conversationId,
-      "messages"
-    );
-    const messagesQuery = query(
-      messagesCollectionRef,
-      orderBy("created_at", "asc")
-    );
-    const messagesSnapshot = await getDocs(messagesQuery);
-    const messages = messagesSnapshot.docs.map((doc) => doc.data());
-
-    const groupedMessages = messages.reduce((groups, message) => {
-      const date = new Date(message.created_at.seconds * 1000)
-        .toISOString()
-        .split("T")[0];
-      if (!groups[date]) {
-        groups[date] = [];
-      }
-      groups[date].push(message);
-      return groups;
-    }, {});
-
-    return groupedMessages;
-  } catch (error) {
-    console.error("Error fetching messages:", error);
-    return {};
-  }
-};

@@ -7,7 +7,16 @@ const get = async (url) => {
     method: "GET",
   });
 
-  console.log(data);
+ return data
 };
 
-export { get };
+const getImagebyID = async (id) => {
+  const { data, refresh, error, pending } = await useApi(`conversations/attachments/${id}`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+   return data
+};
+
+export { get, getImagebyID };

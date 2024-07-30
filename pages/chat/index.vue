@@ -18,19 +18,23 @@
 
                 <div
                     class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
-                    <div v-if="UsersConversations.length > 0 || loadConversations" v-for="userConversation in UsersConversations"
-                        :key="userConversation.id" @click="getConversation(userConversation.user)"
-                        class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600 ">
+
+                    <div v-if="UsersConversations.length > 0 || loadConversations"
+                        v-for="userConversation in UsersConversations" :key="userConversation.id"
+                        @click="getConversation(userConversation.user)"
+                        :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
+                        class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-100 dark:hover:bg-slate-800 ">
                         <div
                             class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
                             <img v-if="userConversation.user.image_url" class="rounded-full object-cover w-full h-full"
                                 :src="userConversation.user.image_url" alt="avatar">
-                            <span v-else class="text-xs dark:text-white">{{ getInitials(userConversation.user.full_name) }}</span>
+                            <span v-else class="text-xs dark:text-white">
+                                {{ getInitials(userConversation.user.full_name) }}
+                            </span>
                         </div>
                         <div class="flex flex-1 flex-col">
                             <div class="flex items-baseline justify-between space-x-1.5">
-                                <p
-                                    class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
+                                <p class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
                                     {{ userConversation.user.full_name }}
                                 </p>
                                 <span class="text-xs text-slate-400 dark:text-navy-300"> {{
@@ -38,11 +42,16 @@
                             </div>
                             <div class="mt-1 flex items-center justify-between space-x-1">
                                 <p class="line-clamp-1 text-xs text-slate-400 dark:text-navy-300">
-                                    <span v-if="userConversation.conversation.last_message.sender_uid == user.firebase_uuid">You: </span>
-                                    <span :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : ''">{{ userConversation.conversation.last_message.content }}</span>
+                                    <span
+                                        v-if="userConversation.conversation.last_message.sender_uid == user.firebase_uuid">You:
+                                    </span>
+                                    <span :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : ''">
+                                        {{ userConversation.conversation.last_message.content }}
+                                    </span>
                                 </p>
                             </div>
                         </div>
+                        
                     </div>
                     <template v-else>
                         <div v-for="i in 10"
@@ -54,7 +63,9 @@
                             </div>
                         </div>
                     </template>
-                    <div ref="scrollTrigger" class="py-3"></div>
+                    <div class="flex justify-center py-4" v-if="showMoreBtn && UsersConversations.length > 0">
+                        <UButton @click="fetchMoreUsersConversations" class="dark:bg-slate-50 capitalize hover:dark:bg-slate-200" size="xs">load more</UButton>
+                    </div>
                 </div>
             </div>
 
@@ -89,14 +100,15 @@
                     class="relative h-[calc(100vh-13rem)] bg-cover bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
                     <div ref="scrollContainer" class="relative min-h-full bg-white/95 dark:bg-[#111827]/95">
                         <div v-for="(listMessages, date) in messages" :key="date" class="p-4">
-                            <UDivider :label="date" size="2xs"/>
+                            <UDivider :label="date" size="2xs" />
 
                             <div v-for="message in listMessages">
                                 <div v-if="message.sender_uid != user.firebase_uuid"
                                     class="flex items-start space-x-2.5 sm:space-x-5 mb-3">
                                     <div class="flex flex-col justify-end items-end space-y-3.5">
                                         <div class="mr-4 max-w-lg sm:mr-10">
-                                            <div v-if="message.content" class="rounded-2xl bg-indigo-100 p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
+                                            <div v-if="message.content"
+                                                class="rounded-2xl bg-indigo-100 p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
                                                 {{ message.content }}
                                             </div>
                                             <p
@@ -110,11 +122,13 @@
                                 <div v-else class="flex items-start justify-end space-x-2.5 sm:space-x-5 mb-3">
                                     <div class="flex flex-col items-end space-y-3.5">
                                         <div class="flex flex-col justify-end items-end ml-4 max-w-lg sm:ml-10">
-                                            <span v-if="message.content" class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
+                                            <span v-if="message.content"
+                                                class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
                                                 {{ message.content }}
                                             </span>
-                                            <div>
-                                                {{ message.attachments }}
+                                            <div v-for="attachment in message.attachments">
+                                                <ImageView v-if="attachment.type == 'image'" :id="attachment.id" />
+                                                <VideoPlayer v-else :id="attachment.id" />
                                             </div>
                                             <p class="ml-auto mt-1 text-left text-xs text-slate-400 dark:text-navy-300">
                                                 {{ firebaseTimeGo(message.created_at) }}
@@ -128,8 +142,8 @@
                 </div>
                 <div
                     class="flex items-center h-16 border-t bg-white dark:border-[#0d121d] dark:bg-[#111827] px-4 space-x-4">
-                    <UInput v-model="message" class="flex-1" variant="none" placeholder="Write your message"
-                        @keyup.enter="" />
+                    <UInput v-model="inputMessage" class="flex-1" variant="none" placeholder="Write your message"
+                        @keyup.enter="sendMessage" />
                     <UButton icon="i-heroicons-photo" class="dark:text-white dark:hover:text-white/70" size="sm"
                         color="primary" square variant="link" />
                     <UButton icon="i-heroicons-paper-clip" class="dark:text-white dark:hover:text-white/70" size="sm"
@@ -210,7 +224,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { collection, getDocs, query, where, doc, getDoc, orderBy, onSnapshot  } from "firebase/firestore"
+import { collection, addDoc, query, doc, where, updateDoc, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
 import { useAuthStore } from '~/stores/authStore';
 import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation'
 import { useConversationStore } from '~/stores/conversations'
@@ -224,7 +238,7 @@ const { $moment } = useNuxtApp()
 const user = computed(() => authStore.getAuthUser);
 const UsersConversations = computed(() => conversationStore.getUsersConversations);
 
-const message = ref();
+const inputMessage = ref();
 const openSidebar = ref(false);
 const scrollTrigger = ref(null);
 const scrollContainer = ref(null);
@@ -235,6 +249,8 @@ const selectedUser = ref(null)
 const messages = ref([]);
 const conversationIds = ref([])
 const conversations = ref([])
+const selectedConversation = ref(null)
+const showMoreBtn = ref(false)
 
 definePageMeta({
     layout: 'auth',
@@ -246,9 +262,10 @@ const getConversationsData = async () => {
 
     try {
         const conversationsCollection = collection($db, "conversations")
-        const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid), orderBy("last_message.created_at", "desc"))
+        const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid), orderBy("last_message.created_at", "desc"), where("type", "==", 1))
+        conversations.value = []
         onSnapshot(q, async (querySnapshot) => {
-
+            conversations.value = []
             querySnapshot.forEach((doc) => {
                 conversations.value.push({ id: doc.id, ...doc.data() })
             })
@@ -260,14 +277,15 @@ const getConversationsData = async () => {
             /* if conversationIds > 10 display more button */
             let arrayConversationIds = []
             let arrayConversations = []
-            if(conversationIds.value.length > 10){
-                arrayConversationIds = conversationIds.value.slice(0, 10) 
-                arrayConversations = conversations.value.slice(0, 10) 
+            if (conversationIds.value.length > 10) {
+                arrayConversationIds = conversationIds.value.slice(0, 10)
+                arrayConversations = conversations.value.slice(0, 10)
+                showMoreBtn.value = true
                 page.value += 1
             }
 
             await getConversations(arrayConversationIds, arrayConversations, false)
-            
+
         })
     } catch (error) {
         console.error("Error fetching conversations:", error)
@@ -278,19 +296,18 @@ const getInitials = (name) => {
     const nameParts = name.split(' ');
     const initials = nameParts.map(part => part[0]).join('');
     return initials;
-};
-
+}
 
 const fetchMoreUsersConversations = async () => {
     loadConversations.value = true
-    console.log(page.value);
-    console.log(hasMore.value);
-    if (hasMore.value && page.value != 1) {
+
+    if (hasMore.value) {
         try {
             const arrayConversationIds = conversationIds.value.slice((page.value - 1) * 10, page.value * 10)
-            const result = await getConversations(arrayConversationIds, conversations.value,true);
+            const result = await getConversations(arrayConversationIds, conversations.value, true);
             if (result.length < 10) {
                 hasMore.value = false
+                showMoreBtn.value = false
             } else {
                 page.value += 1
             }
@@ -303,13 +320,64 @@ const fetchMoreUsersConversations = async () => {
 }
 
 const getConversation = async (user) => {
-    selectedUser.value = user
-    messages.value = await getOrCreateConversation(user.id)
+    selectedUser.value = user;
+    const conversationID = await getOrCreateConversation(user.id);
+    selectedConversation.value = conversationID
+    try {
+        const messagesCollectionRef = collection($db, "conversations", selectedConversation.value, "messages");
+        const messagesQuery = query(messagesCollectionRef, orderBy("created_at", "asc"));
 
-    await nextTick();
+        onSnapshot(messagesQuery, (snapshot) => {
+            const messagesList = snapshot.docs.map((doc) => doc.data());
+            const groupedMessages = messagesList.reduce((groups, message) => {
+                const date = new Date(message.created_at.seconds * 1000)
+                    .toISOString()
+                    .split("T")[0];
+                if (!groups[date]) {
+                    groups[date] = [];
+                }
+                groups[date].push(message);
+                return groups;
+            }, {});
 
-    if (scrollContainer.value) {
-        scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+            messages.value = groupedMessages;
+
+            nextTick().then(() => {
+                if (scrollContainer.value) {
+                    scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+                }
+            });
+        })
+
+    } catch (error) {
+        console.error("Error fetching messages:", error);
+    }
+}
+
+const sendMessage = async () => {
+    if (selectedConversation.value) {
+        if (inputMessage.value.trim() === '') return;
+        try {
+            const messagesRef = collection($db, 'conversations', selectedConversation.value, 'messages')
+            const conversationDocRef = doc($db, 'conversations', selectedConversation.value)
+            const newMessageRef = await addDoc(messagesRef, {
+                content: inputMessage.value,
+                created_at: serverTimestamp(),
+                sender_uid: user.value.firebase_uuid,
+            });
+
+            await updateDoc(conversationDocRef, {
+                last_message: {
+                    id: newMessageRef.id,
+                    content: inputMessage.value,
+                    created_at: serverTimestamp(),
+                    sender_uid: user.value.firebase_uuid,
+                }
+            });
+            inputMessage.value = ""
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
     }
 }
 
@@ -319,23 +387,14 @@ const firebaseTimeGo = (timestamp) => {
     return $moment(totalMilliseconds).fromNow();
 }
 
+const receivedMessageSound = () => {
+    const audio = new Audio('/sounds/MessageNotification.mp3');
+    audio.play();
+}
 
 watchEffect(() => {
     getConversationsData()
 })
 
-onMounted(() => {
-    const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            fetchMoreUsersConversations();
-        }
-    }, {
-        root: null,
-        rootMargin: '0px',
-        threshold: 1.0,
-    });
-    if (scrollTrigger.value) {
-        observer.observe(scrollTrigger.value);
-    }
-})
+
 </script>

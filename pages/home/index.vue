@@ -93,6 +93,7 @@
                 <div>
                     <div class="flex justify-between items-center flex-wrap">
                         <div class="flex items-center space-x-4">
+
                             <div
                                 class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
                                 <img v-if="post.author.image_url" class="rounded-full object-cover w-full h-full"
@@ -119,7 +120,7 @@
                             :poster="post.video.thumbnail_url" />
                     </ClientOnly>
                     <div>
-                        <ImageView v-if="post.image" :image="`${post.image.url}${post.image.path}`" />
+                        <ImageView v-if="post.image" :url="`${post.image.url}${post.image.path}`" />
                         <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
                             v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
@@ -138,12 +139,22 @@
                         </button>
                     </div>
                     <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" /> -->
-
+                        
                         <div class="flex items-center space-x-4 my-4 text-sm">
                             <div class="flex items-center">
                                 <UPopover mode="hover" :popper="{ placement: 'top-start' }">
                                     <div class="flex items-center space-x-0 font-semibold">
-                                        <UButton size="sm" color="primary" square variant="link">
+                                        <div v-if="post.reaction">
+                                            <UButton size="sm" color="primary" square variant="link">
+                                                <Icon v-if="post.reaction == '1'" @click="toggleReaction(post.id, 1)" name="tabler:thumb-up-filled"
+                                                    class=" text-green-600" size="22" />
+                                                <Icon v-if="post.reaction == '2'" @click="toggleReaction(post.id, 2)" name="tabler:heart-filled"
+                                                    class=" text-red-600" size="22" />
+                                                <Icon v-if="post.reaction == '3'" @click="toggleReaction(post.id, 3)" name="tabler:mood-smile-filled"
+                                                    class=" text-orange-500" size="22" />
+                                            </UButton>
+                                        </div>
+                                        <UButton v-else size="sm" @click="toggleReaction(post.id, 2)" color="primary" square variant="link">
                                             <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
                                         </UButton>
                                         <span>{{ post.reactions_count }}</span>
@@ -155,12 +166,14 @@
                                                 v-for="reaction in settings.reaction.type">
                                                 <UTooltip :text="reaction.label">
                                                     <UButton size="sm" color="primary" square variant="link">
-                                                        <Icon v-if="reaction.case == 'LIKE'" name="tabler:thumb-up"
-                                                            class="dark:text-white text-green-600" size="22" />
-                                                        <Icon v-if="reaction.case == 'LOVE'" name="tabler:heart"
-                                                            class="dark:text-white text-red-600" size="22" />
-                                                        <Icon v-if="reaction.case == 'HAHA'" name="tabler:mood-smile"
-                                                            class="dark:text-white text-orange-500" size="22" />
+                                                        <Icon v-if="reaction.case == 'LIKE'"
+                                                            name="tabler:thumb-up-filled" class=" text-green-600"
+                                                            size="22" />
+                                                        <Icon v-if="reaction.case == 'LOVE'" name="tabler:heart-filled"
+                                                            class=" text-red-600" size="22" />
+                                                        <Icon v-if="reaction.case == 'HAHA'"
+                                                            name="tabler:mood-smile-filled" class=" text-orange-500"
+                                                            size="22" />
                                                     </UButton>
                                                 </UTooltip>
                                             </div>
@@ -237,7 +250,9 @@
                                             </div>
                                             <div v-if="file.progress < 100"
                                                 class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
-                                                <UButton loading variant="link" class="text-white" disabled>
+                                                <UButton loading
+                                                    :color="(colorMode.value != 'light') ? 'white' : 'primary'"
+                                                    variant="link" disabled>
                                                     Compressing...
                                                 </UButton>
                                             </div>
@@ -439,6 +454,20 @@ const onImageFileChange = async (event) => {
             compressedFiles.value[index].file = compressedFile
         } catch (error) {
             console.error('Error compressing file:', error);
+        }
+    }
+}
+
+const toggleReaction = (postID, reaction_id) => {
+    const postIndex = posts.value.findIndex(post => post.id === postID);
+    console.log(postIndex);
+    if (postIndex !== -1) {
+        console.log(reaction_id);
+        console.log(postIndex);
+        if(posts.value[postIndex].reaction == reaction_id){
+            posts.value[postIndex].reaction = null
+        }else{
+            posts.value[postIndex].reaction = reaction_id;
         }
     }
 }
