@@ -22,4 +22,14 @@ const create = async (payload) => {
   console.log(data);
 };
 
-export { index, create };
+const toogleReaction = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(`/posts/${id}/react`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data
+};
+
+export { index, create, toogleReaction };

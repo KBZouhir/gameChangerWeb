@@ -145,16 +145,20 @@
                                 <UPopover mode="hover" :popper="{ placement: 'top-start' }">
                                     <div class="flex items-center space-x-0 font-semibold">
                                         <div v-if="post.reaction">
-                                            <UButton size="sm" color="primary" square variant="link">
-                                                <Icon v-if="post.reaction == '1'" @click="toggleReaction(post.id, 1)" name="tabler:thumb-up-filled"
+                                            <UButton v-if="post.reaction == '1'" @click="togglePostReaction(post.id, 1)" size="sm" color="primary" square variant="link">
+                                                <Icon name="tabler:thumb-up-filled"
                                                     class=" text-green-600" size="22" />
-                                                <Icon v-if="post.reaction == '2'" @click="toggleReaction(post.id, 2)" name="tabler:heart-filled"
+                                            </UButton>
+                                            <UButton v-if="post.reaction == '2'" @click="togglePostReaction(post.id, 2)" size="sm" color="primary" square variant="link">
+                                                <Icon name="tabler:heart-filled"
                                                     class=" text-red-600" size="22" />
-                                                <Icon v-if="post.reaction == '3'" @click="toggleReaction(post.id, 3)" name="tabler:mood-smile-filled"
-                                                    class=" text-orange-500" size="22" />
+                                            </UButton>
+                                            <UButton v-if="post.reaction == '3'" @click="togglePostReaction(post.id, 3)" size="sm" color="primary" square variant="link">
+                                                <Icon name="tabler:mood-smile-filled"
+                                                class=" text-orange-500" size="22" />
                                             </UButton>
                                         </div>
-                                        <UButton v-else size="sm" @click="toggleReaction(post.id, 2)" color="primary" square variant="link">
+                                        <UButton v-else size="sm" @click="togglePostReaction(post.id, 2)" color="primary" square variant="link">
                                             <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
                                         </UButton>
                                         <span>{{ post.reactions_count }}</span>
@@ -166,12 +170,12 @@
                                                 v-for="reaction in settings.reaction.type">
                                                 <UTooltip :text="reaction.label">
                                                     <UButton size="sm" color="primary" square variant="link">
-                                                        <Icon v-if="reaction.case == 'LIKE'"
+                                                        <Icon v-if="reaction.case == 'LIKE'" @click="togglePostReaction(post.id, 1)"
                                                             name="tabler:thumb-up-filled" class=" text-green-600"
                                                             size="22" />
-                                                        <Icon v-if="reaction.case == 'LOVE'" name="tabler:heart-filled"
+                                                        <Icon v-if="reaction.case == 'LOVE'" @click="togglePostReaction(post.id, 2)" name="tabler:heart-filled"
                                                             class=" text-red-600" size="22" />
-                                                        <Icon v-if="reaction.case == 'HAHA'"
+                                                        <Icon v-if="reaction.case == 'HAHA'" @click="togglePostReaction(post.id, 3)"
                                                             name="tabler:mood-smile-filled" class=" text-orange-500"
                                                             size="22" />
                                                     </UButton>
@@ -190,7 +194,7 @@
                             </div>
                         </div>
 
-                        <div
+                        <!-- <div
                             class="p-2 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex space-x-4">
                             <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
                                 <img :src="user?.image_url" class="object-cover" alt="" srcset="">
@@ -199,7 +203,7 @@
                                 <UTextarea :rows="0" :padded="false" autoresize placeholder="Write a comment"
                                     variant="none" class="w-full pt-2" />
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </UCard>
@@ -299,7 +303,7 @@
 
 
 <script setup>
-import { create, index } from '~/composables/store/usePost'
+import { create, index, toogleReaction } from '~/composables/store/usePost'
 import { usePostStore } from "~/stores/posts"
 import FsLightbox from "fslightbox-vue/v3"
 import { QuillEditor } from '@vueup/vue-quill'
@@ -458,19 +462,22 @@ const onImageFileChange = async (event) => {
     }
 }
 
-const toggleReaction = (postID, reaction_id) => {
-    const postIndex = posts.value.findIndex(post => post.id === postID);
-    console.log(postIndex);
-    if (postIndex !== -1) {
-        console.log(reaction_id);
-        console.log(postIndex);
-        if(posts.value[postIndex].reaction == reaction_id){
-            posts.value[postIndex].reaction = null
-        }else{
-            posts.value[postIndex].reaction = reaction_id;
+const togglePostReaction = async (postID, reaction_id) => {
+    const post = posts.value.find(post => post.id === postID);
+    if (post) {
+        if (post.reaction === reaction_id) {
+            post.reaction = null;
+            post.reactions_count -= 1;
+        } else {
+            if (post.reaction === null) {
+                post.reactions_count += 1;
+            }
+            post.reaction = reaction_id;
         }
+
+        await toogleReaction(post.id, {type: reaction_id})
     }
-}
+};
 
 const validationData = () => {
     if (content.value.replace(/<[^>]*>/g, '').trim() == "") {
