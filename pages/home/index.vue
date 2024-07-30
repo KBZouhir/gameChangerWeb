@@ -237,7 +237,7 @@
                                             </div>
                                             <div v-if="file.progress < 100"
                                                 class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
-                                                <UButton loading variant="link" class="dark:text-white" disabled>
+                                                <UButton loading variant="link" class="text-white" disabled>
                                                     Compressing...
                                                 </UButton>
                                             </div>

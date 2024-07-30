@@ -1,10 +1,10 @@
 import { useConversationStore } from "~/stores/conversations";
 import { collection, getDocs, query, where, doc, getDoc, orderBy, onSnapshot  } from "firebase/firestore"
-export const getConversations = async (page = 1, conversationIds, conversations, append) => {
+export const getConversations = async (conversationIds, conversations, append) => {
   const conversationStore = useConversationStore()
 
-  var payload = { conversations: conversationIds };
-  const { data, refresh, error, pending } = await useApi(`conversations/get-conversations-users?page=${page}`,
+  var payload = { conversations: conversationIds};
+  const { data, refresh, error, pending } = await useApi(`conversations/get-conversations-users`,
     {
       initialCache: false,
       body: payload,
