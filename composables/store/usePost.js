@@ -32,4 +32,54 @@ const toogleReaction = async (id, payload) => {
   return data
 };
 
-export { index, create, toogleReaction };
+
+const getReactions = async (id) => {
+  const { data, refresh, error, pending } = await useApi(`/posts/${id}/reactions`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+  return data
+};
+
+
+const createComment = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(`/posts/${id}/comments`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data
+};
+
+
+const editComment = async (post_id, comment_id, payload) => {
+  const { data, refresh, error, pending } = await useApi(`/posts/${post_id}/comments/${comment_id}`, {
+    initialCache: false,
+    body: payload,
+    method: "PUT",
+  });
+
+  return data
+};
+
+const deleteComment = async (post_id, comment_id) => {
+  const { data, refresh, error, pending } = await useApi(`/posts/${post_id}/comments/${comment_id}`, {
+    initialCache: false,
+    method: "DELETE",
+  });
+
+  return data
+};
+
+const getComments = async (post_id, comment_id) => {
+  const { data, refresh, error, pending } = await useApi(`/posts/${post_id}/comments?per_page=10`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+  return data
+};
+
+export { index, create, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments };

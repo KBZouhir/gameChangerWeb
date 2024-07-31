@@ -16,8 +16,7 @@
                     </UInput>
                 </div>
 
-                <div
-                    class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
+                <div class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
 
                     <div v-if="UsersConversations.length > 0 || loadConversations"
                         v-for="userConversation in UsersConversations" :key="userConversation.id"
@@ -28,13 +27,12 @@
                             class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
                             <img v-if="userConversation.user.image_url" class="rounded-full object-cover w-full h-full"
                                 :src="userConversation.user.image_url" alt="avatar">
-                            <span v-else class="text-xs dark:text-white">
-                                {{ getInitials(userConversation.user.full_name) }}
-                            </span>
+                            <UAvatar v-else :alt="userConversation.user.full_name" size="sm" />
                         </div>
                         <div class="flex flex-1 flex-col">
                             <div class="flex items-baseline justify-between space-x-1.5">
-                                <p class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
+                                <p
+                                    class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
                                     {{ userConversation.user.full_name }}
                                 </p>
                                 <span class="text-xs text-slate-400 dark:text-navy-300"> {{
@@ -45,13 +43,14 @@
                                     <span
                                         v-if="userConversation.conversation.last_message.sender_uid == user.firebase_uuid">You:
                                     </span>
-                                    <span :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : ''">
+                                    <span
+                                        :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : ''">
                                         {{ userConversation.conversation.last_message.content }}
                                     </span>
                                 </p>
                             </div>
                         </div>
-                        
+
                     </div>
                     <template v-else>
                         <div v-for="i in 10"
@@ -64,7 +63,8 @@
                         </div>
                     </template>
                     <div class="flex justify-center py-4" v-if="showMoreBtn && UsersConversations.length > 0">
-                        <UButton @click="fetchMoreUsersConversations" class="dark:bg-slate-50 capitalize hover:dark:bg-slate-200" size="xs">load more</UButton>
+                        <UButton @click="fetchMoreUsersConversations" :loading="seeMoreLoading"
+                            class="dark:bg-slate-50 capitalize hover:dark:bg-slate-200" size="xs">load more</UButton>
                     </div>
                 </div>
             </div>
@@ -251,6 +251,8 @@ const conversationIds = ref([])
 const conversations = ref([])
 const selectedConversation = ref(null)
 const showMoreBtn = ref(false)
+const seeMoreLoading = ref(false)
+
 
 definePageMeta({
     layout: 'auth',
@@ -300,7 +302,7 @@ const getInitials = (name) => {
 
 const fetchMoreUsersConversations = async () => {
     loadConversations.value = true
-
+    seeMoreLoading.value = true
     if (hasMore.value) {
         try {
             const arrayConversationIds = conversationIds.value.slice((page.value - 1) * 10, page.value * 10)
@@ -315,7 +317,7 @@ const fetchMoreUsersConversations = async () => {
             console.error("Error fetching conversations:", error)
         }
     }
-
+    seeMoreLoading.value = false
     loadConversations.value = false
 }
 
@@ -395,6 +397,5 @@ const receivedMessageSound = () => {
 watchEffect(() => {
     getConversationsData()
 })
-
 
 </script>
