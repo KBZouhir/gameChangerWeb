@@ -522,7 +522,7 @@ const postReactions = ref(null)
 const postCommnets = ref(null)
 const comment = ref('')
 const selectedPost = ref(null)
-const commentScrollTrigger = ref()
+const selectedComment = ref(null)
 
 const options = ref({
     modules: {
@@ -679,17 +679,25 @@ const getPostComments = async (id) => {
 const sendComment = async () => {
     if (comment.value.trim() == "") return;
     const payload = { description: comment.value }
-    const result = await createComment(selectedPost.value, payload)
+    let result = ""
+    if(selectedComment.value){
+        result = await editComment(selectedPost.value, selectedComment.value.id ,payload) 
+    }else{
+        result = await createComment(selectedPost.value, payload) 
+    }
+
     if (result.success) {
         getPostComments(selectedPost.value)
         const index = posts.value.findIndex((post) => post.id === selectedPost.value)
         posts.value[index].comments_count += 1
         comment.value = ""
     }
+    
 }
 
 const editPostCommnet = (data) => {
     comment.value = data.description
+    selectedComment.value = data
 }
 
 const deletePostCommnet = async (comment) => {
