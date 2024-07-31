@@ -73,7 +73,7 @@ const deleteComment = async (post_id, comment_id) => {
   return data
 };
 
-const getComments = async (post_id, comment_id) => {
+const getComments = async (post_id) => {
   const { data, refresh, error, pending } = await useApi(`/posts/${post_id}/comments?per_page=10`, {
     initialCache: false,
     method: "GET",
@@ -82,4 +82,13 @@ const getComments = async (post_id, comment_id) => {
   return data
 };
 
-export { index, create, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments };
+const getPaginationsComments = async (url) => {
+  const { data, refresh, error, pending } = await useApi(`${url}`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+  return data
+};
+
+export { index, create, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments };

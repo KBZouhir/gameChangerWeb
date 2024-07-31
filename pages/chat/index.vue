@@ -97,7 +97,7 @@
                     </ul>
                 </div>
                 <div
-                    class="relative h-[calc(100vh-13rem)] bg-cover bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
+                    class="relative h-[calc(100vh-13rem)] bg-repeat bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
                     <div ref="scrollContainer" class="relative min-h-full bg-white/95 dark:bg-[#111827]/95">
                         <div v-for="(listMessages, date) in messages" :key="date" class="p-4">
                             <UDivider :label="date" size="2xs" />

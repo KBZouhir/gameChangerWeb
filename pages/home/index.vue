@@ -392,7 +392,7 @@
                                         :src="comment.user.image_url" alt="avatar">
                                     <UAvatar v-else :alt="comment.user.full_name" size="sm" />
                                 </div>
-                                <div class="flex flex-col items-start">
+                                <div class="flex flex-1 flex-col items-start">
                                     <div
                                         class="flex flex-col px-3 py-2 text-sm bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-md">
                                         <h4 class="font-bold">{{ comment.user.full_name }}</h4>
@@ -422,7 +422,16 @@
                             </div>
                         </div>
                     </div>
-
+                    <InfiniteLoading @infinite="fetchMoreComments">
+                        <template #spinner>
+                            <div class="flex justify-center w-full">
+                                <LoadingIcon />
+                            </div>
+                        </template>
+                        <template #complete>
+                            <span>No more data found!</span>
+                        </template>
+                    </InfiniteLoading>
                     <div class="flex justify-center items-center w-full h-full" v-if="postCommnets.meta.total == 0">
                         <div>
                             <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false"
@@ -466,7 +475,7 @@
 
 
 <script setup>
-import { create, index, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments } from '~/composables/store/usePost'
+import { create, index, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments } from '~/composables/store/usePost'
 import { usePostStore } from "~/stores/posts"
 import FsLightbox from "fslightbox-vue/v3"
 import { QuillEditor } from '@vueup/vue-quill'
@@ -474,6 +483,8 @@ import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import imageCompression from 'browser-image-compression'
 import { useAuthStore } from "~/stores/authStore"
 import { useSettings } from "~/stores/settings"
+import InfiniteLoading from "v3-infinite-loading";
+import "v3-infinite-loading/lib/style.css";
 
 const colorMode = useColorMode()
 
@@ -500,6 +511,7 @@ const content = ref('');
 const inputFileImage = ref(null)
 const isLoading = ref(false)
 const tag = ref()
+const page = ref(1)
 const tags = ref([])
 const errors = ref([])
 const compressedFiles = ref([])
@@ -725,22 +737,19 @@ const submitForm = async () => {
     isLoading.value = false
 }
 
-const fetchMoreComments = () => {}
+const fetchMoreComments = async $state => {
+    if (postCommnets.value.links.next == null){$state.complete(); return}
+    try {
+        const result = await getPaginationsComments(postCommnets.value.links.next)
+        postCommnets.value.data.push(...result.data)
+        postCommnets.value.links = result.links
+        if (result.data.length < 10) $state.complete()
 
-onMounted(() => {
-    const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            fetchMoreComments();
-        }
-    }, {
-        root: null,
-        rootMargin: '0px',
-        threshold: 1.0,
-    });
-    if (commentScrollTrigger.value) {
-        observer.observe(commentScrollTrigger.value);
+    } catch (error) {
+        $state.error()
     }
-});
+}
+
 
 const items = [
     [
