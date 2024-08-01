@@ -16,7 +16,8 @@
                     </UInput>
                 </div>
 
-                <div class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
+                <div
+                    class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
 
                     <div v-if="UsersConversations.length > 0 || loadConversations"
                         v-for="userConversation in UsersConversations" :key="userConversation.id"
@@ -62,6 +63,22 @@
                             </div>
                         </div>
                     </template>
+
+                    <template v-if="loadConversations && UsersConversations.length == 0">
+                        <div class="flex-1 justify-center flex items-center">
+                            <div>
+                                <img class="w-32 mx-auto mb-4 dark:hidden flex"
+                                    src="~/assets/svg/vectors/chat-illustration.svg" alt="" srcset="">
+                                <img class="w-32 mx-auto mb-4 dark:flex hidden"
+                                    src="~/assets/svg/vectors/chat-illustration-white.svg" alt="" srcset="">
+                                <div class="text-center my-3">
+                                    <h2 class="text-xl font-bold">No Conversations</h2>
+                                    <p class="text-gray-400">You don't have any conversations yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
                     <div class="flex justify-center py-4" v-if="showMoreBtn && UsersConversations.length > 0">
                         <UButton @click="fetchMoreUsersConversations" :loading="seeMoreLoading"
                             class="dark:bg-slate-50 capitalize hover:dark:bg-slate-200" size="xs">load more</UButton>
@@ -276,18 +293,19 @@ const getConversationsData = async () => {
                 (conversation) => conversation.id
             )
 
-            /* if conversationIds > 10 display more button */
-            let arrayConversationIds = []
-            let arrayConversations = []
-            if (conversationIds.value.length > 10) {
-                arrayConversationIds = conversationIds.value.slice(0, 10)
-                arrayConversations = conversations.value.slice(0, 10)
-                showMoreBtn.value = true
-                page.value += 1
+            if (conversationIds.value.length > 0) {
+                let arrayConversationIds = []
+                let arrayConversations = []
+                if (conversationIds.value.length > 10) {
+                    arrayConversationIds = conversationIds.value.slice(0, 10)
+                    arrayConversations = conversations.value.slice(0, 10)
+                    showMoreBtn.value = true
+                    page.value += 1
+                }
+
+                await getConversations(arrayConversationIds, arrayConversations, false)
             }
-
-            await getConversations(arrayConversationIds, arrayConversations, false)
-
+            loadConversations.value = true
         })
     } catch (error) {
         console.error("Error fetching conversations:", error)

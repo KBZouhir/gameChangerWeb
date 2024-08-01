@@ -179,13 +179,13 @@ async function onSubmit(event) {
                     <div class="flex justify-center space-x-4">
                         <UButton size="lg" square class="bg-[#d14938] hover:bg-[#d14938] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
-                                <Icon name="tabler:brand-google" size="20" class="text-white" />
+                                <Icon name="tabler:brand-google-filled" size="20" class="text-white" />
                             </template>
                         </UButton>
 
                         <UButton size="lg" square class="bg-[#1877f2] hover:bg-[#1877f2] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
-                                <Icon name="tabler:brand-facebook" size="20" class="dark:text-white text-white" />
+                                <Icon name="tabler:brand-facebook-filled" size="20" class="dark:text-white text-white" />
                             </template>
                         </UButton>
 

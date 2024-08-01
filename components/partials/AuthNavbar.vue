@@ -89,7 +89,7 @@ const items = [
                         </UButton>
                     </nuxt-link>
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }" :popper="{ placement: 'bottom-start' }">
-                        <UAvatar :src="user.image_url" />
+                        <UAvatar :src="user.image_url" :alt="user.full_name" size="md" />
                         
                         <template #account="{ item }">
                             <div class="text-left">

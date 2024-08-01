@@ -94,12 +94,13 @@
                     <div class="flex justify-between items-center flex-wrap">
                         <div class="flex items-center space-x-4">
 
-                            <div
-                                class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
-                                <img v-if="post.author.image_url" class="rounded-full object-cover w-full h-full"
-                                    :src="post.author.image_url" alt="avatar">
-                                <UAvatar v-else :alt="post.author.full_name" size="sm" />
-                            </div>
+                            <nuxt-link :to="`profile/${post.author.id}`">
+                                <div class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
+                                    <img v-if="post.author.image_url" class="rounded-full object-cover w-full h-full"
+                                        :src="post.author.image_url" alt="avatar">
+                                    <UAvatar v-else :alt="post.author.full_name" size="sm" />
+                                </div>
+                            </nuxt-link>
 
                             <div class="flex flex-col">
                                 <h4 class="font-bold mb-0">{{ post.author.full_name }}</h4>
@@ -384,14 +385,8 @@
                 <div class="flex flex-col space-y-2 h-[350px] overflow-auto is-scrollbar-hidden" v-if="postCommnets">
                     <div v-for="comment in postCommnets.data">
                         <div class="flex items-center justify-between">
-                            <div
-                                class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
-                                <div
-                                    class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
-                                    <img v-if="comment.user.image_url" class="rounded-full object-cover w-full h-full"
-                                        :src="comment.user.image_url" alt="avatar">
-                                    <UAvatar v-else :alt="comment.user.full_name" size="sm" />
-                                </div>
+                            <div class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+                                <UAvatar :src="comment.user.image_url" :alt="comment.user.full_name" size="lg" />
                                 <div class="flex flex-1 flex-col items-start">
                                     <div
                                         class="flex flex-col px-3 py-2 text-sm bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-md">
@@ -428,7 +423,7 @@
                                 <LoadingIcon />
                             </div>
                         </template>
-                        <template #complete>
+                        <template v-if="postCommnets.data.length > 0" #complete>
                             <span>No more data found!</span>
                         </template>
                     </InfiniteLoading>
@@ -680,19 +675,20 @@ const sendComment = async () => {
     if (comment.value.trim() == "") return;
     const payload = { description: comment.value }
     let result = ""
-    if(selectedComment.value){
-        result = await editComment(selectedPost.value, selectedComment.value.id ,payload) 
-    }else{
-        result = await createComment(selectedPost.value, payload) 
+    if (selectedComment.value) {
+        result = await editComment(selectedPost.value, selectedComment.value.id, payload)
+        let commentIndex = postCommnets.value.data.findIndex((comment) => comment.id === selectedComment.value.id)
+        postCommnets.value.data[commentIndex].description = comment.value
+    } else {
+        result = await createComment(selectedPost.value, payload)
+        if (result.success) {
+            getPostComments(selectedPost.value)
+            const index = posts.value.findIndex((post) => post.id === selectedPost.value)
+            posts.value[index].comments_count += 1
+        }
     }
-
-    if (result.success) {
-        getPostComments(selectedPost.value)
-        const index = posts.value.findIndex((post) => post.id === selectedPost.value)
-        posts.value[index].comments_count += 1
-        comment.value = ""
-    }
-    
+    selectedComment.value = null
+     comment.value = ""
 }
 
 const editPostCommnet = (data) => {
@@ -746,7 +742,7 @@ const submitForm = async () => {
 }
 
 const fetchMoreComments = async $state => {
-    if (postCommnets.value.links.next == null){$state.complete(); return}
+    if (postCommnets.value.links.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(postCommnets.value.links.next)
         postCommnets.value.data.push(...result.data)

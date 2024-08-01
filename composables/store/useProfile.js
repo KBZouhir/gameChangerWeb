@@ -42,7 +42,19 @@ const updatePassword = async (payload) => {
 };
 
 
+const getProfile = async (id) => {
+  const authStore = useAuthStore();
+  const { data, refresh, error, pending } = await useApi(`/profile/${id}`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+  return data
+};
+
+
 export {
   updatePassword,
   updateGeneral,
+  getProfile
 };
