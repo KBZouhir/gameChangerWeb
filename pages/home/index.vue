@@ -72,9 +72,8 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                        <img :src="user?.image_url" class="object-cover" alt="" srcset="">
-                    </div>
+                    <UAvatar :src="user?.image_url" :alt="user.full_name" size="md" />
+                    
                     <button class="flex-1 text-start bg-slate-100 dark:bg-white/5 py-3 px-4 rounded-lg"
                         @click="isOpen = true">
                         <span class="pt-2 select-none text-sm">Write something ...</span>
