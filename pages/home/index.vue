@@ -477,8 +477,8 @@ import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import imageCompression from 'browser-image-compression'
 import { useAuthStore } from "~/stores/authStore"
 import { useSettings } from "~/stores/settings"
-import InfiniteLoading from "v3-infinite-loading";
-import "v3-infinite-loading/lib/style.css";
+import InfiniteLoading from "v3-infinite-loading"
+import "v3-infinite-loading/lib/style.css"
 
 const colorMode = useColorMode()
 
@@ -569,15 +569,11 @@ const getErrorMessage = (key) => {
     return error ? error.value : ''
 }
 
-const resetFileInput = () => {
-    inputFileImage.value.value = null;
-}
-
 const removeImage = (index) => {
     compressedFiles.value.splice(index, 1);
 
     if (compressedFiles.value.length === 0) {
-        resetFileInput();
+        inputFileImage.value.value = null;
     }
 }
 

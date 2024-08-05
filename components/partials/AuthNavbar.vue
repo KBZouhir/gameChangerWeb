@@ -59,7 +59,8 @@ const items = [
 
                 <div class="hidden sm:ml-16 sm:flex items-center">
                     <div class="flex space-x-4">
-                        <a href="#" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Events</a>
+                        <nuxt-link to="/services" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Services </nuxt-link>
+                       
                         <a href="#"
                             class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Trainings</a>
                         <a href="#"
