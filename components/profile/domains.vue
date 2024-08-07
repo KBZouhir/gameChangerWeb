@@ -1,131 +1,133 @@
 <script setup>
-// import { apiGetInterests } from "~/composables/store/useInterests";
-import { apiGetDomains, apiGetDomainBySector } from "~/composables/store/useDomains";
-import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors";
-import { completeProfile } from "~/composables/store/useApiAuth";
-import { errorAlert } from "~/composables/useAlert";
-// import { useInterestsStore } from "~/stores/interests";
-import { useBusinessSectorsStore } from "~/stores/business-sectors";
-import { useDomainsStore } from "~/stores/domains";
-
-definePageMeta({
-    layout: "auth",
-    title: "Login Page",
-});
-
-const businessSectorStore = useBusinessSectorsStore();
-const domainsStore = useDomainsStore();
-
-const isOpen = ref(false);
-const showDomains = ref(false);
-const isLoading = ref(false);
-const searchBuinessSector = ref();
-const form = ref()
+import { useBusinessSectorsStore } from "~/stores/business-sectors"
+import { useDomainsStore } from "~/stores/domains"
+import { apiGetDomainBySector } from "~/composables/store/useDomains"
+import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors"
+import { useAuthStore } from '~/stores/authStore'
 
 
-const domains = computed(() => domainsStore.getDomains);
-const businessSectors = computed(() => businessSectorStore.getBusinessSectors);
-const filteredBusinessSectors = computed(() => businessSectorStore.getBusinessSectors);
 
-console.log(businessSectors.value);
-
-const selectedSector = ref(null);
-const selectedDomains = ref([]);
-const selectedViewDomains = ref([]);
+const businessSectorStore = useBusinessSectorsStore()
+const intrestDomainsStore = useDomainsStore()
+const authStore = useAuthStore()
 
 
+const domains = computed(() => intrestDomainsStore.getDomains)
+const businessSectors = computed(() => businessSectorStore.getBusinessSectors)
+const user = computed(() => authStore.getAuthUser)
+const userDomains = computed(() => user.value.domains)
+
+const colorMode = useColorMode()
+const domainLoading = ref(false)
+const isOpen = ref(false)
+const selectedDomains = ref([])
+const selectedSector = ref(null)
+const showDomains = ref(false)
+const selectedViewDomains = ref([])
+const errors = ref([])
+
+
+selectedViewDomains.value = userDomains.value
+selectedDomains.value = userDomains.value
 
 const getDataFromApi = async () => {
-    // await apiGetInterests();
     await apiGetBusinessSectors()
-};
+}
 
 watchEffect(() => {
     getDataFromApi();
-});
-
-watch(() => searchBuinessSector.value, (val) => {
-    searchBuinessSectors(val);
-});
+})
 
 const getdomain = async (sector) => {
     selectedSector.value = sector;
-    const qurey = { business_sector: selectedSector.value.id };
-    isLoading.value = true;
+    const qurey = { business_sector: selectedSector.value.id }
+    domainLoading.value = true;
     await apiGetDomainBySector(qurey).then(() => {
-        isLoading.value = false;
-    });
-    showDomains.value = true;
-};
-
-const isSelected = (domain) => {
-    return selectedDomains.value.some((selectedDomain) => selectedDomain.id === domain.id);
-};
+        domainLoading.value = false
+    })
+    showDomains.value = true
+}
 
 const isSectorOnDomain = (sector) => {
     return selectedDomains.value.some(
         (selectedDomain) => selectedDomain.business_sector_id === sector.id
-    );
-};
+    )
+}
 
-const dispalyDomains = () => {
-    isOpen.value = false;
-    selectedViewDomains.value = selectedDomains.value;
-};
+const selectDomain = (domain) => {
+    if (!isSelected(domain)) {
+        selectedDomains.value.push(domain)
+    } else {
+        selectedDomains.value = selectedDomains.value.filter((d) => d.id !== domain.id)
+    }
+    selectedViewDomains.value = selectedDomains.value
+}
+
+const isSelected = (domain) => {
+    return selectedDomains.value.some((selectedDomain) => selectedDomain.id === domain.id)
+}
 
 const removeDomain = (domain) => {
     selectedDomains.value = selectedDomains.value.filter((d) => d.id !== domain.id);
     selectedViewDomains.value = selectedDomains.value;
-};
+}
 
-const selectDomain = (domain) => {
-    if (!isSelected(domain)) {
-        selectedDomains.value.push(domain);
-    } else {
-        selectedDomains.value = selectedDomains.value.filter((d) => d.id !== domain.id);
-    }
+const dispalyDomains = () => {
+    isOpen.value = false;
     selectedViewDomains.value = selectedDomains.value;
-};
+}
 
-const searchBuinessSectors = (name) => {
-    filteredBusinessSectors.value = businessSectors.value.filter((businessSector) => businessSector.translated_name.toLowerCase().includes(name.toLowerCase()));
+const keyExists = (key) => {
+    return errors.value.some(error => error.key === key)
+}
+
+const getErrorMessage = (key) => {
+    const error = errors.value.find(error => error.key === key)
+    return error ? error.value : ''
+}
+
+const submitForm = () =>{    
+    formData.forEach((element) => {
+        let profile = element.can_disscuss
+        console.log(profile)
+    })
 }
 
 </script>
 
 <template>
     <div>
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <div v-if="selectedViewDomains.length == 0"
-                class="flex flex-1 justify-center items-center gap-4 py-8 overflow-auto bg-slate-50 mt-4 border-dashed border-2 border-[#ABB7C8] rounded-md">
-                <button class="flex space-x-4" @click="isOpen = true">
-                    <p class="text-[#0F1454] text-md">Add domains</p>
-                </button>
-            </div>
-
-            <div v-if="selectedViewDomains.length > 0"
-                class="flex flex-col flex-1 relative gap-4 py-8 overflow-auto bg-slate-50 mt-4 border-dashed border-2 border-[#ABB7C8] rounded-md">
-                <div class="flex flex-wrap">
+        <div class="flex flex-col space-y-2 mb-4">
+            <label class="block font-medium text-gray-700 dark:text-gray-200">Select domains</label>
+            <div :class="(keyExists('domain') && selectedViewDomains.length <= 0) ? `border-red-500` : `border-[#d1d5db] dark:border-[#374151]`"
+                class="p-2 py-6 border rounded-md bg-white dark:bg-slate-900">
+                <div class="flex flex-col justify-center items-center flex-wrap">
                     <div class="flex flex-wrap items-start space-x-4 flex-1 px-4">
-                        <span class="flex justify-between items-center space-x-4 px-4 py-2 my-2 bg-gray-200 rounded-xl"
+                        <span
+                            class="flex justify-between items-center space-x-4 px-4 py-2 my-2 dark:bg-slate-900 border border-slate-700 bg-gray-200 rounded-xl"
                             v-for="domain in selectedViewDomains">
                             <span class="text-sm">{{ domain.translated_name }}</span>
                             <UButton icon="i-heroicons-x-mark" size="2xs" color="red" @click="removeDomain(domain)"
                                 square variant="ghost" />
                         </span>
                     </div>
-                </div>
-
-                <div class="w-full mx-auto text-center px-4">
-                    <UButton size="lg" icon="i-heroicons-plus" color="#F0F0F0" variant="outline" @click="isOpen = true">
-                        Add domains
-                    </UButton>
+                    <UButton size="sm" @click="isOpen = true" :color="colorMode.value == 'light' ? 'black' : 'white'"
+                        variant="link" label="Select domains" :trailing="false" />
                 </div>
             </div>
+            <p v-show="keyExists('domain') && selectedViewDomains.length <= 0" class="text-red-500 text-[10px]">
+                {{ getErrorMessage('domain') }}
+            </p>
+        </div>
+
+        <div class="flex justify-end">
+            <UButton type="submit" class="px-4 py-2 dark:bg-[#34d399] dark:hover:bg-green-400" @click="submitForm">
+                Save changes
+            </UButton>
         </div>
 
         <USlideover v-model="isOpen">
-            <Loading v-model="isLoading" />
+            <Loading v-model="domainLoading" />
             <div class="p-4 flex-1 overflow-y-auto">
                 <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
                     class="flex sm:hidden absolute end-5 top-5 z-10" square padded @click="isOpen = false" />
@@ -136,23 +138,12 @@ const searchBuinessSectors = (name) => {
                         things in common.
                     </p>
 
-                    <UInput placeholder="Search what you need..." v-model="searchBuinessSector" size="xl" color="gray"
-                        class="my-4">
-                        <template #trailing>
-                            <span class="text-gray-500 dark:text-gray-400 text-xs">
-                                <img src="/assets/svg/icons/search.svg" alt="" srcset="" />
-                            </span>
-                        </template>
-                    </UInput>
-
-                    <div class="flex-1 overscroll-y-auto">
-                        <div v-for="businessSector in filteredBusinessSectors" @click="getdomain(businessSector)"
-                            :class="isSectorOnDomain(businessSector)
-                                ? 'bg-green-100 hover:bg-green-200 border-green-300'
-                                : ''
-                                "
-                            class="border-[1px] border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer">
-                            <div class="text-[#0F1454]">
+                    <div class="flex-1 overscroll-y-auto py-4">
+                        <div v-for="businessSector in businessSectors" @click="getdomain(businessSector)"
+                            :class="isSectorOnDomain(businessSector) ? 'bg-green-100 dark:bg-slate-800 hover:bg-green-200 border-green-300' : ''"
+                            class="border-[1px] dark:border-slate-800 border-blueGray-200 dark:text-white rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-200
+                             dark:hover:bg-slate-800 transition-all ease-in-out duration-300 cursor-pointer">
+                            <div class="">
                                 <h3 class="font-bold text-md">
                                     {{ businessSector.translated_name }}
                                 </h3>
@@ -182,26 +173,22 @@ const searchBuinessSectors = (name) => {
                         Select a few of your working domain to match with things in common.
                     </p>
 
-                    <UInput placeholder="Search what you need..." size="xl" color="gray" class="my-4">
-                        <template #trailing>
-                            <span class="text-gray-500 dark:text-gray-400 text-xs">EUR</span>
-                        </template>
-                    </UInput>
-
-                    <div class="flex-1 overscroll-y-auto">
+                    <div class="flex-1 overscroll-y-auto py-4">
                         <div v-for="domain in domains" @click="selectDomain(domain)"
-                            :class="isSelected(domain) ? 'bg-green-100 hover:bg-green-200 border-green-300' : ''"
-                            class="border-[1px] border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer">
-                            <div class="text-[#0F1454]">
+                            :class="isSelected(domain) ? 'bg-green-100 dark:bg-slate-800 hover:bg-green-200 border-green-300 text-primary' : ''"
+                            class="border-[1px] dark:border-slate-800 border-blueGray-200 rounded-md flex justify-between items-center mb-3 px-6 py-3 dark:hover:bg-slate-800 hover:bg-slate-50 transition-all ease-in-out duration-300 cursor-pointer">
+                            <div class="text-[#0F1454] dark:text-white">
                                 <h3 class="font-bold text-md">{{ domain.translated_name }}</h3>
                             </div>
                             <input type="checkbox" name="" :checked="isSelected(domain)" id="" />
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 sticky bottom-0 bg-white py-4">
-                        <UButton block color="primary" size="lg" @click="{selectedSector = null;showDomains = false;}" variant="outline">Back</UButton>
-                        <UButton block size="lg" label="Save" @click="dispalyDomains" />
+                    <div class="grid grid-cols-2 gap-4 sticky bottom-0 bg-white py-4 dark:bg-[#111827]">
+                        <UButton block :color="colorMode.value == 'dark' ? 'gray' : 'primary'" size="lg" variant="link"
+                            label="Back" @click="{ selectedSector = null; showDomains = false; }" />
+                        <UButton block :color="colorMode.value == 'dark' ? 'white' : 'green'" size="lg" label="Save"
+                            @click="dispalyDomains" />
                     </div>
                 </div>
             </div>

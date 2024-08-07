@@ -29,8 +29,8 @@ watchEffect(() => {
     getDataFromApi();
 });
 
-const submitForm = () =>{
-    formData.value.forEach((element) => {
+const submitForm = () =>{    
+    formData.forEach((element) => {
         let profile = element.can_disscuss
         console.log(profile);
     })
@@ -45,7 +45,7 @@ const submitForm = () =>{
         </template>
     </div>
     <div class="flex justify-end">
-        <UButton type="submit" class="px-4 py-2" @click="submitForm">
+        <UButton type="submit" class="px-4 py-2 dark:bg-[#34d399] dark:hover:bg-green-400" @click="submitForm">
             Save changes
         </UButton>
     </div>

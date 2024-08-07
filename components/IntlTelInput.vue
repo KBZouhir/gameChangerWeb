@@ -1,29 +1,41 @@
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col relative">
         <label for="phone" class="text-gray-700 dark:text-slate-300 text-sm font-medium mb-2">
             Phone number
         </label>
-        <input ref="phoneInput" type="tel" id="phone" @input="onInput" autofocus class="text-sm" :value="modelValue"
-            @blur="validatePhone" />
+
+        <input ref="phoneInput" type="tel" id="phone" @input="onInput" autofocus class="text-sm w-full"
+            :value="modelValue" @blur="validatePhone" />
+        <span v-if="user.is_phone_verified" class="flex space-x-4 text-[#34d399] text-xs absolute right-4 top-9">
+            Verified
+            <Icon name="tabler:circle-check" size="18" />
+        </span>
+        <span v-else class="text-amber-600 text-xs absolute right-4 top-9">
+            Not verified
+            <Icon name="tabler:alert-octagon" size="18" />
+        </span>
+
         <span v-if="validationMessage" class="text-sm text-red-500">{{ validationMessage }}</span>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import intlTelInput from 'intl-tel-input';
-import 'intl-tel-input/build/css/intlTelInput.css';
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+import intlTelInput from 'intl-tel-input'
+import 'intl-tel-input/build/css/intlTelInput.css'
+import { useAuthStore } from '~/stores/authStore'
+const authStore = useAuthStore()
+const user = computed(() => authStore.getAuthUser)
 
 const props = defineProps({
     modelValue: String,
 });
 
-const emits = defineEmits(['update:modelValue', 'hidePhone']);
+const emits = defineEmits(['update:modelValue', 'hidePhone', 'update:fullNumber', 'update:countryCode']);
 
 const phoneInput = ref(null);
 const iti = ref({});
 const validationMessage = ref();
-
 
 onMounted(() => {
     iti.value = intlTelInput(phoneInput.value, {
@@ -58,7 +70,6 @@ const onInput = (event) => {
     emits('update:modelValue', sanitizedValue);
 };
 
-
 const validatePhone = () => {
     if (phoneInput.value && iti.value) {
         const isValid = iti.value.isValidNumber();
@@ -66,8 +77,11 @@ const validatePhone = () => {
             validationMessage.value = 'Invalid phone number';
         } else {
             validationMessage.value = '';
-            const phoneNumber = iti.value.getNumber();
-            emits('update:modelValue', phoneNumber);
+            const fullNumber = iti.value.getNumber();
+            const countryCode = iti.value.getSelectedCountryData().dialCode;
+            emits('update:fullNumber', fullNumber);
+            emits('update:countryCode', countryCode);
+            emits('update:modelValue', fullNumber);
         }
     }
 }
@@ -82,8 +96,16 @@ watch(() => props.modelValue, (newValue) => {
 });
 </script>
 
-
 <style scoped>
+.dark .iti__tel-input {
+    border-color: #374151 !important;
+    background: #111827 !important;
+}
+
+.dark .iti__country-list {
+    background-color: #111827 !important;
+}
+
 .iti {
     width: 100% !important;
 }

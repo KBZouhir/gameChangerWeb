@@ -1,11 +1,11 @@
 <template>
     <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
-            <UButton size="lg" @click="isOpen = true">Open</UButton>
-            
+            <UButton size="lg" @click="isOpen = true" class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500">Open</UButton>
+
             <USlideover v-model="isOpen" prevent-close>
                 <div class="flex-1 overflow-y-auto">
-                    <div class="flex sticky top-0 items-center justify-between bg-white z-50 p-4">
+                    <div class="flex sticky top-0 items-center justify-between bg-white dark:bg-gray-900 dark:border-b-gray-800 border-b z-50 p-4">
                         <h3 class="text-base font-bold leading-6 text-gray-900 dark:text-white">
                             Working hours
                         </h3>
@@ -18,55 +18,64 @@
                             <p class="text-slate-400 text-sm">Setup the meeting duration , max duration is 60 min </p>
                         </div>
                         <div class="flex space-x-4 items-center mb-4">
-                            <URange class="flex-1" :max="60" :step="15" v-model="meetDuration" />
+                            <URange @change="changeDuration" color="green" class="flex-1" :max="60" :step="15"
+                                v-model="meetDuration" />
                             <span>{{ meetDuration }}/60</span>
                         </div>
 
                         <div class="flex flex-col space-y-4 flex-1">
-                            <div v-for="(day, index) in daysOfWeek" class="border rounded-lg p-4 over"
-                                :class="(day.active) ? `` : `opacity-40`">
+                            <div v-for="(day, index) in daysOfWeek"
+                                class="border dark:border-slate-800 rounded-lg p-4 over"
+                                :class="(day.active) ? `` : `opacity-80`">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="font-semibold">{{ day.name }}</h3>
-                                    <UToggle v-model="day.active" size="sm" />
+                                    <UToggle color="green" v-model="day.active" size="sm" />
                                 </div>
                                 <div class="flex flex-col space-y-4">
                                     <div class="flex flex-col space-y-2" v-for="(range, rangeIndex) in day.timeRanges">
                                         <div class="flex justify-between items-center space-x-4">
-                                            <div class="flex-1 text-sm flex justify-between border rounded-lg p-4" :class="(range.error ? 'border-red-600' : '')">
+                                            <div class="flex-1 text-sm flex justify-between border dark:border-slate-800 rounded-lg p-4"
+                                                :class="(range.error ? 'border-red-600 dark:border-red-600' : '')">
                                                 <div>
-                                                    <span class="mb-2">From :</span>
-                                                    <input type="time" step="900" v-model="range.from"
+                                                    <span class="mb-2 mr-2">From :</span>
+                                                    <input type="time" step="900" :disabled="!day.active"
+                                                        v-model="range.from" class="bg-transparent"
                                                         @input="validateTimeRange(index, rangeIndex)" :padded="false"
                                                         variant="none" />
                                                 </div>
-                                                <div class="border"></div>
+                                                <div class="border dark:border-slate-800"></div>
                                                 <div>
-                                                    <span class="mb-2">To :</span>
-                                                    <input type="time" step="900" :min="range.from" v-model="range.to"
+                                                    <span class="mb-2 mr-2">To :</span>
+                                                    <input type="time" step="900" :disabled="!day.active"
+                                                        :min="range.from" v-model="range.to" class="bg-transparent"
                                                         @input="validateTimeRange(index, rangeIndex)" :padded="false"
                                                         variant="none" />
                                                 </div>
                                             </div>
-                                            <UButton @click="removeRange(index, rangeIndex)" size="xs" square
-                                                :ui="{ rounded: 'rounded-full' }"
+                                            <UButton :disabled="!day.active" @click="removeRange(index, rangeIndex)"
+                                                size="xs" square :ui="{ rounded: 'rounded-full' }"
                                                 class="bg-red-500 text-white hover:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600">
                                                 <template #leading>
                                                     <Icon name="tabler:x" size="20" class="text-white" />
                                                 </template>
                                             </UButton>
-                                            
+
                                         </div>
                                         <p v-if="range.error" class="text-xs text-red-600">{{ range.error }}</p>
                                     </div>
-                                    <UButton size="xs" @click="addRange(index)" :disabled="!day.active" block
-                                        variant="link" label="Add" />
+                                    <UButton size="xs" color="white" class="hover:no-underline" @click="addRange(index)"
+                                        :disabled="!day.active" block variant="link" label="Add">
+                                        <template #leading>
+                                            <Icon name="tabler:plus" size="18" />
+                                        </template>
+                                    </UButton>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="sticky bottom-0 p-4 bg-white z-50">
-                        <UButton :disabled="allow" block size="lg">Button</UButton>
+                    <div class="sticky bottom-0 p-4 bg-white dark:bg-gray-900 border-t dark:border-t-gray-800 z-50">
+                        <UButton class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500" :disabled="allow || !allRangesValid" block size="lg">Submit</UButton>
                     </div>
                 </div>
             </USlideover>
@@ -79,21 +88,29 @@
 const isOpen = ref(false)
 const meetDuration = ref(15)
 
+const daysOfWeek = ref(
+    [
+        { id: 0, name: 'Sunday', timeRanges: [], active: true },
+        { id: 1, name: 'Monday', timeRanges: [], active: true },
+        { id: 2, name: 'Tuesday', timeRanges: [], active: true },
+        { id: 3, name: 'Wednesday', timeRanges: [], active: true },
+        { id: 4, name: 'Thursday', timeRanges: [], active: true },
+        { id: 5, name: 'Friday', timeRanges: [], active: true },
+        { id: 6, name: 'Saturday', timeRanges: [], active: true },
+    ]
+)
+
 const allow = computed(() => {
+
     return meetDuration.value < 15
 })
 
-const daysOfWeek = ref(
-    [
-        { id:  0, name: 'Sunday', timeRanges: [], active: true },
-        { id:  1, name: 'Monday', timeRanges: [], active: true },
-        { id:  2, name: 'Tuesday', timeRanges: [], active: true },
-        { id:  3, name: 'Wednesday', timeRanges: [], active: true },
-        { id:  4, name: 'Thursday', timeRanges: [], active: true },
-        { id:  5, name: 'Friday', timeRanges: [], active: true },
-        { id:  6, name: 'Saturday', timeRanges: [], active: true },
-    ]
-)
+const allRangesValid = computed(() => {
+    return daysOfWeek.value.every(day =>
+        !day.active || day.timeRanges.every(range => range.error === '')
+    )
+})
+
 
 definePageMeta({
     layout: 'auth',
@@ -136,6 +153,15 @@ const parseTime = (timeString) => {
     date.setHours(hours);
     date.setMinutes(minutes);
     return date;
+}
+
+
+const changeDuration = () => {
+    daysOfWeek.value.forEach((day, dayIndex) => {
+        day.timeRanges.forEach((range, rangeIndex) => {
+            validateTimeRange(dayIndex, rangeIndex);
+        });
+    });
 }
 
 

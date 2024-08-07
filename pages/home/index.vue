@@ -93,12 +93,8 @@
                     <div class="flex justify-between items-center flex-wrap">
                         <div class="flex items-center space-x-4">
 
-                            <nuxt-link :to="`profile/${post.author.id}`">
-                                <div class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
-                                    <img v-if="post.author.image_url" class="rounded-full object-cover w-full h-full"
-                                        :src="post.author.image_url" alt="avatar">
-                                    <UAvatar v-else :alt="post.author.full_name" size="sm" />
-                                </div>
+                            <nuxt-link :to="(post.author.id == user.id) ? `profile/update` : `profile/${post.author.id}`">
+                                <UAvatar :src="post.author.image_url" :alt="post.author.full_name" size="md" />
                             </nuxt-link>
 
                             <div class="flex flex-col">
@@ -119,7 +115,7 @@
                             :poster="post.video.thumbnail_url" />
                     </ClientOnly>
                     <div>
-                        <ImageView v-if="post.image" :url="`${post.image.url}${post.image.path}`" />
+                        <ImageView v-if="post.image" :url="`${post.image.url}`" />
                         <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
                         <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
                             v-for="(image, index) in images" @click="openLightboxOnSlide(index)">

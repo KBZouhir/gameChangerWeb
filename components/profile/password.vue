@@ -86,7 +86,7 @@ async function onSubmit(event) {
         </UFormGroup>
 
         <div class="flex justify-end">
-            <UButton type="submit" class="px-4 py-2">
+            <UButton type="submit" class="px-4 py-2 dark:bg-[#34d399] dark:hover:bg-green-400">
                 Save changes
             </UButton>
         </div>

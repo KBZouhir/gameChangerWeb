@@ -26,7 +26,12 @@ import { ref, computed, toRefs } from 'vue'
 
 const props = defineProps({
     description: String,
-    number: Number
+    number: Number,
+    htmlContent: {
+        type: String,
+        required: false,
+        default: true
+    }
 })
 
 const readMore = ref(false)
@@ -35,7 +40,13 @@ const removeHtmlTags = (htmlString) => {
   return htmlString.replace(/<\/?[^>]+(>|$)/g, "")
 }
 
-const displayDescription = computed(() => removeHtmlTags(props.description))
+const displayDescription = computed(() =>{
+    if(props.htmlContent){
+        return removeHtmlTags(props.description)
+    }else{
+        return props.description
+    }
+})
 const htmlDescription = computed(() => props.description.replaceAll('<br>', ''))
 
 const toggleReadMore = () => {

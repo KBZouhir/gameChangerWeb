@@ -46,12 +46,12 @@
                                     </span>
 
                                     <div v-else class="flex">
-                                        <span  class="capitalize bg-emerald-500 px-4" >estimate</span>
+                                        <span  class="capitalize bg-emerald-500 px-4">estimate</span>
                                     </div>
                                 </div>
 
                                 <div class="py-2">
-                                    <UButton block label="Send Message" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary" size="lg" />
+                                    <UButton block label="Send Message" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-green-400" color="primary" size="lg" />
                                 </div>
 
                             </div>

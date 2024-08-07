@@ -38,6 +38,7 @@ const openLightboxOnSlide = () => {
     toggler.value = !toggler.value;
 }
 
+
 onMounted(async () => {
     let blob
     if (props.url) {

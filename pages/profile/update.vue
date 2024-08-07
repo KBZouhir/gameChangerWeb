@@ -20,7 +20,7 @@ const currentStep = ref(0)
 </script>
 
 <template>
-    <div class="bg-[#F1F5F9]">
+    <div class="bg-[#F1F5F9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl py-4">
             <div class="flex flex-col">
                 <div class="rounded-tr-md rounded-tl-md h-96 w-full overflow-hidden relative">
@@ -35,11 +35,11 @@ const currentStep = ref(0)
                     </div>
                 </div>
 
-                <div class="pb-4 w-full shadow-sm bg-white">
+                <div class="pb-4 w-full shadow-sm bg-white dark:bg-slate-800">
                     <div
                         class="flex md:flex-row flex-col items-center md:items-start space-x-4 space-y-2 w-3/4 mx-auto ">
                         <div
-                            class="w-32 h-32 bg-white shadow-sm p-1 rounded-2xl relative -mt-12 md:mx-0 mx-auto md:block">
+                            class="w-32 h-32 bg-white dark:bg-slate-900 shadow-sm p-1 rounded-2xl relative -mt-12 md:mx-0 mx-auto md:block">
                             <img :src="user.image_url"
                                 class="w-full h-full object-cover rounded-2xl" alt="">
                             <UButton :ui="{ rounded: 'rounded-full' }" icon="i-heroicons-pencil-square" size="xs"
@@ -69,7 +69,7 @@ const currentStep = ref(0)
             </div>
 
             <div class="flex flex-col md:flex-row items-start space-y-4 md:space-x-4 md:space-y-0 my-4">
-                <div class="top-0 md:top-4 bg-white sticky md:w-3/12 w-full p-2 rounded-md shadow-sm z-50">
+                <div class="top-0 md:top-4 bg-white dark:bg-slate-800 sticky md:w-3/12 w-full p-2 rounded-md shadow-sm z-50">
                     <div class="px-3 py-4 overflow-y-auto">
                         <ul class=" font-medium text-sm flex flex-row md:flex-col items-center">
                             <li class="w-full">
@@ -112,7 +112,7 @@ const currentStep = ref(0)
                     </div>
                 </div>
 
-                <div class="bg-white md:w-9/12 w-full p-4 rounded-md shadow-sm">
+                <div class="bg-white dark:bg-slate-800 md:w-9/12 w-full p-4 rounded-md shadow-sm">
                     <div v-if="currentStep == 0" class="py-4">
                         <h1 class="text-xl font-bold mb-2">Update your Informations</h1>
                         <p class="text-xs text-[#989394]">
