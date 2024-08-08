@@ -1,11 +1,13 @@
 <template>
     <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
-            <UButton size="lg" @click="isOpen = true" class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500">Open</UButton>
+            <UButton size="lg" @click="isOpen = true"
+                class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500">Open</UButton>
 
             <USlideover v-model="isOpen" prevent-close>
                 <div class="flex-1 overflow-y-auto">
-                    <div class="flex sticky top-0 items-center justify-between bg-white dark:bg-gray-900 dark:border-b-gray-800 border-b z-50 p-4">
+                    <div
+                        class="flex sticky top-0 items-center justify-between bg-white dark:bg-gray-900 dark:border-b-gray-800 border-b z-50 p-4">
                         <h3 class="text-base font-bold leading-6 text-gray-900 dark:text-white">
                             Working hours
                         </h3>
@@ -34,8 +36,8 @@
                                 <div class="flex flex-col space-y-4">
                                     <div class="flex flex-col space-y-2" v-for="(range, rangeIndex) in day.timeRanges">
                                         <div class="flex justify-between items-center space-x-4">
-                                            <div class="flex-1 text-sm flex justify-between border dark:border-slate-800 rounded-lg p-4"
-                                                :class="(range.error ? 'border-red-600 dark:border-red-600' : '')">
+                                            <div class="flex-1 text-sm flex justify-between border rounded-lg p-4"
+                                                :class="(range.error ? 'border-red-600 dark:border-red-600' : 'dark:border-slate-800')">
                                                 <div>
                                                     <span class="mb-2 mr-2">From :</span>
                                                     <input type="time" step="900" :disabled="!day.active"
@@ -75,7 +77,9 @@
                     </div>
 
                     <div class="sticky bottom-0 p-4 bg-white dark:bg-gray-900 border-t dark:border-t-gray-800 z-50">
-                        <UButton class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500" :disabled="allow || !allRangesValid" block size="lg">Submit</UButton>
+                        <UButton @click="onSubmit"
+                            class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500"
+                            :disabled="allow || !allRangesValid" block size="lg">Submit</UButton>
                     </div>
                 </div>
             </USlideover>
@@ -84,9 +88,17 @@
 </template>
 
 <script setup>
+import { storeOpeningHours, getUserOpeningHours } from '~/composables/store/useAppointment'
+import { useAuthStore } from '~/stores/authStore'
+
 
 const isOpen = ref(false)
 const meetDuration = ref(15)
+
+const authStore = useAuthStore();
+
+
+const user = computed(() => authStore.getAuthUser);
 
 const daysOfWeek = ref(
     [
@@ -125,25 +137,52 @@ const addRange = (dayIndex) => {
 
 const removeRange = (dayIndex, rangeIndex) => {
     daysOfWeek.value[dayIndex].timeRanges.splice(rangeIndex, 1);
+    validateTimeRange(dayIndex, rangeIndex)
 }
 
 const validateTimeRange = (dayIndex, rangeIndex) => {
-    const range = daysOfWeek.value[dayIndex].timeRanges[rangeIndex]
-    if (range.from && range.to) {
+    const range = daysOfWeek.value[dayIndex].timeRanges[rangeIndex];
+    const minSlotTime = 30
+
+    if (range?.from && range?.to) {
         if (range.from >= range.to) {
             range.error = '"From" time must be before "To" time'
         } else {
             const fromTime = parseTime(range.from)
             const toTime = parseTime(range.to)
             const duration = (toTime - fromTime) / (1000 * 60)
+
             if (duration < meetDuration.value) {
                 range.error = `The duration must be at least ${meetDuration.value} minutes`
             } else {
-                range.error = ''
+                const previousRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex - 1]
+                const nextRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex + 1]
+
+                let consecutiveError = false;
+                if (previousRange && previousRange.to) {
+                    const prevToTime = parseTime(previousRange.to)
+                    const timeDiff = (fromTime - prevToTime) / (1000 * 60)
+                    if (timeDiff < minSlotTime) {
+                        consecutiveError = true
+                    }
+                }
+                if (nextRange && nextRange.from) {
+                    const nextFromTime = parseTime(nextRange.from);
+                    const timeDiff = (nextFromTime - toTime) / (1000 * 60)
+                    if (timeDiff < minSlotTime) {
+                        consecutiveError = true;
+                    }
+                }
+
+                if (consecutiveError) {
+                    range.error = `The periods must be consecutive with at least ${minSlotTime} minutes in between`
+                } else {
+                    range.error = ''
+                }
             }
         }
     } else {
-        range.error = ''
+        range.error = '';
     }
 }
 
@@ -155,7 +194,6 @@ const parseTime = (timeString) => {
     return date;
 }
 
-
 const changeDuration = () => {
     daysOfWeek.value.forEach((day, dayIndex) => {
         day.timeRanges.forEach((range, rangeIndex) => {
@@ -163,6 +201,69 @@ const changeDuration = () => {
         });
     });
 }
+
+const onSubmit = async () => {
+    let opening_hours = [];
+
+    daysOfWeek.value.forEach((day, dayIndex) => {
+        if (day.active) {
+            const periods = [];
+            day.timeRanges.forEach((periode) => {
+                if (periode.error === '' && periode.from !== '' && periode.to !== '') {
+                    periods.push({
+                        from: periode.from,
+                        to: periode.to
+                    });
+                }
+            });
+            if (periods.length > 0) {
+                opening_hours.push({
+                    day: dayIndex,
+                    periods: periods
+                });
+            }
+        }
+    });
+    if (opening_hours.length > 0) {
+        let payload = { opening_hours: opening_hours }
+        const result = await storeOpeningHours(payload)
+
+    }
+}
+
+
+const groupByDayWithNames = (atimeRanges) => {
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const grouped = [];
+
+    dayNames.forEach((name, index) => {
+        grouped.push({
+            day: index,
+            name: name,
+            timeRanges: [],
+            active: true
+        });
+    });
+
+    atimeRanges.forEach(({ day, from, to }) => {
+        let dayGroup = grouped.find(group => group.day === day);
+
+        if (dayGroup) {
+            dayGroup.timeRanges.push({ from, to, error: '' });
+        }
+    });
+
+    return grouped;
+};
+
+const getData = async () => {
+    const result = await getUserOpeningHours(user.value.id)
+    daysOfWeek.value = groupByDayWithNames(result.data) 
+}
+
+watchEffect(() => {
+    getData();
+});
 
 
 </script>
