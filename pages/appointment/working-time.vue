@@ -144,45 +144,47 @@ const validateTimeRange = (dayIndex, rangeIndex) => {
     const range = daysOfWeek.value[dayIndex].timeRanges[rangeIndex];
     const minSlotTime = 30
 
-    if (range?.from && range?.to) {
-        if (range.from >= range.to) {
-            range.error = '"From" time must be before "To" time'
-        } else {
-            const fromTime = parseTime(range.from)
-            const toTime = parseTime(range.to)
-            const duration = (toTime - fromTime) / (1000 * 60)
-
-            if (duration < meetDuration.value) {
-                range.error = `The duration must be at least ${meetDuration.value} minutes`
+    if (range) {
+        if (range?.from && range?.to) {
+            if (range.from >= range.to) {
+                range.error = '"From" time must be before "To" time'
             } else {
-                const previousRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex - 1]
-                const nextRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex + 1]
+                const fromTime = parseTime(range.from)
+                const toTime = parseTime(range.to)
+                const duration = (toTime - fromTime) / (1000 * 60)
 
-                let consecutiveError = false;
-                if (previousRange && previousRange.to) {
-                    const prevToTime = parseTime(previousRange.to)
-                    const timeDiff = (fromTime - prevToTime) / (1000 * 60)
-                    if (timeDiff < minSlotTime) {
-                        consecutiveError = true
-                    }
-                }
-                if (nextRange && nextRange.from) {
-                    const nextFromTime = parseTime(nextRange.from);
-                    const timeDiff = (nextFromTime - toTime) / (1000 * 60)
-                    if (timeDiff < minSlotTime) {
-                        consecutiveError = true;
-                    }
-                }
-
-                if (consecutiveError) {
-                    range.error = `The periods must be consecutive with at least ${minSlotTime} minutes in between`
+                if (duration < meetDuration.value) {
+                    range.error = `The duration must be at least ${meetDuration.value} minutes`
                 } else {
-                    range.error = ''
+                    const previousRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex - 1]
+                    const nextRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex + 1]
+
+                    let consecutiveError = false;
+                    if (previousRange && previousRange.to) {
+                        const prevToTime = parseTime(previousRange.to)
+                        const timeDiff = (fromTime - prevToTime) / (1000 * 60)
+                        if (timeDiff < minSlotTime) {
+                            consecutiveError = true
+                        }
+                    }
+                    if (nextRange && nextRange.from) {
+                        const nextFromTime = parseTime(nextRange.from);
+                        const timeDiff = (nextFromTime - toTime) / (1000 * 60)
+                        if (timeDiff < minSlotTime) {
+                            consecutiveError = true;
+                        }
+                    }
+
+                    if (consecutiveError) {
+                        range.error = `The periods must be consecutive with at least ${minSlotTime} minutes in between`
+                    } else {
+                        range.error = ''
+                    }
                 }
             }
+        } else {
+            range.error = '';
         }
-    } else {
-        range.error = '';
     }
 }
 
@@ -231,7 +233,6 @@ const onSubmit = async () => {
     }
 }
 
-
 const groupByDayWithNames = (atimeRanges) => {
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const grouped = [];
@@ -254,11 +255,11 @@ const groupByDayWithNames = (atimeRanges) => {
     });
 
     return grouped;
-};
+}
 
 const getData = async () => {
     const result = await getUserOpeningHours(user.value.id)
-    daysOfWeek.value = groupByDayWithNames(result.data) 
+    daysOfWeek.value = groupByDayWithNames(result.data)
 }
 
 watchEffect(() => {
