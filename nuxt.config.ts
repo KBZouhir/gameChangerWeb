@@ -13,7 +13,13 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/ui", "@nuxtjs/i18n", "@pinia/nuxt", "nuxt-snackbar"],
+  modules: [
+    "@nuxt/ui",
+    "@nuxtjs/i18n",
+    "@pinia/nuxt",
+    "nuxt-snackbar",
+    "@samk-dev/nuxt-vcalendar"
+  ],
 
   icon: {
     customCollections: [
