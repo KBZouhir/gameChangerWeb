@@ -31,7 +31,7 @@
                                 :class="(day.active) ? `` : `opacity-80`">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="font-semibold">{{ day.name }}</h3>
-                                    <UToggle color="green" v-model="day.active" size="sm" />
+                                    <!-- <UToggle color="green" v-model="day.active" size="sm" /> -->
                                 </div>
                                 <div class="flex flex-col space-y-4">
                                     <div class="flex flex-col space-y-2" v-for="(range, rangeIndex) in day.timeRanges">
@@ -40,18 +40,40 @@
                                                 :class="(range.error ? 'border-red-600 dark:border-red-600' : 'dark:border-slate-800')">
                                                 <div>
                                                     <span class="mb-2 mr-2">From :</span>
-                                                    <input type="time" step="900" :disabled="!day.active"
+                                                    <client-only>
+                                                        <VueTimepicker v-model="range.from" :disabled="!day.active"
+                                                            format="HH:mm" auto-scroll
+                                                            @change="validateTimeRange(index, rangeIndex)"
+                                                            hour-label=" " close-on-complete minute-label=" "
+                                                            :minute-interval="15">
+                                                            <template v-slot:icon>
+                                                                <Icon name="tabler:clock" size="20" />
+                                                            </template>
+                                                        </VueTimepicker>
+                                                    </client-only>
+                                                    <!-- <input type="time" step="900" :disabled="!day.active"
                                                         v-model="range.from" class="bg-transparent"
                                                         @input="validateTimeRange(index, rangeIndex)" :padded="false"
-                                                        variant="none" />
+                                                        variant="none" /> -->
                                                 </div>
-                                                <div class="border dark:border-slate-800"></div>
+                                                <div class="border dark:border-slate-800 mx-4"></div>
                                                 <div>
                                                     <span class="mb-2 mr-2">To :</span>
-                                                    <input type="time" step="900" :disabled="!day.active"
+                                                    <client-only>
+                                                        <VueTimepicker format="HH:mm" auto-scroll
+                                                            :disabled="!day.active" v-model="range.to"
+                                                            @change="validateTimeRange(index, rangeIndex)"
+                                                            hour-label=" " close-on-complete minute-label=" "
+                                                            :minute-interval="15">
+                                                            <template v-slot:icon>
+                                                                <Icon name="tabler:clock" size="20" />
+                                                            </template>
+                                                        </VueTimepicker>
+                                                    </client-only>
+                                                    <!-- <input type="time" step="900" :disabled="!day.active"
                                                         :min="range.from" v-model="range.to" class="bg-transparent"
                                                         @input="validateTimeRange(index, rangeIndex)" :padded="false"
-                                                        variant="none" />
+                                                        variant="none" /> -->
                                                 </div>
                                             </div>
                                             <UButton :disabled="!day.active" @click="removeRange(index, rangeIndex)"
@@ -90,6 +112,9 @@
 <script setup>
 import { storeOpeningHours, getUserOpeningHours } from '~/composables/store/useAppointment'
 import { useAuthStore } from '~/stores/authStore'
+
+import VueTimepicker from 'vue3-timepicker'
+import 'vue3-timepicker/dist/VueTimepicker.css'
 
 
 const isOpen = ref(false)
@@ -143,6 +168,7 @@ const removeRange = (dayIndex, rangeIndex) => {
 const validateTimeRange = (dayIndex, rangeIndex) => {
     const range = daysOfWeek.value[dayIndex].timeRanges[rangeIndex];
     const minSlotTime = 30
+    console.log(range);
 
     if (range) {
         if (range?.from && range?.to) {
@@ -153,34 +179,32 @@ const validateTimeRange = (dayIndex, rangeIndex) => {
                 const toTime = parseTime(range.to)
                 const duration = (toTime - fromTime) / (1000 * 60)
 
-                if (duration < meetDuration.value) {
-                    range.error = `The duration must be at least ${meetDuration.value} minutes`
-                } else {
-                    const previousRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex - 1]
-                    const nextRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex + 1]
 
-                    let consecutiveError = false;
-                    if (previousRange && previousRange.to) {
-                        const prevToTime = parseTime(previousRange.to)
-                        const timeDiff = (fromTime - prevToTime) / (1000 * 60)
-                        if (timeDiff < minSlotTime) {
-                            consecutiveError = true
-                        }
-                    }
-                    if (nextRange && nextRange.from) {
-                        const nextFromTime = parseTime(nextRange.from);
-                        const timeDiff = (nextFromTime - toTime) / (1000 * 60)
-                        if (timeDiff < minSlotTime) {
-                            consecutiveError = true;
-                        }
-                    }
+                const previousRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex - 1]
+                const nextRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex + 1]
 
-                    if (consecutiveError) {
-                        range.error = `The periods must be consecutive with at least ${minSlotTime} minutes in between`
-                    } else {
-                        range.error = ''
+                let consecutiveError = false;
+                if (previousRange && previousRange.to) {
+                    const prevToTime = parseTime(previousRange.to)
+                    const timeDiff = (fromTime - prevToTime) / (1000 * 60)
+                    if (timeDiff < minSlotTime) {
+                        consecutiveError = true
                     }
                 }
+                if (nextRange && nextRange.from) {
+                    const nextFromTime = parseTime(nextRange.from);
+                    const timeDiff = (nextFromTime - toTime) / (1000 * 60)
+                    if (timeDiff < minSlotTime) {
+                        consecutiveError = true;
+                    }
+                }
+
+                if (consecutiveError) {
+                    range.error = `The periods must be consecutive with at least ${minSlotTime} minutes in between`
+                } else {
+                    range.error = ''
+                }
+
             }
         } else {
             range.error = '';
@@ -217,12 +241,12 @@ const onSubmit = async () => {
                         to: periode.to
                     });
                 }
-            });
+            })
             if (periods.length > 0) {
                 opening_hours.push({
                     day: dayIndex,
                     periods: periods
-                });
+                })
             }
         }
     });
@@ -262,9 +286,43 @@ const getData = async () => {
     daysOfWeek.value = groupByDayWithNames(result.data)
 }
 
+const changetime = () => {
+    alert('eoziropezrpe')
+}
+
 watchEffect(() => {
     getData();
 });
 
 
 </script>
+
+<style>
+.vue__time-picker input.vue__time-picker-input {
+    border: none !important;
+    width: 100% !important;
+}
+
+.vue__time-picker .dropdown,
+.vue__time-picker,
+.vue__time-picker .dropdown .select-list {
+    width: 100% !important;
+}
+
+.dark .vue__time-picker .dropdown,
+.vue__time-picker {
+    background-color: #1e293b !important;
+}
+
+.dark .vue__time-picker .dropdown ul li {
+    color: #FFF !important;
+}
+
+.dark .vue__time-picker .dropdown ul.minutes {
+    border-left: 1px solid #000 !important;
+}
+
+.dark .vue__time-picker input.vue__time-picker-input {
+    background-color: #111827 !important;
+}
+</style>
