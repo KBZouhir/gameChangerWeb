@@ -34,6 +34,10 @@ export default defineNuxtConfig({
     storesDirs: ["./stores/**"],
   },
 
+  build: {
+    transpile: ['@vuepic/vue-datepicker']
+  },
+
   snackbar: {
     bottom: true,
     right: true,

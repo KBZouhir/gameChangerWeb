@@ -30,6 +30,7 @@ export const getAvailableTimeSlots = async (id, date) => {
       method: "GET",
     }
   );
+  
   return data
 
 };
