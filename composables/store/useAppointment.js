@@ -21,3 +21,15 @@ export const getUserOpeningHours = async (id) => {
   return data
 
 };
+
+export const getAvailableTimeSlots = async (id, date) => {
+  const { data, refresh, error, pending } = await useApi(
+    `appointments/opening-hours/get-available-time-slots/${id}?date=${date}`,
+    {
+      initialCache: false,
+      method: "GET",
+    }
+  );
+  return data
+
+};

@@ -103,7 +103,21 @@
                             </div>
                         </div>
                         <div class="flex space-x-4" v-if="post.author.id == user.id">
-                            {{ user.full_name }}
+                            <UDropdown :items="postDropDown" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                                    :popper="{ placement: 'bottom-start' }">
+                                    <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
+                                        :color="(colorMode.value == 'dark') ? 'white' : 'black'" variant="link"
+                                        :trailing="false" />
+
+                                    <template #item="{ item }">
+                                        <button class="w-full flex items-center justify-between"
+                                            @click="item.function(comment)">
+                                            <span class="truncate">{{ item.label }}</span>
+                                            <UIcon :name="item.icon"
+                                                class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
+                                        </button>
+                                    </template>
+                                </UDropdown>
                         </div>
                     </div>
                     <div class="my-4">
@@ -747,6 +761,20 @@ const fetchMoreComments = async $state => {
 
 
 const items = [
+    [
+        {
+            label: 'Edit',
+            icon: 'i-heroicons-pencil-square',
+            function: editPostCommnet
+        }, {
+            label: 'Delete',
+            icon: 'i-heroicons-trash',
+            function: deletePostCommnet
+        }
+    ]
+]
+
+const postDropDown = [
     [
         {
             label: 'Edit',

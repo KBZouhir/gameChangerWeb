@@ -87,6 +87,7 @@
                                         </div>
                                         <p v-if="range.error" class="text-xs text-red-600">{{ range.error }}</p>
                                     </div>
+ 
                                     <UButton size="xs" color="white" class="hover:no-underline" @click="addRange(index)"
                                         :disabled="!day.active" block variant="link" label="Add">
                                         <template #leading>
@@ -157,60 +158,51 @@ definePageMeta({
 
 
 const addRange = (dayIndex) => {
-    daysOfWeek.value[dayIndex].timeRanges.push({ from: '', to: '', error: '' });
+    daysOfWeek.value[dayIndex].timeRanges.push({ from: '', to: '', error: '' })
 }
 
 const removeRange = (dayIndex, rangeIndex) => {
-    daysOfWeek.value[dayIndex].timeRanges.splice(rangeIndex, 1);
+    daysOfWeek.value[dayIndex].timeRanges.splice(rangeIndex, 1)
     validateTimeRange(dayIndex, rangeIndex)
 }
 
 const validateTimeRange = (dayIndex, rangeIndex) => {
-    const range = daysOfWeek.value[dayIndex].timeRanges[rangeIndex];
-    const minSlotTime = 30
-    console.log(range);
+    const timeRanges = daysOfWeek.value[dayIndex]?.timeRanges
+    const range = timeRanges?.[rangeIndex]
 
     if (range) {
+
+        const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
         if (range?.from && range?.to) {
-            if (range.from >= range.to) {
+            if (!timePattern.test(range.from) || !timePattern.test(range.to)) {
+                range.error = 'Invalid time format. Please use HH:mm format.'
+            } else if (range.from >= range.to) {
                 range.error = '"From" time must be before "To" time'
             } else {
-                const fromTime = parseTime(range.from)
-                const toTime = parseTime(range.to)
-                const duration = (toTime - fromTime) / (1000 * 60)
 
+                let overlapFound = false;
 
-                const previousRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex - 1]
-                const nextRange = daysOfWeek.value[dayIndex].timeRanges[rangeIndex + 1]
-
-                let consecutiveError = false;
-                if (previousRange && previousRange.to) {
-                    const prevToTime = parseTime(previousRange.to)
-                    const timeDiff = (fromTime - prevToTime) / (1000 * 60)
-                    if (timeDiff < minSlotTime) {
-                        consecutiveError = true
-                    }
-                }
-                if (nextRange && nextRange.from) {
-                    const nextFromTime = parseTime(nextRange.from);
-                    const timeDiff = (nextFromTime - toTime) / (1000 * 60)
-                    if (timeDiff < minSlotTime) {
-                        consecutiveError = true;
+                for (let i = 0; i < timeRanges.length; i++) {
+                    if (i !== rangeIndex) {
+                        const otherRange = timeRanges[i];
+                        if (range.from < otherRange.to && range.to > otherRange.from) {
+                            range.error = 'Time range overlaps with another range'
+                            overlapFound = true
+                            break;
+                        }
                     }
                 }
 
-                if (consecutiveError) {
-                    range.error = `The periods must be consecutive with at least ${minSlotTime} minutes in between`
-                } else {
+                if (!overlapFound) {
                     range.error = ''
                 }
-
             }
         } else {
-            range.error = '';
+            range.error = ''
         }
     }
-}
+};
 
 const parseTime = (timeString) => {
     const [hours, minutes] = timeString.split(':').map(Number);
@@ -286,9 +278,6 @@ const getData = async () => {
     daysOfWeek.value = groupByDayWithNames(result.data)
 }
 
-const changetime = () => {
-    alert('eoziropezrpe')
-}
 
 watchEffect(() => {
     getData();
