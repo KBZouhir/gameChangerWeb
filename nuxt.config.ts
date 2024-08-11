@@ -18,7 +18,8 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
     "@pinia/nuxt",
     "nuxt-snackbar",
-    "@samk-dev/nuxt-vcalendar"
+    "@samk-dev/nuxt-vcalendar",
+    "nuxt-swiper"
   ],
 
   icon: {

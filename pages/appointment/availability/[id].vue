@@ -1,26 +1,35 @@
 <template>
     <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
-            <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply
-                :min-date="new Date()" :dark="true"></VueDatePicker>
+            
+            <div class="flex justify-between items-center">
+                <h2>Available days</h2>
+                <div>
+                    <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply :min-date="new Date()" :dark="color.value == 'dark' ? true : false"></VueDatePicker>
+                </div>
+            </div>
         </div>
 
-        <div class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto is-scrollbar-hidden px-4">
-            <button v-for="{ day, name } in daysOfMonth" :class="dayClassCondition(day)" @click="getAvailableSlots(day)"
-                :disabled="day < new Date().getDate()"
-                class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
-                <h2 class="font-semibold text-md">{{ name }}</h2>
-                <h3 class="font-bold text-2xl">{{ day }}</h3>
-            </button>
+        <div ref="dateContainer" class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4">
+            <div v-for="{ day, name } in daysOfMonth" :key="day">
+                <button :class="dayClassCondition(day)" @click="getAvailableSlots(day)"
+                    :disabled="day < new Date().getDate()"
+                    class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                    <h2 class="font-semibold text-md">{{ name }}</h2>
+                    <h3 class="font-bold text-2xl">{{ day }}</h3>
+                </button>
+            </div>
         </div>
+        <div class="flex flex-wrap justify-center my-4 p-4  mx-auto w-full max-w-screen-xl">
+            <template v-if="availableSlots">
+                <button v-for="(slot, index) in Object.keys(availableSlots)" :key="index"
+                    :class="availableSlots[slot].is_available ? '' : 'dark:bg-slate-800 hover:cursor-not-allowed opacity-30'"
+                    class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                    {{ convertTo12HourFormat(slot) }}
+                </button>
+            </template>
 
-        <div class="flex flex-wrap my-4 p-4  mx-auto w-full max-w-screen-xl">
-            <button v-if="availableSlots" v-for="day in availableSlots"
-                :class="(day.is_available ? '' : 'bg-slate-800 hover:cursor-not-allowed opacity-30')"
-                class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
-                {{ convertTo12HourFormat(day.end_time) }}
-            </button>
-            <USkeleton v-else v-for="i in 20" class="w-20 h-20 rounded-md m-2" />
+            <USkeleton v-else v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
         </div>
     </div>
 </template>
@@ -32,6 +41,9 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import { getAvailableTimeSlots } from '~/composables/store/useAppointment'
 
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import 'swiper/swiper-bundle.css'
+
 
 const route = useRoute()
 const color = useColorMode()
@@ -42,8 +54,10 @@ const id = route.params.id
 const date = ref(new Date())
 const daysOfMonth = ref()
 
-const availableSlots = ref()
+const availableSlots = ref([])
 const selectedDay = ref(new Date().getDate())
+
+const dateContainer = ref()
 
 
 
@@ -80,6 +94,7 @@ const getAvailableSlots = async (day) => {
         result = await getAvailableTimeSlots(id, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day}`)
     }
     availableSlots.value = result
+    //dateContainer.value.scrollLeft = selectedDay.value * 95
 }
 
 
@@ -105,8 +120,6 @@ const getDaysInMonth = (month, year) => {
 }
 
 
-
-
 function convertTo12HourFormat(dateTime) {
     const timeZone = moment.tz.guess();
     return moment.tz(dateTime, timeZone).format('hh:mm A');
@@ -120,6 +133,8 @@ const getDataFromApi = async () => {
 watchEffect(() => {
     getDataFromApi();
 });
+
+
 
 
 </script>
