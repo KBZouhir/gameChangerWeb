@@ -3,7 +3,14 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   colorMode: {
-    preference: "light",
+    preference: "system", // default value of $colorMode.preference
+    fallback: "light", // fallback value if not system preference found
+    hid: "nuxt-color-mode-script",
+    globalName: "__NUXT_COLOR_MODE__",
+    componentName: "ColorScheme",
+    classPrefix: "",
+    classSuffix: "-mode",
+    storageKey: "nuxt-color-mode",
   },
 
   postcss: {
@@ -19,14 +26,15 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "nuxt-snackbar",
     "@samk-dev/nuxt-vcalendar",
-    "nuxt-swiper"
+    "nuxt-swiper",
+    "dayjs-nuxt",
   ],
 
   icon: {
     customCollections: [
       {
-        prefix: 'my-icon',
-        dir: './assets/svg/icons'
+        prefix: "my-icon",
+        dir: "./assets/svg/icons",
       },
     ],
   },
@@ -36,7 +44,7 @@ export default defineNuxtConfig({
   },
 
   build: {
-    transpile: ['@vuepic/vue-datepicker']
+    transpile: ["@vuepic/vue-datepicker"],
   },
 
   snackbar: {
@@ -72,6 +80,13 @@ export default defineNuxtConfig({
     },
   },
 
+  dayjs: {
+    locales: ["en", "fr"],
+    plugins: ["relativeTime", "utc", "timezone"],
+    defaultLocale: "en",
+    defaultTimezone: "America/New_York",
+  },
+
   runtimeConfig: {
     public: {
       googleMapsApiKey: process.env.GOOGLE_MAP_KEY,
@@ -101,6 +116,5 @@ export default defineNuxtConfig({
     ssr: {
       noExternal: ["@sipec/vue3-tags-input"],
     },
-  }
-  
+  },
 });

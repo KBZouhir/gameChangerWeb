@@ -59,14 +59,23 @@ const items = [
 
                 <div class="hidden sm:ml-16 sm:flex items-center">
                     <div class="flex space-x-4">
-                        <nuxt-link to="/services" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Services </nuxt-link>
-                       
-                        <a href="#"
-                            class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Trainings</a>
-                        <a href="#"
-                            class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Ressources</a>
-                        <a href="#" class="text-blueGray-900 dark:text-white px-3 py-2 text-sm font-medium">Contact
-                            us</a>
+                        <nuxt-link to="/services" class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:briefcase"/>
+                            <span>Services</span> 
+                        </nuxt-link>
+                        <nuxt-link to="/calander" class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:calendar"/>
+                            <span>Calander</span>
+                        </nuxt-link>
+                        <nuxt-link to="/" class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:calendar"/>
+                            <span>Ressources</span>
+                        </nuxt-link>
+
+                        <nuxt-link to="/" class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:calendar"/>
+                            <span>Contact</span>
+                        </nuxt-link>
                     </div>
                 </div>
 
@@ -91,7 +100,6 @@ const items = [
                     </nuxt-link>
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }" :popper="{ placement: 'bottom-start' }">
                         <UAvatar :src="user.image_url" :alt="user.full_name" size="md" />
-                        
                         <template #account="{ item }">
                             <div class="text-left">
                                 <p>

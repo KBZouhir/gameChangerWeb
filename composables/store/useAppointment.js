@@ -34,3 +34,45 @@ export const getAvailableTimeSlots = async (id, date) => {
   return data
 
 };
+
+
+export const bookAppointment = async (payload) => {
+  
+  const { data, refresh, error, pending } = await useApi(`appointments/`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+  
+  return data
+
+};
+
+
+export const calander = async (date) => {
+  
+  const { data, refresh, error, pending } = await useApi(`appointments/calendar?month=${date}`,
+    {
+      initialCache: false,
+      method: "GET",
+    }
+  );
+
+  return data
+
+};
+
+export const getAppointments = async (date) => {
+  
+  const { data, refresh, error, pending } = await useApi(`appointments/?date=${date}`,
+    {
+      initialCache: false,
+      method: "GET",
+    }
+  );
+
+  return data
+
+};

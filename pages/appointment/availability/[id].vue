@@ -4,8 +4,10 @@
             <div class="flex justify-between items-center">
                 <h2>Available days</h2>
                 <div>
-                    <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply
-                        :min-date="new Date()" :dark="color.value == 'dark' ? true : false"></VueDatePicker>
+                    <ClientOnly>
+                        <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply
+                            :min-date="new Date()" :dark="color.value == 'dark' ? true : false"></VueDatePicker>
+                    </ClientOnly>
                 </div>
             </div>
         </div>
@@ -26,10 +28,11 @@
             <template v-if="availableSlots">
                 <button v-for="(slot, index) in Object.keys(availableSlots)" :key="index"
                     :disabled="!availableSlots[slot].is_available" @click="selectAppointment(slot)" :class="{
-                        'bg-emerald-400 text-white dark:border-slate-900': availableSlots[slot].is_available && appointmentDate === slot,
+                        'bg-emerald-400 text-white dark:border-slate-900': availableSlots[slot].is_available && state.begin_at === slot,
                         'dark:bg-slate-800 hover:cursor-not-allowed opacity-30': !availableSlots[slot].is_available,
                         'border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer': true
-                    }" class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                    }"
+                    class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
                     {{ convertTo12HourFormat(slot) }}
                 </button>
             </template>
@@ -37,29 +40,44 @@
             <USkeleton v-else v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
         </div>
 
-        <div class="w-full max-w-screen-xl mx-auto py-8">
-            <UTextarea v-model="description" :rows="8" class="mb-4" />
-            <div class="flex justify-end">
-                <UButton label="Book now" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white"
-                    color="primary" size="md"></UButton>
+        <div v-if="!availableSlots" class="flex flex-1 flex-col items-center justify-center py-4">
+            <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
+                srcset="">
+            <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false" alt=""
+                srcset="">
+            <h2 class="font-semibold text-2xl">No data founds !</h2>
+            <p>You don't have any notification yet.</p>
+        </div>
+
+        <div v-if="availableSlots" ref="descriptionContainer">
+            <div class="w-full max-w-screen-xl mx-auto py-8 px-4">
+                <UTextarea v-model="state.description" autofocus
+                    placeholder="Describe why you want to book this appointment" :rows="8" class="mb-4" />
+                <div class="flex justify-end">
+                    <UButton @click="submitFrom" label="Book appointment"
+                        class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                        size="md">
+                    </UButton>
+                </div>
             </div>
         </div>
+
     </div>
 </template>
 
 <script setup>
-import moment from 'moment-timezone';
+import { useDayjs } from '#dayjs'
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import { getAvailableTimeSlots } from '~/composables/store/useAppointment'
+import { getAvailableTimeSlots, bookAppointment } from '~/composables/store/useAppointment'
 
 
 
 const route = useRoute()
 const color = useColorMode()
+const dayjs = useDayjs()
 
-const { $moment } = useNuxtApp()
 const id = route.params.id
 
 const date = ref(new Date())
@@ -69,7 +87,15 @@ const availableSlots = ref([])
 const selectedDay = ref(new Date().getDate())
 
 const dateContainer = ref()
-const appointmentDate = ref()
+const descriptionContainer = ref()
+
+const state = reactive(
+    {
+        user_id: parseInt(id),
+        begin_at: null,
+        description: null
+    }
+)
 
 
 definePageMeta({
@@ -132,12 +158,16 @@ const getDaysInMonth = (month, year) => {
 
 
 const convertTo12HourFormat = (dateTime) => {
-    const timeZone = moment.tz.guess();
-    return moment.tz(dateTime, timeZone).format('hh:mm A');
+    const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return dayjs.utc(dateTime).tz(localTimezone).format('hh:mm A')
 }
 
 const selectAppointment = (slot) => {
-    appointmentDate.value = slot
+    state.begin_at = slot
+    if (descriptionContainer.value) {
+        descriptionContainer.value?.scrollIntoView({ behavior: 'smooth' })
+
+    }
 }
 
 const getDataFromApi = async () => {
@@ -148,6 +178,11 @@ const getDataFromApi = async () => {
 watchEffect(() => {
     getDataFromApi();
 });
+
+
+const submitFrom = async () => {
+    const result = await bookAppointment(state)
+}
 
 
 
