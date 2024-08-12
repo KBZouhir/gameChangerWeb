@@ -9,17 +9,45 @@
                 </div>
             </div>
         </div>
+        <div class="mx-auto w-full max-w-screen-xl px-4">
+            <Swiper :slidesPerView="10" :breakpoints="{
+                '200': {
+        slidesPerView: 3,
+        spaceBetween: 20,
+      },
+      '430': {
+        slidesPerView: 5,
+        spaceBetween: 20,
+      },
+      '768': {
+        slidesPerView: 5,
+        spaceBetween: 40,
+      },
+      '1024': {
+        slidesPerView: 10,
+        spaceBetween: 50,
+      },
+    }" :spaceBetween="30">
+                <SwiperSlide v-for="{ day, name } in daysOfMonth" :key="day">
+                    <button :class="dayClassCondition(day)" :disabled="day < new Date().getDate()"  @click="getAvailableSlots(day)" class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                        <h2 class="font-semibold text-md">{{ name }}</h2>
+                        <h3 class="font-bold text-2xl">{{ day }}</h3>
+                    </button>
+                </SwiperSlide>
+            </Swiper>
+        </div>
+        
 
-        <div ref="dateContainer" class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4">
+        <!-- <div ref="dateContainer" class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4">
             <div v-for="{ day, name } in daysOfMonth" :key="day">
-                <button :class="dayClassCondition(day)" @click="getAvailableSlots(day)"
-                    :disabled="day < new Date().getDate()"
+                <button :class="dayClassCondition(day)"
+                    
                     class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
                     <h2 class="font-semibold text-md">{{ name }}</h2>
                     <h3 class="font-bold text-2xl">{{ day }}</h3>
                 </button>
             </div>
-        </div>
+        </div> -->
         <div class="flex flex-wrap justify-center my-4 p-4  mx-auto w-full max-w-screen-xl">
             <template v-if="availableSlots">
                 <button v-for="(slot, index) in Object.keys(availableSlots)" :key="index"
@@ -88,7 +116,7 @@ const getAvailableSlots = async (day) => {
     availableSlots.value = null
     let result = null
     selectedDay.value = day
-    if (date.value.year && date.value.month) {
+    if (date.value?.year && date.value?.month) {
         result = await getAvailableTimeSlots(id, `${date.value.year}-${date.value.month + 1}-${day}`)
     } else {
         result = await getAvailableTimeSlots(id, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day}`)
