@@ -1,63 +1,48 @@
 <template>
     <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
-            
             <div class="flex justify-between items-center">
                 <h2>Available days</h2>
                 <div>
-                    <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply :min-date="new Date()" :dark="color.value == 'dark' ? true : false"></VueDatePicker>
+                    <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply
+                        :min-date="new Date()" :dark="color.value == 'dark' ? true : false"></VueDatePicker>
                 </div>
             </div>
         </div>
-        <div class="mx-auto w-full max-w-screen-xl px-4">
-            <Swiper :slidesPerView="10" :breakpoints="{
-                '200': {
-        slidesPerView: 3,
-        spaceBetween: 20,
-      },
-      '430': {
-        slidesPerView: 5,
-        spaceBetween: 20,
-      },
-      '768': {
-        slidesPerView: 5,
-        spaceBetween: 40,
-      },
-      '1024': {
-        slidesPerView: 10,
-        spaceBetween: 50,
-      },
-    }" :spaceBetween="30">
-                <SwiperSlide v-for="{ day, name } in daysOfMonth" :key="day">
-                    <button :class="dayClassCondition(day)" :disabled="day < new Date().getDate()"  @click="getAvailableSlots(day)" class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
-                        <h2 class="font-semibold text-md">{{ name }}</h2>
-                        <h3 class="font-bold text-2xl">{{ day }}</h3>
-                    </button>
-                </SwiperSlide>
-            </Swiper>
-        </div>
-        
 
-        <!-- <div ref="dateContainer" class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4">
+        <div ref="dateContainer"
+            class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4 py-4 scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full dark:scrollbar-thumb-slate-900 scrollbar-thumb-slate-300/80 dark:scrollbar-track-slate-800/80 scrollbar-track-slate-100">
             <div v-for="{ day, name } in daysOfMonth" :key="day">
-                <button :class="dayClassCondition(day)"
-                    
+                <button :class="dayClassCondition(day)" :disabled="day < new Date().getDate()"
+                    @click="getAvailableSlots(day)"
                     class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
                     <h2 class="font-semibold text-md">{{ name }}</h2>
                     <h3 class="font-bold text-2xl">{{ day }}</h3>
                 </button>
             </div>
-        </div> -->
+        </div>
+
         <div class="flex flex-wrap justify-center my-4 p-4  mx-auto w-full max-w-screen-xl">
             <template v-if="availableSlots">
                 <button v-for="(slot, index) in Object.keys(availableSlots)" :key="index"
-                    :class="availableSlots[slot].is_available ? '' : 'dark:bg-slate-800 hover:cursor-not-allowed opacity-30'"
-                    class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                    :disabled="!availableSlots[slot].is_available" @click="selectAppointment(slot)" :class="{
+                        'bg-emerald-400 text-white dark:border-slate-900': availableSlots[slot].is_available && appointmentDate === slot,
+                        'dark:bg-slate-800 hover:cursor-not-allowed opacity-30': !availableSlots[slot].is_available,
+                        'border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer': true
+                    }" class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
                     {{ convertTo12HourFormat(slot) }}
                 </button>
             </template>
 
             <USkeleton v-else v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
+        </div>
+
+        <div class="w-full max-w-screen-xl mx-auto py-8">
+            <UTextarea v-model="description" :rows="8" class="mb-4" />
+            <div class="flex justify-end">
+                <UButton label="Book now" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white"
+                    color="primary" size="md"></UButton>
+            </div>
         </div>
     </div>
 </template>
@@ -69,8 +54,6 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import { getAvailableTimeSlots } from '~/composables/store/useAppointment'
 
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import 'swiper/swiper-bundle.css'
 
 
 const route = useRoute()
@@ -86,7 +69,7 @@ const availableSlots = ref([])
 const selectedDay = ref(new Date().getDate())
 
 const dateContainer = ref()
-
+const appointmentDate = ref()
 
 
 definePageMeta({
@@ -121,8 +104,8 @@ const getAvailableSlots = async (day) => {
     } else {
         result = await getAvailableTimeSlots(id, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day}`)
     }
+
     availableSlots.value = result
-    //dateContainer.value.scrollLeft = selectedDay.value * 95
 }
 
 
@@ -148,15 +131,19 @@ const getDaysInMonth = (month, year) => {
 }
 
 
-function convertTo12HourFormat(dateTime) {
+const convertTo12HourFormat = (dateTime) => {
     const timeZone = moment.tz.guess();
     return moment.tz(dateTime, timeZone).format('hh:mm A');
+}
+
+const selectAppointment = (slot) => {
+    appointmentDate.value = slot
 }
 
 const getDataFromApi = async () => {
     getDaysInMonth(new Date().getMonth() + 1, new Date().getFullYear())
     getAvailableSlots(new Date().getDate())
-};
+}
 
 watchEffect(() => {
     getDataFromApi();
