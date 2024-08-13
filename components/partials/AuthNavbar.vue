@@ -63,9 +63,9 @@ const items = [
                             <Icon name="tabler:briefcase"/>
                             <span>Services</span> 
                         </nuxt-link>
-                        <nuxt-link to="/calander" class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
+                        <nuxt-link to="/calendar" class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
                             <Icon name="tabler:calendar"/>
-                            <span>Calander</span>
+                            <span>Calendar</span>
                         </nuxt-link>
                         <nuxt-link to="/" class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
                             <Icon name="tabler:calendar"/>

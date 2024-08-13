@@ -1,67 +1,112 @@
 <template>
     <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
-        <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
-            <div class="flex justify-between items-center">
-                <h2>Available days</h2>
-                <div>
+        <div v-if="!selectedAppointment">
+            <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
+                <div class="flex justify-between items-center">
+                    <h2>Available days</h2>
+                    <div>
+                        <ClientOnly>
+                            <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply
+                                :min-date="new Date()" :dark="color.value == 'dark' ? true : false"></VueDatePicker>
+                        </ClientOnly>
+                    </div>
+                </div>
+            </div>
+
+            <div ref="dateContainer"
+                class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4 py-4 scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full dark:scrollbar-thumb-slate-900 scrollbar-thumb-slate-300/80 dark:scrollbar-track-slate-800/80 scrollbar-track-slate-100">
+                <div v-for="{ day, name } in daysOfMonth" :key="day">
+                    <button :class="dayClassCondition(day)" :disabled="day < new Date().getDate()"
+                        @click="getAvailableSlots(day)"
+                        class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                        <h2 class="font-semibold text-md">{{ name }}</h2>
+                        <h3 class="font-bold text-2xl">{{ day }}</h3>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center my-4 p-4  mx-auto w-full max-w-screen-xl">
+                <template v-if="availableSlots">
+                    <button v-for="(slot, index) in Object.keys(availableSlots)" :key="index"
+                        :disabled="!availableSlots[slot].is_available" @click="selectAppointment(slot)" :class="{
+                            'bg-emerald-400 text-white dark:border-slate-900': availableSlots[slot].is_available && state.begin_at === slot,
+                            'dark:bg-slate-800 hover:cursor-not-allowed opacity-30': !availableSlots[slot].is_available,
+                            'border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer': true
+                        }"
+                        class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                        {{ convertTo12HourFormat(slot) }}
+                    </button>
+                </template>
+
+                <USkeleton v-else v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
+            </div>
+
+            <div v-if="!availableSlots" class="flex flex-1 flex-col items-center justify-center py-4">
+                <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
+                    srcset="">
+                <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false"
+                    alt="" srcset="">
+                <h2 class="font-semibold text-2xl">No data founds !</h2>
+                <p>You don't have any notification yet.</p>
+            </div>
+
+            <div v-if="availableSlots" ref="descriptionContainer">
+                <div class="w-full max-w-screen-xl mx-auto py-8 px-4">
+                    <UTextarea v-model="state.description" autofocus
+                        placeholder="Describe why you want to book this appointment" :rows="8" class="mb-4" />
+                    <div class="flex justify-end">
+                        <UButton @click="submitFrom" :loading="loadingbooking" label="Book appointment"
+                            class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                            size="md">
+                        </UButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
+                <div class="flex flex-1 flex-col items-center justify-center py-4">
                     <ClientOnly>
-                        <VueDatePicker v-model="date" month-picker @update:model-value="handleDate" auto-apply
-                            :min-date="new Date()" :dark="color.value == 'dark' ? true : false"></VueDatePicker>
+                        <img class="mx-auto" :src="($colorMode.value == 'dark') ? calendarWhite : calendar"
+                            draggable="false" alt="" srcset="">
                     </ClientOnly>
+
+                    <h2 class="font-bold text-3xl mb-2 uppercase">{{ $t('Appointment Booked ') }}</h2>
+                    <p class="text-gray-400">Your appointment has been booked Check your calendar to see it.</p>
+                </div>
+
+                <div class="mx-auto max-w-screen-sm">
+                    <div
+                        class="p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4 mt-8">
+                        <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt=""
+                            srcset="">
+                        <div class="flex items-start justify-between" style="margin-top: 0;">
+                            <div class="flex items-center space-x-4">
+                                <UAvatar :src="selectedAppointment?.user.image_url"
+                                    :alt="selectedAppointment?.user.full_name" size="md" />
+
+                                <div class="flex flex-col">
+                                    <h4 class="font-bold mb-0">{{ selectedAppointment?.user.full_name }}</h4>
+                                    <span class="text-xs -mt-[0.5px]">
+                                        Appointment
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p>Duration: 15 min</p>
+                            <p>{{ $dayjs(selectedAppointment?.begin_at).format('dddd, MMMM D') }}</p>
+                        </div>
+                    </div>
+                    <nuxt-link :to="`/calendar`">
+                        <UButton block label="Check calendar" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white"
+                            color="primary" size="md"></UButton>
+                    </nuxt-link>
                 </div>
             </div>
+
         </div>
-
-        <div ref="dateContainer"
-            class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4 py-4 scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full dark:scrollbar-thumb-slate-900 scrollbar-thumb-slate-300/80 dark:scrollbar-track-slate-800/80 scrollbar-track-slate-100">
-            <div v-for="{ day, name } in daysOfMonth" :key="day">
-                <button :class="dayClassCondition(day)" :disabled="day < new Date().getDate()"
-                    @click="getAvailableSlots(day)"
-                    class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
-                    <h2 class="font-semibold text-md">{{ name }}</h2>
-                    <h3 class="font-bold text-2xl">{{ day }}</h3>
-                </button>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap justify-center my-4 p-4  mx-auto w-full max-w-screen-xl">
-            <template v-if="availableSlots">
-                <button v-for="(slot, index) in Object.keys(availableSlots)" :key="index"
-                    :disabled="!availableSlots[slot].is_available" @click="selectAppointment(slot)" :class="{
-                        'bg-emerald-400 text-white dark:border-slate-900': availableSlots[slot].is_available && state.begin_at === slot,
-                        'dark:bg-slate-800 hover:cursor-not-allowed opacity-30': !availableSlots[slot].is_available,
-                        'border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer': true
-                    }"
-                    class="border rounded-md dark:border-slate-800 p-6 m-2 flex justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
-                    {{ convertTo12HourFormat(slot) }}
-                </button>
-            </template>
-
-            <USkeleton v-else v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
-        </div>
-
-        <div v-if="!availableSlots" class="flex flex-1 flex-col items-center justify-center py-4">
-            <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
-                srcset="">
-            <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false" alt=""
-                srcset="">
-            <h2 class="font-semibold text-2xl">No data founds !</h2>
-            <p>You don't have any notification yet.</p>
-        </div>
-
-        <div v-if="availableSlots" ref="descriptionContainer">
-            <div class="w-full max-w-screen-xl mx-auto py-8 px-4">
-                <UTextarea v-model="state.description" autofocus
-                    placeholder="Describe why you want to book this appointment" :rows="8" class="mb-4" />
-                <div class="flex justify-end">
-                    <UButton @click="submitFrom" label="Book appointment"
-                        class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
-                        size="md">
-                    </UButton>
-                </div>
-            </div>
-        </div>
-
     </div>
 </template>
 
@@ -72,6 +117,8 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import { getAvailableTimeSlots, bookAppointment } from '~/composables/store/useAppointment'
 
+import calendarWhite from '~/assets/svg/vectors/calendar-white.svg'
+import calendar from '~/assets/svg/vectors/calendar.svg'
 
 
 const route = useRoute()
@@ -88,6 +135,8 @@ const selectedDay = ref(new Date().getDate())
 
 const dateContainer = ref()
 const descriptionContainer = ref()
+const selectedAppointment = ref()
+const loadingbooking = ref(false)
 
 const state = reactive(
     {
@@ -166,7 +215,6 @@ const selectAppointment = (slot) => {
     state.begin_at = slot
     if (descriptionContainer.value) {
         descriptionContainer.value?.scrollIntoView({ behavior: 'smooth' })
-
     }
 }
 
@@ -181,10 +229,13 @@ watchEffect(() => {
 
 
 const submitFrom = async () => {
+    loadingbooking.value = true
     const result = await bookAppointment(state)
+    if (result.success) {
+        selectedAppointment.value = result.appointment
+    }
+    loadingbooking.value = false
 }
-
-
 
 
 </script>

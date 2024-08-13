@@ -1,171 +1,10 @@
-<script setup>
-import { apiGetInterests } from "~/composables/store/useInterests"
-import { apiGetDomains, apiGetDomainBySector } from "~/composables/store/useDomains"
-import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors"
-import { completeProfile } from "~/composables/store/useApiAuth"
-import { errorAlert } from "~/composables/useAlert"
-import { useInterestsStore } from "~/stores/interests"
-import { useBusinessSectorsStore } from "~/stores/business-sectors"
-import { useDomainsStore } from "~/stores/domains"
-import { handleApiError } from '~/composables/useApiError'
 
-definePageMeta({
-  layout: "auth",
-  title: "Login Page",
-  middleware: ['auth', 'valid']
-});
-
-const intrestStore = useInterestsStore();
-const intrestBusinessSectorStore = useBusinessSectorsStore();
-const intrestDomainsStore = useDomainsStore();
-
-const activeStep = ref(0);
-const isOpen = ref(false);
-const isOpenMap = ref(true);
-const showDomains = ref(false);
-const isLoading = ref(false);
-const domainLoading = ref(false);
-const steps = ref(3);
-const searchBuinessSector = ref();
-const form = ref()
-
-
-// const interests = computed(() => intrestStore.getInterests);
-const domains = computed(() => intrestDomainsStore.getDomains);
-const businessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
-const filteredBusinessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
-
-
-const selectedSector = ref(null);
-const selectedDomains = ref([]);
-const selectedViewDomains = ref([]);
-
-const formData = reactive({
-  interests: [],
-  domains: [],
-  address: {
-    address: "",
-    city: "",
-    zip_code: "",
-    country: "",
-    lat: "",
-    lon: "",
-  },
-});
-
-const getDataFromApi = async () => {
-  // await apiGetInterests();
-  await apiGetBusinessSectors()
-};
-
-watchEffect(() => {
-  getDataFromApi();
-});
-
-watch(() => searchBuinessSector.value, (val) => {
-  searchBuinessSectors(val);
-});
-
-const getdomain = async (sector) => {
-  selectedSector.value = sector;
-  const qurey = { business_sector: selectedSector.value.id };
-  domainLoading.value = true;
-  await apiGetDomainBySector(qurey).then(() => {
-    domainLoading.value = false;
-  });
-  showDomains.value = true;
-};
-
-const isSelected = (domain) => {
-  return selectedDomains.value.some((selectedDomain) => selectedDomain.id === domain.id);
-};
-
-const isSectorOnDomain = (sector) => {
-  return selectedDomains.value.some(
-    (selectedDomain) => selectedDomain.business_sector_id === sector.id
-  );
-};
-
-const dispalyDomains = () => {
-  isOpen.value = false;
-  selectedViewDomains.value = selectedDomains.value;
-};
-
-const removeDomain = (domain) => {
-  selectedDomains.value = selectedDomains.value.filter((d) => d.id !== domain.id);
-  selectedViewDomains.value = selectedDomains.value;
-};
-
-const selectDomain = (domain) => {
-  if (!isSelected(domain)) {
-    selectedDomains.value.push(domain);
-  } else {
-    selectedDomains.value = selectedDomains.value.filter((d) => d.id !== domain.id);
-  }
-  selectedViewDomains.value = selectedDomains.value;
-};
-
-const searchBuinessSectors = (name) => {
-  filteredBusinessSectors.value = businessSectors.value.filter((businessSector) => businessSector.translated_name.toLowerCase().includes(name.toLowerCase()));
-}
-
-const formValidation = () => {
-  formData.domains = selectedViewDomains.value;
-
-  if (formData.interests.length == 0) {
-    errorAlert("Interests is required");
-    activeStep.value = 0;
-    return;
-  }
-
-  if (formData.domains.length == 0) {
-    errorAlert("domains is required");
-    activeStep.value = 1;
-    return;
-  }
-};
-
-const submitForm = async () => {
-  formValidation();
-
-  let payload = {
-    address: null,
-    interests: [],
-    domains: [],
-  };
-
-  formData.interests.forEach((item) => {
-    payload.interests.push(item.id);
-  });
-
-  formData.domains.forEach((item) => {
-    payload.domains.push(item.id);
-  });
-
-  payload.address = formData.address;
-
-  payload.address.lat = payload.address.lat.toString();
-  payload.address.lon = payload.address.lon.toString();
-
-  const result = await completeProfile(payload);
-
-  if (!result.data) {
-    const error = handleApiError(result.error);
-    if (error.status === 422) {
-      form.value.setErrors(error.errors);
-    }
-  }
-  if (result?.success) {
-    await navigateTo('/home')
-  }
-};
-</script>
 
 <template>
   <div class="relative bg-slate-50 dark:bg-slate-800">
     <div class="mx-auto max-w-s w-full max-w-screen-xl  h-full   grid grid-cols-5 gap-0 "
       :class="activeStep != 2 ? 'h-screen' : ''">
-      <div class="flex bg-slate-50 justify-center items-center col-span-5 lg:col-span-3 ">
+      <div class="flex bg-slate-50 dark:bg-slate-800 justify-center items-center col-span-5 lg:col-span-3 ">
         <div class="h-full flex flex-col w-full px-4 sm:px-6 lg:px-2 py-8">
           <h1 class="text-3xl font-bold">Complete profile</h1>
 
@@ -359,12 +198,186 @@ const submitForm = async () => {
           </div>
         </USlideover>
       </div>
-      <div class=" col-span-2 bg-slate-50 h-full flex-1 hidden lg:flex justify-center items-center relative">
-        <img class="absolute right-0 top-0" width="80%" src="~/assets/svg/particules/gradient.svg" alt="">
-        <img src="~/assets/svg/vectors/complete-profile.svg" v-if="activeStep == 0" draggable="false" width="50%">
-        <img src="~/assets/svg/vectors/intelligence.svg" v-if="activeStep == 1" draggable="false" width="50%">
-        <img src="~/assets/svg/vectors/map.svg" v-if="activeStep == 2" draggable="false" width="50%">
+      <div class=" col-span-2 bg-slate-50 dark:bg-slate-800 h-full flex-1 hidden lg:flex justify-center items-center ">
+        <img class="absolute hidden right-0 top-0" width="80%" :src="greenBlurEffect" alt="">
+        <img :src="$colorMode.value == 'dark' ? completeProfileImageWhite  : completeProfileImage" v-if="activeStep == 0" draggable="false" width="50%">
+        <img :src="$colorMode.value == 'dark' ? intelligenceImageWhite : intelligenceImage"  v-if="activeStep == 1" draggable="false" width="50%">
+        <img :src="$colorMode.value == 'dark' ? mapImageWhite : mapImage" v-if="activeStep == 2" draggable="false" width="50%">
       </div>
     </div>
   </div>
 </template>
+
+<script setup>
+import { apiGetInterests } from "~/composables/store/useInterests"
+import { apiGetDomains, apiGetDomainBySector } from "~/composables/store/useDomains"
+import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors"
+import { completeProfile } from "~/composables/store/useApiAuth"
+import { errorAlert } from "~/composables/useAlert"
+import { useInterestsStore } from "~/stores/interests"
+import { useBusinessSectorsStore } from "~/stores/business-sectors"
+import { useDomainsStore } from "~/stores/domains"
+import { handleApiError } from '~/composables/useApiError'
+
+import completeProfileImage from '~/assets/svg/vectors/complete-profile.svg'
+import completeProfileImageWhite from '~/assets/svg/vectors/complete-profile-white.svg'
+
+import intelligenceImage from '~/assets/svg/vectors/intelligence.svg'
+import intelligenceImageWhite from '~/assets/svg/vectors/intelligence.svg'
+
+import mapImage from '~/assets/svg/vectors/map.svg'
+import mapImageWhite from '~/assets/svg/vectors/map.svg'
+
+import greenBlurEffect from '~/assets/img/green-blur-effect.png'
+
+definePageMeta({
+  layout: "auth",
+  title: "Login Page",
+  middleware: ['auth', 'valid']
+});
+
+const intrestStore = useInterestsStore();
+const intrestBusinessSectorStore = useBusinessSectorsStore();
+const intrestDomainsStore = useDomainsStore();
+
+const activeStep = ref(0);
+const isOpen = ref(false);
+const isOpenMap = ref(true);
+const showDomains = ref(false);
+const isLoading = ref(false);
+const domainLoading = ref(false);
+const steps = ref(3);
+const searchBuinessSector = ref();
+const form = ref()
+
+
+// const interests = computed(() => intrestStore.getInterests);
+const domains = computed(() => intrestDomainsStore.getDomains);
+const businessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
+const filteredBusinessSectors = computed(() => intrestBusinessSectorStore.getBusinessSectors);
+
+
+const selectedSector = ref(null);
+const selectedDomains = ref([]);
+const selectedViewDomains = ref([]);
+
+const formData = reactive({
+  interests: [],
+  domains: [],
+  address: {
+    address: "",
+    city: "",
+    zip_code: "",
+    country: "",
+    lat: "",
+    lon: "",
+  },
+});
+
+const getDataFromApi = async () => {
+  // await apiGetInterests();
+  await apiGetBusinessSectors()
+};
+
+watchEffect(() => {
+  getDataFromApi();
+});
+
+watch(() => searchBuinessSector.value, (val) => {
+  searchBuinessSectors(val);
+});
+
+const getdomain = async (sector) => {
+  selectedSector.value = sector;
+  const qurey = { business_sector: selectedSector.value.id };
+  domainLoading.value = true;
+  await apiGetDomainBySector(qurey).then(() => {
+    domainLoading.value = false;
+  });
+  showDomains.value = true;
+};
+
+const isSelected = (domain) => {
+  return selectedDomains.value.some((selectedDomain) => selectedDomain.id === domain.id);
+};
+
+const isSectorOnDomain = (sector) => {
+  return selectedDomains.value.some(
+    (selectedDomain) => selectedDomain.business_sector_id === sector.id
+  );
+};
+
+const dispalyDomains = () => {
+  isOpen.value = false;
+  selectedViewDomains.value = selectedDomains.value;
+};
+
+const removeDomain = (domain) => {
+  selectedDomains.value = selectedDomains.value.filter((d) => d.id !== domain.id);
+  selectedViewDomains.value = selectedDomains.value;
+};
+
+const selectDomain = (domain) => {
+  if (!isSelected(domain)) {
+    selectedDomains.value.push(domain);
+  } else {
+    selectedDomains.value = selectedDomains.value.filter((d) => d.id !== domain.id);
+  }
+  selectedViewDomains.value = selectedDomains.value;
+};
+
+const searchBuinessSectors = (name) => {
+  filteredBusinessSectors.value = businessSectors.value.filter((businessSector) => businessSector.translated_name.toLowerCase().includes(name.toLowerCase()));
+}
+
+const formValidation = () => {
+  formData.domains = selectedViewDomains.value;
+
+  if (formData.interests.length == 0) {
+    errorAlert("Interests is required");
+    activeStep.value = 0;
+    return;
+  }
+
+  if (formData.domains.length == 0) {
+    errorAlert("domains is required");
+    activeStep.value = 1;
+    return;
+  }
+};
+
+const submitForm = async () => {
+  formValidation();
+
+  let payload = {
+    address: null,
+    interests: [],
+    domains: [],
+  };
+
+  formData.interests.forEach((item) => {
+    payload.interests.push(item.id);
+  });
+
+  formData.domains.forEach((item) => {
+    payload.domains.push(item.id);
+  });
+
+  payload.address = formData.address;
+
+  payload.address.lat = payload.address.lat.toString();
+  payload.address.lon = payload.address.lon.toString();
+
+  const result = await completeProfile(payload);
+
+  if (!result.data) {
+    const error = handleApiError(result.error);
+    if (error.status === 422) {
+      form.value.setErrors(error.errors);
+    }
+  }
+  if (result?.success) {
+    await navigateTo('/home')
+  }
+};
+</script>
