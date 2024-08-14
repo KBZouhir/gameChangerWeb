@@ -73,7 +73,7 @@
 
                 <div class="flex items-center space-x-4">
                     <UAvatar :src="user?.image_url" :alt="user.full_name" size="md" />
-                    
+
                     <button class="flex-1 text-start bg-slate-100 dark:bg-white/5 py-3 px-4 rounded-lg"
                         @click="isOpen = true">
                         <span class="pt-2 select-none text-sm">Write something ...</span>
@@ -88,12 +88,13 @@
                 </div>
             </div>
 
-            <UCard v-for="post in posts" class="my-2">
+            <UCard v-for="post in posts.data" class="my-2">
                 <div>
                     <div class="flex justify-between items-center flex-wrap">
                         <div class="flex items-center space-x-4">
 
-                            <nuxt-link :to="(post.author.id == user.id) ? `profile/update` : `profile/${post.author.id}`">
+                            <nuxt-link
+                                :to="(post.author.id == user.id) ? `profile/update` : `profile/${post.author.id}`">
                                 <UAvatar :src="post.author.image_url" :alt="post.author.full_name" size="md" />
                             </nuxt-link>
 
@@ -104,20 +105,20 @@
                         </div>
                         <div class="flex space-x-4" v-if="post.author.id == user.id">
                             <UDropdown :items="postDropDown" :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                                    :popper="{ placement: 'bottom-start' }">
-                                    <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
-                                        :color="(colorMode.value == 'dark') ? 'white' : 'black'" variant="link"
-                                        :trailing="false" />
+                                :popper="{ placement: 'bottom-start' }">
+                                <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
+                                    :color="(colorMode.value == 'dark') ? 'white' : 'black'" variant="link"
+                                    :trailing="false" />
 
-                                    <template #item="{ item }">
-                                        <button class="w-full flex items-center justify-between"
-                                            @click="item.function(comment)">
-                                            <span class="truncate">{{ item.label }}</span>
-                                            <UIcon :name="item.icon"
-                                                class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
-                                        </button>
-                                    </template>
-                                </UDropdown>
+                                <template #item="{ item }">
+                                    <button class="w-full flex items-center justify-between"
+                                        @click="item.function(comment)">
+                                        <span class="truncate">{{ item.label }}</span>
+                                        <UIcon :name="item.icon"
+                                            class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
+                                    </button>
+                                </template>
+                            </UDropdown>
                         </div>
                     </div>
                     <div class="my-4">
@@ -220,7 +221,18 @@
                         </div> -->
                     </div>
                 </div>
+                
             </UCard>
+            <InfiniteLoading @infinite="fetchMorePosts">
+                    <template #spinner>
+                        <div class="flex justify-center w-full">
+                            <LoadingIcon />
+                        </div>
+                    </template>
+                    <template v-if="posts.data.length > 0" #complete>
+                        <span>No more data found!</span>
+                    </template>
+                </InfiniteLoading>
 
             <div v-if="!posts" class="flex flex-1 flex-col items-center justify-center py-4">
                 <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
@@ -237,7 +249,7 @@
                         <template #header>
                             <div class="flex items-center justify-between">
                                 <h3 class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
-                                    Create publication
+                                    {{ $t('Create publication') }}
                                 </h3>
                                 <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                                     @click="isOpen = false" />
@@ -357,7 +369,7 @@
                         <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg"
                             draggable="false" alt="" srcset="">
                         <div class="my-4 text-center">
-                            <h2 class="text-xl font-semibold">No reactions on post</h2>
+                            <h2 class="text-xl font-semibold">{{ $t('No reactions on post') }}</h2>
                         </div>
                     </div>
                 </div>
@@ -394,7 +406,8 @@
                 <div class="flex flex-col space-y-2 h-[350px] overflow-auto is-scrollbar-hidden" v-if="postCommnets">
                     <div v-for="comment in postCommnets.data">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+                            <div
+                                class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
                                 <UAvatar :src="comment.user.image_url" :alt="comment.user.full_name" size="lg" />
                                 <div class="flex flex-1 flex-col items-start">
                                     <div
@@ -639,7 +652,7 @@ const onImageFileChange = async (event) => {
 }
 
 const togglePostReaction = async (postID, reaction_id) => {
-    const post = posts.value.find(post => post.id === postID);
+    const post = posts.value.data.find(post => post.id === postID);
     if (post) {
         if (post.reaction === reaction_id) {
             post.reaction = null;
@@ -688,12 +701,12 @@ const sendComment = async () => {
         result = await createComment(selectedPost.value, payload)
         if (result.success) {
             getPostComments(selectedPost.value)
-            const index = posts.value.findIndex((post) => post.id === selectedPost.value)
-            posts.value[index].comments_count += 1
+            const index = posts.value.data.findIndex((post) => post.id === selectedPost.value)
+            posts.value.data[index].comments_count += 1
         }
     }
     selectedComment.value = null
-     comment.value = ""
+    comment.value = ""
 }
 
 const editPostCommnet = (data) => {
@@ -706,8 +719,8 @@ const deletePostCommnet = async (comment) => {
     if (result.success) {
         postCommnets.value.data = postCommnets.value.data.filter(item => item.id !== comment.id)
         postCommnets.value.meta.total -= 1
-        const index = posts.value.findIndex((post) => post.id === selectedPost.value)
-        posts.value[index].comments_count -= 1
+        const index = posts.value.data.findIndex((post) => post.id === selectedPost.value)
+        posts.value.data[index].comments_count -= 1
     }
 }
 
@@ -752,6 +765,19 @@ const fetchMoreComments = async $state => {
         const result = await getPaginationsComments(postCommnets.value.links.next)
         postCommnets.value.data.push(...result.data)
         postCommnets.value.links = result.links
+        if (result.data.length < 10) $state.complete()
+
+    } catch (error) {
+        $state.error()
+    }
+}
+
+const fetchMorePosts = async $state => {
+    if (posts.value.links.next == null) { $state.complete(); return }
+    try {
+        const result = await getPaginationsComments(posts.value.links.next)
+        posts.value.data.push(...result.data)
+        posts.value.links = result.links
         if (result.data.length < 10) $state.complete()
 
     } catch (error) {

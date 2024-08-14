@@ -42,8 +42,10 @@
                         <dt class="text-sm font-semibold leading-6 dark:text-gray-400 text-gray-600">{{ $t('Status') }}
                         </dt>
                         <dd class="text-xl font-semibold  tracking-tight dark:text-white text-gray-900">
-                            <span
-                                class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">Badge</span>
+                            <span :class="badgeType(appointmentStatus(appointment))"
+                                class="inline-flex items-center rounded-md capitalize px-2 py-1 text-xs font-medium  ring-1 ring-inset ">
+                                {{ appointmentStatus(appointment) }}
+                            </span>
                         </dd>
                     </div>
                 </dl>
@@ -56,6 +58,8 @@
                 <UButton v-if="appointment?.is_requested_by_me" label="Accept" color="green" block size="lg"></UButton>
                 <UButton v-else label="Start" :disabled="true" color="green" block size="lg"></UButton>
             </div>
+            {{ appointment?.room_id }} <br>
+            {{ appointment?.room_link }}
             <nuxt-link to="/calendar">
                 <span class="text-center hover:underline text-gray-400">
                     {{ $t('Go back to calendar') }}
@@ -91,6 +95,62 @@ const convertTo12HourFormat = (dateTime) => {
     const dayjs = useDayjs()
     const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     return dayjs.utc(dateTime).tz(localTimezone).format('hh:mm A')
+}
+
+
+const appointmentStatus = (object) => {
+    const dayjs = useDayjs();
+    const { status: jsonStatus, begin_at, end_at, room_opened_at, room_closed_at, is_requested_by_me } = object;
+
+    const beginAt = dayjs(begin_at);
+    const endAt = dayjs(end_at);
+    const roomOpenedAt = room_opened_at ? dayjs(room_opened_at) : null;
+    const roomClosedAt = room_closed_at ? dayjs(room_closed_at) : null;
+
+    const appointmentStatusEnumMap = ["Accepted", "Pending", "Refused", "Canceled_before", "Canceled"];
+    let status = appointmentStatusEnumMap[jsonStatus - 1];
+
+    const duration = 15;
+    const now = dayjs();
+
+    if (status === "Accepted") {
+        const timeToBegin = beginAt.diff(now, 'minute');
+        const timeToEnd = endAt.diff(now, 'minute');
+
+        if (timeToBegin < duration) {
+            if (timeToEnd < duration) {
+                status = roomOpenedAt ? "ended" : "expired";
+            } else {
+                if (!roomOpenedAt) {
+                    status = "waiting";
+                } else if (!roomClosedAt) {
+                    status = "started";
+                } else {
+                    status = "pendingEnd";
+                }
+            }
+        } else if (is_requested_by_me) {
+            status = "confirmed";
+        }
+    } else if (status === "Pending" && beginAt.diff(now, 'minute') < duration) {
+        status = "expired";
+    }
+
+    return status;
+}
+
+const badgeType = (status) => {
+    const badgeClasses = {
+        ended: 'bg-red-400/10 text-red-400 ring-red-400/20',
+        expired: 'bg-red-400/10 text-red-400 ring-red-400/20',
+        Refused: 'bg-red-400/10 text-red-400 ring-red-400/20',
+        Canceled: 'bg-red-400/10 text-red-400 ring-red-400/20',
+        confirmed: 'bg-green-400/10 text-green-400 ring-green-400/20',
+        Accepted: 'bg-green-400/10 text-green-400 ring-green-400/20',
+        Pending: 'bg-yellow-400/10 text-yellow-400 ring-yellow-400/20',
+    };
+
+    return badgeClasses[status] || '';
 }
 
 

@@ -8,7 +8,7 @@ const index = async () => {
     method: "GET",
   });
   if (data) {
-    store.setPosts(data.data)
+    store.setPosts(data)
   }
 };
 
