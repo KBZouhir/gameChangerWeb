@@ -49,7 +49,6 @@ export default defineNuxtConfig({
 
   snackbar: {
     bottom: true,
-    right: true,
     duration: 5000,
   },
 
