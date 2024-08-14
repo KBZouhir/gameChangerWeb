@@ -2,17 +2,17 @@
     <div>
         <div class="w-full px-4 py-4 max-w-screen-md mx-auto">
             <ClientOnly>
-                <VCalendar :max-date="maxDate" expanded color="green" @dayclick="selectDay"
+                <VCalendar ref="calendarRef"   expanded color="green" @dayclick="selectDay"
                     @did-move="calendarSwipePage" :attributes="attributes"
                     :is-dark="$colorMode.value == 'dark' ? true : false"></VCalendar>
                 <template #fallback>
-                    <p>Loading calendar...</p>
+                    <p>{{ $t('Loading calendar...') }}</p>
                 </template>
             </ClientOnly>
 
             <div class="my-4">
-                <h2 class="mb-4">Appointments for <span class="font-semibold">{{ $dayjs(selectedDay).format("YYYY-MM-DD") }}</span> </h2>
-                <div v-if="appointments.length > 0 && !loadingAppointments" class="grid md:grid-cols-2 grid-cols-1 gap-4">
+                <h2 class="mb-4">{{ $t('Appointments for ') }}<span class="font-semibold">{{ $dayjs(selectedDay).format("YYYY-MM-DD") }}</span> </h2>
+                <div v-if="appointments?.length > 0 && !loadingAppointments" class="grid md:grid-cols-2 grid-cols-1 gap-4">
                     <NuxtLink v-for="appointment in appointments" :to="`/appointment/${appointment.id}`">
                         <div 
                         class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
@@ -47,7 +47,7 @@
                     </NuxtLink>
                 </div>
 
-                <div v-if="appointments.length == 0 && !loadingAppointments" class="flex flex-1 flex-col items-center justify-center py-4">
+                <div v-if="appointments?.length == 0 && !loadingAppointments" class="flex flex-1 flex-col items-center justify-center py-4">
                     <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
                         srcset="">
                     <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false"
@@ -102,6 +102,7 @@ const maxDate = computed(() => {
 
 const calendarLoading = ref(false)
 const loadingAppointments = ref(false)
+const calendarRef = ref()
 
 const attributes = ref([
     {
@@ -231,7 +232,13 @@ const convertTo12HourFormat = (dateTime) => {
     return dayjs.utc(dateTime).tz(localTimezone).format('hh:mm A')
 }
 
+if(calendarRef.value){
+    await calendarRef.value?.move({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
+}
 
+onMounted(async() => {   
+    await calendarRef.value?.move({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
+})
 
 watchEffect(() => {
     let currentDate = new Date().toISOString().slice(0, 7)
