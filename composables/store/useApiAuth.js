@@ -60,7 +60,7 @@ const ResendValidationMail = async () => {
 
 const login = async (payload) => {
   const authStore = useAuthStore();
-
+  const {$auth, $signInWithEmailAndPassword} = useNuxtApp()
   
   let cleanData = { ...payload };
   if (!payload.email || payload.email === "0") {
@@ -77,6 +77,9 @@ const login = async (payload) => {
     body: cleanData,
     method: "POST",
   });
+
+  const {user} = await $signInWithEmailAndPassword($auth, payload.email, payload.password);
+
 
  
   if (data) {

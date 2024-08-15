@@ -95,7 +95,7 @@ const user = computed(() => authStore.getAuthUser);
 const fetchMoreServices = async $state => {
     console.log("fetch more data");
 
-    if (services.value.links.next == null) { $state.complete(); return }
+    if (services.value?.links?.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(services.value.links.next)
         services.value.data.push(...result.data)

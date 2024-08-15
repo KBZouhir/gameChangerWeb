@@ -2,7 +2,7 @@ import { useApi } from "~/composables/useApi";
 import { successAlert, errorAlert } from "~/composables/useAlert";
 import { useAuthStore } from "~/stores/authStore";
 
-const updateGeneral = async (payload) => {
+export const updateGeneral = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/profile`, {
     initialCache: false,
     body: payload,
@@ -14,7 +14,7 @@ const updateGeneral = async (payload) => {
 };
 
 
-const updatePassword = async (payload) => {
+export const updatePassword = async (payload) => {
   const authStore = useAuthStore();
   const { data, refresh, error, pending } = await useApi(`/update-password`, {
     initialCache: false,
@@ -31,7 +31,7 @@ const updatePassword = async (payload) => {
 };
 
 
-const getProfile = async (id) => {
+export const getProfile = async (id) => {
   const authStore = useAuthStore();
   const { data, refresh, error, pending } = await useApi(`/profile/${id}`, {
     initialCache: false,
@@ -42,8 +42,12 @@ const getProfile = async (id) => {
 };
 
 
-export {
-  updatePassword,
-  updateGeneral,
-  getProfile
+export const toggleFollow = async (id) => {
+  const authStore = useAuthStore();
+  const { data, refresh, error, pending } = await useApi(`profile/${id}/follow`, {
+    initialCache: false,
+    method: "POST",
+  });
+
+  return data
 };

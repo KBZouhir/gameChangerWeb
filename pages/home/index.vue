@@ -88,7 +88,7 @@
                 </div>
             </div>
 
-            <UCard v-for="post in posts.data" class="my-2">
+            <UCard v-for="post in posts?.data" class="my-2">
                 <div>
                     <div class="flex justify-between items-center flex-wrap">
                         <div class="flex items-center space-x-4">
@@ -229,7 +229,7 @@
                             <LoadingIcon />
                         </div>
                     </template>
-                    <template v-if="posts.data.length > 0" #complete>
+                    <template v-if="posts?.data.length > 0" #complete>
                         <span>No more data found!</span>
                     </template>
                 </InfiniteLoading>

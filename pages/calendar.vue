@@ -12,23 +12,23 @@
             <div class="my-4">
                 <h2 class="mb-4">{{ $t('Appointments for ') }}<span class="font-semibold">{{
                     $dayjs(selectedDay).format("YYYY-MM-DD") }}</span> </h2>
-                <div v-if="appointments?.length > 0 && !loadingAppointments"
+                <div v-if="appointments?.data?.length > 0 && !loadingAppointments"
                     class="grid md:grid-cols-2 grid-cols-1 gap-4">
-                    <NuxtLink v-for="appointment in appointments" :to="`/appointment/${appointment.id}`">
+                    <NuxtLink v-for="appointment in appointments?.data" :to="`/appointment/${appointment.id}`">
+
                         <div
                             class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
                             <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0"
                                 alt="" srcset="">
                             <div class="flex items-start justify-between mt-1">
                                 <div class="flex items-center space-x-4">
-                                    <nuxt-link
-                                        :to="(appointment.requester.id == appointment.requester.id) ? `profile/update` : `profile/${appointment.requester.id}`">
-                                        <UAvatar :src="appointment.requester.image_url"
-                                            :alt="appointment.requester.full_name" size="md" />
+                                    <nuxt-link :to="`profile/${appointment.user.id}`">
+                                        <UAvatar :src="(appointment.user.id == user.id) ? appointment.requester.image_url  : appointment.user.image_url" :alt="(appointment.user.id == user.id)  ? appointment.requester.full_name : appointment.user.full_name"
+                                            size="md" />
                                     </nuxt-link>
 
                                     <div class="flex flex-col">
-                                        <h4 class="font-bold mb-0">{{ appointment.requester.full_name }}</h4>
+                                        <h4 class="font-bold mb-0">{{ (appointment.user.id == user.id) ? appointment.requester.full_name : appointment.user.full_name}}</h4>
                                         <span class="text-xs -mt-[0.5px]">
                                             {{ convertTo12HourFormat(appointment.begin_at) }} - {{
                                                 convertTo12HourFormat(appointment.end_at) }}
@@ -47,15 +47,27 @@
                             </div>
                         </div>
                     </NuxtLink>
+                    <div class="col-span-2 text-center">
+                        <InfiniteLoading @infinite="fetchMoreAppointments">
+                            <template #spinner>
+                                <div class="flex justify-center w-full">
+                                    <LoadingIcon />
+                                </div>
+                            </template>
+                            <template v-if="appointments?.data.length > 0" #complete>
+                                <span></span>
+                            </template>
+                        </InfiniteLoading>
+                    </div>
                 </div>
 
-                <div v-if="appointments?.length == 0 && !loadingAppointments"
+                <div v-if="appointments?.data?.length == 0 && !loadingAppointments"
                     class="flex flex-1 flex-col items-center justify-center py-4">
                     <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
                         srcset="">
                     <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false"
                         alt="" srcset="">
-                    <h2 class="font-semibold text-2xl">{{ $t('No Appointment founds !') }}</h2>
+                    <h2 class="font-semibold text-2xl">{{ $t('No Appointments for this date') }}</h2>
                 </div>
             </div>
 
@@ -92,16 +104,23 @@
 
 <script setup>
 import { calendar, getAppointments } from '~/composables/store/useAppointment'
+import { getPaginationsComments } from '~/composables/store/usePost'
+import { useAuthStore } from "~/stores/authStore"
+import InfiniteLoading from "v3-infinite-loading"
+import "v3-infinite-loading/lib/style.css"
 
 const selectedDay = ref(new Date())
 const appointments = ref([])
+const authStore = useAuthStore()
+
+
 
 const maxDate = computed(() => {
-    const dayjs = useDayjs();
+    const dayjs = useDayjs()
     return dayjs().add(3, 'month').format('YYYY-MM-DD');
 })
 
-
+const user = computed(() => authStore.getAuthUser);
 
 const calendarLoading = ref(false)
 const loadingAppointments = ref(false)
@@ -179,14 +198,19 @@ const badgeType = (status) => {
     return badgeClasses[status] || '';
 }
 
+const getAppointmentByDate = async (date) => {
+    loadingAppointments.value = true
+    const result = await getAppointments(date)
+    appointments.value = result
+    loadingAppointments.value = false
+}
+
 const selectDay = async (e) => {
     selectedDay.value = e.startDate
     attributes.value[0].dates = selectedDay.value
-    loadingAppointments.value = true
-    const result = await getAppointments(e.id)
-    appointments.value = result?.data.reverse()
-    loadingAppointments.value = false
+    await getAppointmentByDate(e.id)
 }
+
 
 const publishcalendarData = (data) => {
     attributes.value = [
@@ -241,12 +265,28 @@ const convertTo12HourFormat = (dateTime) => {
     return dayjs.utc(dateTime).tz(localTimezone).format('hh:mm A')
 }
 
+const fetchMoreAppointments = async $state => {
+
+    if (appointments.value.links.next == null) { $state.complete(); return }
+    try {
+        const result = await getPaginationsComments(appointments.value.links.next)
+        appointments.value.data.push(...result.data)
+        appointments.value.links = result.links
+        if (result.data.length < 10) $state.complete()
+
+    } catch (error) {
+        $state.error()
+    }
+}
+
 if (calendarRef.value) {
     await calendarRef.value?.move({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
 }
 
 onMounted(async () => {
+    const dayjs = useDayjs()
     await calendarRef.value?.move({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
+    await getAppointmentByDate(dayjs().format('YYYY-MM-DD'))
 })
 
 watchEffect(() => {

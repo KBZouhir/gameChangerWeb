@@ -209,28 +209,6 @@
                         </div>
 
                     </div>
-
-                    <!-- <div class="flex flex-col space-y-6 p-6">
-                        <div class="flex flex-col">
-                            <label class="text-[#797C7B]" for="">Display Name</label>
-                            <h2 class="font-semibold">Jhon Abraham</h2>
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="text-[#797C7B]" for="">Email Address</label>
-                            <h2 class="font-semibold">jhonabraham20@gmail.com</h2>
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="text-[#797C7B]" for="">Address</label>
-                            <h2 class="font-semibold">33 street west subidbazar,sylhet</h2>
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="text-[#797C7B]" for="">Phone Number</label>
-                            <h2 class="font-semibold">(320) 555-0104</h2>
-                        </div>
-                    </div> -->
                 </div>
             </USlideover>
         </div>
@@ -241,7 +219,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { collection, addDoc, query, doc, where, updateDoc, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
+    import { collection, addDoc, query, doc, where, updateDoc, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
 import { useAuthStore } from '~/stores/authStore';
 import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation'
 import { useConversationStore } from '~/stores/conversations'

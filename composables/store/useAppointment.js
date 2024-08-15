@@ -1,13 +1,16 @@
 import { useApi } from "~/composables/useApi";
 
 export const storeOpeningHours = async (payload) => {
-    const { data, refresh, error, pending } = await useApi(`appointments/opening-hours`, {
+  const { data, refresh, error, pending } = await useApi(
+    `appointments/opening-hours`,
+    {
       initialCache: false,
       body: payload,
       method: "POST",
-    });
+    }
+  );
 
-    console.log(data)
+  console.log(data);
 };
 
 export const getUserOpeningHours = async (id) => {
@@ -18,8 +21,7 @@ export const getUserOpeningHours = async (id) => {
       method: "GET",
     }
   );
-  return data
-
+  return data;
 };
 
 export const getAvailableTimeSlots = async (id, date) => {
@@ -30,62 +32,83 @@ export const getAvailableTimeSlots = async (id, date) => {
       method: "GET",
     }
   );
-  
-  return data
 
+  return data;
 };
-
 
 export const bookAppointment = async (payload) => {
-  
-  const { data, refresh, error, pending } = await useApi(`appointments`,
-    {
-      initialCache: false,
-      body: payload,
-      method: "POST",
-    }
-  );
-  
-  return data
+  const { data, refresh, error, pending } = await useApi(`appointments`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
 
+  return data;
 };
 
-
 export const calendar = async (date) => {
-  
-  const { data, refresh, error, pending } = await useApi(`appointments/calendar?month=${date}`,
+  const { data, refresh, error, pending } = await useApi(
+    `appointments/calendar?month=${date}`,
     {
       initialCache: false,
       method: "GET",
     }
   );
 
-  return data
-
+  return data;
 };
 
 export const getAppointments = async (date) => {
-  
-  const { data, refresh, error, pending } = await useApi(`appointments?date=${date}`,
+  const { data, refresh, error, pending } = await useApi(
+    `appointments?date=${date}`,
     {
       initialCache: false,
       method: "GET",
     }
   );
 
-  return data
-
+  return data;
 };
 
 export const getAppointment = async (id) => {
-  
-  const { data, refresh, error, pending } = await useApi(`appointments/${id}`,
+  const { data, refresh, error, pending } = await useApi(`appointments/${id}`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+  return data;
+};
+
+export const acceptAppointment = async (id) => {
+  const { data, refresh, error, pending } = await useApi(
+    `appointments/${id}/accept`,
     {
       initialCache: false,
-      method: "GET",
+      method: "PUT",
     }
   );
 
-  return data
+  return data;
+};
 
+export const rejectAppointment = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(
+    `appointments/${id}/reject`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "PUT",
+    }
+  );
+  if (data) {
+    return {
+      success: true,
+      data,
+    };
+  } else {
+    return {
+      success: false,
+      error,
+    };
+  }
 };

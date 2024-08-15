@@ -38,10 +38,10 @@
                     </button>
                 </template>
 
-                <USkeleton v-else v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
+                <USkeleton v-if="loadingSlots" v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
             </div>
 
-            <div v-if="!availableSlots" class="flex flex-1 flex-col items-center justify-center py-4">
+            <div v-if="isEmpty(availableSlots) && !loadingSlots" class="flex flex-1 flex-col items-center justify-center py-4">
                 <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
                     srcset="">
                 <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false"
@@ -50,7 +50,7 @@
                 <p>You don't have any notification yet.</p>
             </div>
 
-            <div v-if="availableSlots" ref="descriptionContainer">
+            <div v-if="!isEmpty(availableSlots)" ref="descriptionContainer">
                 <div class="w-full max-w-screen-xl mx-auto py-8 px-4">
                     <UTextarea v-model="state.description" autofocus
                         placeholder="Describe why you want to book this appointment" :rows="8" class="mb-4" />
@@ -130,7 +130,8 @@ const id = route.params.id
 const date = ref(new Date())
 const daysOfMonth = ref()
 
-const availableSlots = ref([])
+const availableSlots = ref({})
+const loadingSlots = ref(false)
 const selectedDay = ref(new Date().getDate())
 
 const dateContainer = ref()
@@ -171,15 +172,16 @@ const dayClassCondition = (day) => {
 
 
 const getAvailableSlots = async (day) => {
-    availableSlots.value = null
+    availableSlots.value = {}
     let result = null
     selectedDay.value = day
+    loadingSlots.value = true
     if (date.value?.year && date.value?.month) {
         result = await getAvailableTimeSlots(id, `${date.value.year}-${date.value.month + 1}-${day}`)
     } else {
         result = await getAvailableTimeSlots(id, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${day}`)
     }
-
+    loadingSlots.value = false
     availableSlots.value = result
 }
 
@@ -190,6 +192,9 @@ const handleDate = () => {
     }
 }
 
+const isEmpty = (obj) =>  {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+}
 
 const getDaysInMonth = (month, year) => {
     const days = [];
