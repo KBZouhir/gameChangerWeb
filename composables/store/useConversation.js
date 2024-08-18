@@ -1,5 +1,5 @@
-import { useConversationStore } from "~/stores/conversations";
-import { collection, getDocs, query, where, doc, getDoc, orderBy, onSnapshot  } from "firebase/firestore"
+import { useConversationStore } from "~/stores/conversations"
+
 export const getConversations = async (conversationIds, conversations, append) => {
   const conversationStore = useConversationStore()
 

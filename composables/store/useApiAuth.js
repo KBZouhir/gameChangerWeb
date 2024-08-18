@@ -166,7 +166,7 @@ async function getSettings() {
     initialCache: false,
   });
 
-  if(data.success){
+  if(data?.success){
     settingStore.setSettings(excludeKeys(data, ['success', 'message']))
   }
 }

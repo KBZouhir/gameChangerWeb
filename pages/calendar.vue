@@ -18,7 +18,7 @@
 
                         <div
                             class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
-                            <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0"
+                            <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false" class="w-12 absolute top-0 right-0"
                                 alt="" srcset="">
                             <div class="flex items-start justify-between mt-1">
                                 <div class="flex items-center space-x-4">
@@ -75,7 +75,7 @@
                 <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
                     <div v-for="i in 4"
                         class="p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
-                        <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt=""
+                        <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false" class="w-12 absolute top-0 right-0" alt=""
                             srcset="">
                         <div class="flex items-start justify-between mt-1">
                             <div class="flex items-center space-x-4">
@@ -145,43 +145,48 @@ const calendarSwipePage = async (e) => {
 
 const appointmentStatus = (object) => {
     const dayjs = useDayjs();
-    const { status: jsonStatus, begin_at, end_at, room_opened_at, room_closed_at, is_requested_by_me } = object;
 
-    const beginAt = dayjs(begin_at);
-    const endAt = dayjs(end_at);
-    const roomOpenedAt = room_opened_at ? dayjs(room_opened_at) : null;
-    const roomClosedAt = room_closed_at ? dayjs(room_closed_at) : null;
+    if (object) {
+        const { status: jsonStatus, begin_at, end_at, room_opened_at, room_closed_at, is_requested_by_me } = object;
 
-    const appointmentStatusEnumMap = ["Accepted", "Pending", "Refused", "Canceled_before", "Canceled"];
-    let status = appointmentStatusEnumMap[jsonStatus - 1];
+        // Convert times to UTC
+        const beginAt = dayjs.utc(begin_at);
+        const endAt = dayjs.utc(end_at);
+        const roomOpenedAt = room_opened_at ? dayjs(room_opened_at).utc() : null;
+        const roomClosedAt = room_closed_at ? dayjs(room_closed_at).utc() : null;
 
-    const duration = 15;
-    const now = dayjs();
+        const appointmentStatusEnumMap = ["Accepted", "Pending", "Refused", "Canceled_before", "Canceled"];
+        let status = appointmentStatusEnumMap[jsonStatus - 1];
 
-    if (status === "Accepted") {
-        const timeToBegin = beginAt.diff(now, 'minute');
-        const timeToEnd = endAt.diff(now, 'minute');
+        const duration = 15;
+        const now = dayjs.utc()
 
-        if (timeToBegin < duration) {
-            if (timeToEnd < duration) {
-                status = roomOpenedAt ? "ended" : "expired";
-            } else {
-                if (!roomOpenedAt) {
-                    status = "waiting";
-                } else if (!roomClosedAt) {
-                    status = "started";
+
+        if (status === "Accepted") {
+            const timeToBegin = beginAt.diff(now, 'minute');
+            const timeToEnd = endAt.diff(now, 'minute');
+
+            if (timeToBegin < 0) {
+                if (timeToEnd < 0) {
+                    status = roomOpenedAt ? "ended" : "expired";
                 } else {
-                    status = "pendingEnd";
+                    if (!roomOpenedAt) {
+                        status = "waiting";
+                    } else if (!roomClosedAt) {
+                        status = "started";
+                    } else {
+                        status = "pendingEnd";
+                    }
                 }
+            } else if (is_requested_by_me) {
+                status = "confirmed";
             }
-        } else if (is_requested_by_me) {
-            status = "confirmed";
+        } else if (status === "Pending" && beginAt.diff(now, 'minute') < 0) {
+            status = "expired";
         }
-    } else if (status === "Pending" && beginAt.diff(now, 'minute') < duration) {
-        status = "expired";
-    }
 
-    return status;
+        return status;
+    }
 }
 
 const badgeType = (status) => {

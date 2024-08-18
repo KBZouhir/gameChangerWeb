@@ -4,7 +4,7 @@
             <h2 class="text-2xl font-semibold text-center mb-6">
                 {{ $dayjs(appointment?.begin_at).format('dddd, MMMM D') }}
             </h2>
-            {{ appointment }}
+            {{ appointment?.room_link }}
             <div
                 class="w-full p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt=""
@@ -34,13 +34,13 @@
                             }}
                         </dt>
                         <dd class="text-xl font-semibold tracking-tight dark:text-white text-gray-900">{{
-                            convertTo12HourFormat(appointment?.begin_at) }}</dd>
+                            convertTo12HourFormat(appointment?.begin_at, 'hh:mm A') }}</dd>
                     </div>
                     <div class="flex flex-col bg-gray-400/5 p-8">
                         <dt class="text-sm font-semibold leading-6 dark:text-gray-400 text-gray-600">{{ $t('End at') }}
                         </dt>
                         <dd class="text-xl font-semibold tracking-tight dark:text-white text-gray-900">{{
-                            convertTo12HourFormat(appointment?.end_at) }}</dd>
+                            convertTo12HourFormat(appointment?.end_at, 'hh:mm A') }}</dd>
                     </div>
                     <div class="flex flex-col bg-gray-400/5 p-8">
                         <dt class="text-sm font-semibold leading-6 dark:text-gray-400 text-gray-600">{{ $t('Status') }}
@@ -53,6 +53,45 @@
                         </dd>
                     </div>
                 </dl>
+
+                <div v-if="appointmentStatus(appointment) == 'waiting'" class="grid grid-cols-4 gap-6 mb-4">
+                    <div class="flex flex-col">
+                        <span
+                            class="p-1 bg-green-400 text-primary text-sm text-center font-semibold rounded-md rounded-b-none">DAYS</span>
+                        <div
+                            class="flex justify-center items-center py-4 p-6 shadow border dark:border-slate-800 border-t-0 rounded-t-none rounded-md">
+                            <h3 class="text-2xl font-bold">{{ days }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <span
+                            class="p-1 bg-green-400 text-primary text-sm text-center font-semibold rounded-md rounded-b-none">HOURS</span>
+                        <div
+                            class="flex justify-center items-center py-4 p-6 shadow border dark:border-slate-800 border-t-0 rounded-t-none rounded-md">
+                            <h3 class="text-2xl font-bold">{{ hours }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <span
+                            class="p-1 bg-green-400 text-primary text-sm text-center font-semibold rounded-md rounded-b-none">MINS</span>
+                        <div
+                            class="flex justify-center items-center py-4 p-6 shadow border dark:border-slate-800 border-t-0 rounded-t-none rounded-md">
+                            <h3 class="text-2xl font-bold">{{ minutes }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <span
+                            class="p-1 bg-green-400 text-primary text-sm text-center font-semibold rounded-md rounded-b-none">SECS</span>
+                        <div
+                            class="flex justify-center items-center py-4 p-6 shadow border dark:border-slate-800 border-t-0 rounded-t-none rounded-md">
+                            <h3 class="text-2xl font-bold">{{ seconds }}</h3>
+                        </div>
+                    </div>
+                </div>
+
                 <div v-if="appointment?.rejected_at"
                     class="rounded-md dark:bg-red-600 border border-red-800 bg-red-100 p-4">
                     <div class="flex items-center dark:text-white text-red-800">
@@ -75,6 +114,7 @@
                     <p>{{ appointment?.description }}</p>
                 </div>
 
+
                 <UDivider label="" />
                 <!-- Accept or reject -->
                 <div v-if="appointmentStatus(appointment) == 'Pending'" class="grid grid-cols-2 space-x-2">
@@ -91,29 +131,30 @@
             </nuxt-link>
 
         </div>
-        <!-- Reject Appointment Modal -->
-        <UModal v-model="rejectAppointmentModal">
-            <div>
+        <div>
                 <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                     <template #header>
                         <h4 class="font-semibold">{{ $t('Are you sure you want to reject this appointment ?') }}</h4>
                     </template>
 
-                    <UForm ref="form" :state="state" class="flex flex-col space-y-2">
-                        <UFormGroup label="Reject reason" name="rejected_reason">
-                            <UTextarea id="reject_reason" :rows="8" v-model="state.rejected_reason" />
-                        </UFormGroup>
-                    </UForm>
+                    <div class="flex flex-col space-y-2">
+                        <label for="reject_reason">Reject reason</label>
+                        <UTextarea id="reject_reason" :rows="8" v-model="state.rejected_reason" />
+                    </div>
 
                     <template #footer>
                         <div v-if="appointmentStatus(appointment) == 'Pending'" class="grid grid-cols-2 space-x-2">
-                            <UButton @click="rejectAppointmentModal = false" variant="link" block label="Cancel" :color="$colorMode.value == 'dark' ? 'green' : 'primary'" size="lg" />
+                            <UButton @click="rejectAppointmentModal = false" variant="link" block label="Cancel"
+                                :color="$colorMode.value == 'dark' ? 'green' : 'primary'" size="lg" />
                             <UButton @click="rejectAppointmentFun" block label="Confirm" color="red" size="lg" />
                         </div>
                     </template>
                 </UCard>
             </div>
-        </UModal>
+        <!-- Reject Appointment Modal -->
+        <!-- <UModal v-model="rejectAppointmentModal">
+            
+        </UModal> -->
     </div>
 </template>
 
@@ -124,6 +165,14 @@ import { handleApiError } from '~/composables/useApiError'
 const appointment = ref()
 const rejectAppointmentModal = ref(false)
 const form = ref()
+const dayjs = useDayjs()
+const days = ref(0);
+const hours = ref(0);
+const minutes = ref(0);
+const seconds = ref(0);
+const now = ref();
+const targetDate = ref()
+let interval;
 
 const route = useRoute()
 const id = route.params.id
@@ -142,6 +191,14 @@ const state = reactive(
     }
 )
 
+const calculateTimeLeft = () => {
+    const totalSeconds = targetDate.value.diff(now.value, 'second');
+    days.value = Math.floor(totalSeconds / (60 * 60 * 24))
+    hours.value = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60))
+    minutes.value = Math.floor((totalSeconds % (60 * 60)) / 60)
+    seconds.value = totalSeconds % 60
+};
+
 const getDataFromApi = async () => {
     const result = await getAppointment(id)
     if (result?.success) {
@@ -149,34 +206,40 @@ const getDataFromApi = async () => {
     }
 }
 
-const convertTo12HourFormat = (dateTime) => {
+const convertTo12HourFormat = (dateTime, format) => {
     const dayjs = useDayjs()
     const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    return dayjs.utc(dateTime).tz(localTimezone).format('hh:mm A')
+    return dayjs.utc(dateTime).tz(localTimezone).format(format)
 }
 
 
 const appointmentStatus = (object) => {
     const dayjs = useDayjs();
+
     if (object) {
         const { status: jsonStatus, begin_at, end_at, room_opened_at, room_closed_at, is_requested_by_me } = object;
-        const beginAt = dayjs(begin_at);
-        const endAt = dayjs(end_at);
-        const roomOpenedAt = room_opened_at ? dayjs(room_opened_at) : null;
-        const roomClosedAt = room_closed_at ? dayjs(room_closed_at) : null;
+       
+        targetDate.value = dayjs(begin_at)
+        // Convert times to UTC
+        const beginAt = dayjs.utc(begin_at);
+        const endAt = dayjs.utc(end_at);
+        const roomOpenedAt = room_opened_at ? dayjs(room_opened_at).utc() : null;
+        const roomClosedAt = room_closed_at ? dayjs(room_closed_at).utc() : null;
+
+        
 
         const appointmentStatusEnumMap = ["Accepted", "Pending", "Refused", "Canceled_before", "Canceled"];
         let status = appointmentStatusEnumMap[jsonStatus - 1];
 
         const duration = 15;
-        const now = dayjs();
-
+        const now = dayjs.utc()
+        
         if (status === "Accepted") {
             const timeToBegin = beginAt.diff(now, 'minute');
             const timeToEnd = endAt.diff(now, 'minute');
-
+            
             if (timeToBegin < duration) {
-                if (timeToEnd < duration) {
+                if (timeToEnd < 0) {
                     status = roomOpenedAt ? "ended" : "expired";
                 } else {
                     if (!roomOpenedAt) {
@@ -190,14 +253,12 @@ const appointmentStatus = (object) => {
             } else if (is_requested_by_me) {
                 status = "confirmed";
             }
-        } else if (status === "Pending" && beginAt.diff(now, 'minute') < duration) {
+        } else if (status === "Pending" && beginAt.diff(now, 'minute') < 0) {
             status = "expired";
         }
 
         return status;
     }
-
-
 }
 
 const badgeType = (status) => {
@@ -221,19 +282,24 @@ const acceptAppointmentFun = async () => {
 }
 
 const rejectAppointmentFun = async () => {
-    console.log("ezpezp");
-    
-    // const result = await rejectAppointment(appointment.value?.id, state)
-    // if (result.success) {
+    const result = await rejectAppointment(appointment.value?.id, state)
+    if (result.success) {
 
-    // } else {
-    //     if (result.error.statusCode == 422) {
-    //         const error = handleApiError(result.error);
-    //         form.value.setErrors(error.errors);
-    //     }
-    // }
+    } else {
+        if (result.error.statusCode == 422) {
+            const error = handleApiError(result.error);
+            form.value.setErrors(error.errors);
+        }
+    }
 
 }
+
+onMounted(() => {
+  interval = setInterval(() => {
+    now.value = dayjs();
+    calculateTimeLeft();
+  }, 1000);
+});
 
 watchEffect(() => {
     getDataFromApi();

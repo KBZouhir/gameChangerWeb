@@ -22,4 +22,30 @@
 import greenBlurEffect from '~/assets/img/green-blur-effect.png'
 import yellowBlurEffect from '~/assets/img/yellow-blur-effect.png'
 
+
+const { $getMessaging } = useNuxtApp()
+
+const requestPermission = async () => {
+  try {
+
+    const permission = await Notification.requestPermission()
+    
+    if (permission === 'granted') {
+      const messaging = $getMessaging()
+
+      const token = await messaging.getToken()
+      console.log('FCM token:', token)
+
+    } else {
+      console.error('Permission denied')
+    }
+  } catch (error) {
+    console.error('Error requesting permission:', error)
+  }
+};
+
+onMounted(() => {
+  requestPermission()
+})
+
 </script>
