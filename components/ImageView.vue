@@ -12,9 +12,9 @@
 
 <script setup>
 import FsLightbox from "fslightbox-vue/v3"
-import { get, getImagebyID } from '~/composables/store/useMedia'
 
 const colorMode = useColorMode()
+const userAccessToken = useCookie('user_access_token')
 
 const toggler = ref(false)
 const slide = ref(1)
@@ -38,16 +38,35 @@ const openLightboxOnSlide = () => {
     toggler.value = !toggler.value;
 }
 
+const fetchImageAsBlob = async (url) => {
+  if (!url) return ''
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${userAccessToken.value}`
+      }
+    })
+    if (!response.ok) {
+      console.error('Failed to fetch poster image')
+      return ''
+    }
+    const blob = await response.blob()
+    return URL.createObjectURL(blob)
+  } catch (error) {
+    console.error('Error fetching poster image:', error)
+    return ''
+  }
+}
+
+
 
 onMounted(async () => {
     let blob
     if (props.url) {
-        blob = await get(props.url)
+        imageSrc.value = await fetchImageAsBlob(props.url)
     } else {
-        blob = await getImagebyID(props.id)
-    }
-    if (blob) {
-        imageSrc.value = URL.createObjectURL(blob)
+        imageSrc.value = await fetchImageAsBlob(props.id)
     }
 })
 </script>

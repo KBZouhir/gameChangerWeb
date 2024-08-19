@@ -21,39 +21,47 @@
 <script setup>
 import greenBlurEffect from '~/assets/img/green-blur-effect.png'
 import yellowBlurEffect from '~/assets/img/yellow-blur-effect.png'
+import { registerToken } from '~/composables/store/useApiAuth'
+
+const { $messaging, $getToken, $onMessage } = useNuxtApp()
 
 
-// const { $messaging, $getToken } = useNuxtApp()
+const requestPermission = async () => {
+  try {
+    const permission = await Notification.requestPermission()
 
+    if (permission === 'granted') {
 
+      $getToken($messaging, { vapidKey: 'BJXJpMYEoxBnfQRx74LugwKT6Bs29NW39m6Wh8exW1bb8nrMElyc4c8VfuCj-ZnhZSOuiEiiKsuq9djzsLVSqgU' }).then((currentToken) => {
+        if (currentToken) {
+          console.log(currentToken)
+          RegisterFCMToken(currentToken)
+        } else {
+          console.log('No registration token available. Request permission to generate one.')
+        }
+      }).catch((err) => {
+        console.log('An error occurred while retrieving token. ', err)
+      })
 
+    } else {
+      console.error('Permission denied')
+    }
+  } catch (error) {
+    console.error('Error requesting permission:', error)
+  }
+}
 
-// const requestPermission = async () => {
-//   try {
-//     const permission = await Notification.requestPermission()
+const RegisterFCMToken =  async (token) => {
+  const result = await registerToken({device_token: token})
+}
 
-//     if (permission === 'granted') {
+onMounted(() => {
+  requestPermission()
 
-//       $getToken($messaging, { vapidKey: 'BOiPnnrdnrB1sfs3GFxX7rqIPZXN4i9VZOY78D1IMVwUdNPILavLfl8HdFCaetxcKg5qz9XQ6QFAh6w7vGxbiVo' }).then((currentToken) => {
-//         if (currentToken) {
-//           console.log(currentToken)
-//         } else {
-//           console.log('No registration token available. Request permission to generate one.')
-//         }
-//       }).catch((err) => {
-//         console.log('An error occurred while retrieving token. ', err)
-//       })
-
-//     } else {
-//       console.error('Permission denied')
-//     }
-//   } catch (error) {
-//     console.error('Error requesting permission:', error)
-//   }
-// }
-
-// onMounted(() => {
-//   requestPermission()
-// })
+  $onMessage($messaging, (payload) => {
+    console.log("Message on Clinet ", payload);
+    
+  })
+})
 
 </script>

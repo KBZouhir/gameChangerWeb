@@ -174,6 +174,17 @@ async function getSettings() {
 }
 
 
+async function registerToken(payload) {
+  
+  const { data, error } = await useApi(`/register-token`,  {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+}
+
+
 export {
   useUser,
   register,
@@ -185,4 +196,5 @@ export {
   completeProfile,
   forgotPassword,
   resetPassword,
+  registerToken
 };
