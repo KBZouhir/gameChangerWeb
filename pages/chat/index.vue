@@ -14,11 +14,27 @@
                             <UIcon name="i-heroicons-magnifying-glass" />
                         </template>
                     </UInput>
+
+                    <div class="pt-4">
+                        <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
+                            <button @click="conversationType = 1" :class="conversationType == 1 ? 'dark:bg-white text-black' : ''"
+                                class=" flex space-x-1 justify-center items-center text-center rounded-full p-2">
+                                <Icon name="tabler:message-2" />
+                                <span class="font-semibold text-sm">{{ $t('Chat') }}</span>
+                            </button>
+
+                            <button @click="conversationType = 2" :class="conversationType == 2 ? 'dark:bg-white text-black' : ''"
+                                class="flex space-x-1 justify-center items-center text-center rounded-full p-2">
+                                <Icon name="tabler:briefcase" />
+                                <span class="font-semibold text-sm">{{ $t('Services') }}</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div
                     class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
-
+                    
                     <div v-if="UsersConversations.length > 0 || loadConversations"
                         v-for="userConversation in UsersConversations" :key="userConversation.id"
                         @click="getConversation(userConversation.user)"
@@ -249,6 +265,7 @@ const conversations = ref([])
 const selectedConversation = ref(null)
 const showMoreBtn = ref(false)
 const seeMoreLoading = ref(false)
+const conversationType = ref(1)
 
 
 definePageMeta({
@@ -261,7 +278,7 @@ const getConversationsData = async () => {
 
     try {
         const conversationsCollection = collection($db, "conversations")
-        const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid), orderBy("last_message.created_at", "desc"), where("type", "==", 1))
+        const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid), orderBy("last_message.created_at", "desc"), where("type", "==", conversationType.value))
 
         conversations.value = []
         onSnapshot(q, async (querySnapshot) => {
@@ -281,7 +298,6 @@ const getConversationsData = async () => {
 
                 let arrayConversationIds = []
                 let arrayConversations = []
-                console.log(conversationIds.value.length);
 
                 arrayConversationIds = conversationIds.value.slice(0, 10)
                 arrayConversations = conversations.value.slice(0, 10)
@@ -327,19 +343,24 @@ const fetchMoreUsersConversations = async () => {
 
 const getConversation = async (user) => {
     selectedUser.value = user;
-    const conversationID = await getOrCreateConversation(user.id);
-    selectedConversation.value = conversationID
+    const conversationID = await getOrCreateConversation(user.id, conversationType.value)
+    console.log(conversationID.conversationable);
+    
+    selectedConversation.value = conversationID?.id
+    messages.value = []
+    
     try {
         const messagesCollectionRef = collection($db, "conversations", selectedConversation.value, "messages");
         const messagesQuery = query(messagesCollectionRef, orderBy("created_at", "asc"));
 
         onSnapshot(messagesQuery, (snapshot) => {
             const messagesList = snapshot.docs.map((doc) => doc.data());
-
+            console.log(messagesList);
+            
             const filteredMessages = messagesList.filter(
                 (message) => message.sender_uid === selectedUser.value.firebase_uuid
-            );
-
+            )
+            
             const groupedMessages = messagesList.reduce((groups, message) => {
                 const date = new Date(message.created_at.seconds * 1000)
                     .toISOString()
@@ -349,7 +370,7 @@ const getConversation = async (user) => {
                 }
                 groups[date].push(message);
                 return groups;
-            }, {});
+            }, {})
 
 
             if (filteredMessages.length > 0) {
@@ -360,7 +381,7 @@ const getConversation = async (user) => {
                 if (scrollContainer.value) {
                     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
                 }
-            });
+            })
         })
 
     } catch (error) {

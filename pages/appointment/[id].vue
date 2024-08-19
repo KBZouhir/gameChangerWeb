@@ -4,18 +4,27 @@
             <h2 class="text-2xl font-semibold text-center mb-6">
                 {{ $dayjs(appointment?.begin_at).format('dddd, MMMM D') }}
             </h2>
-            {{ appointment?.room_link }}
+
             <div
                 class="w-full p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt=""
                     srcset="">
                 <div class="flex items-start justify-between mt-1">
-                    <div class="flex flex-col items-center mx-auto">
+                    <div v-if="appointment?.is_requested_by_me" class="flex flex-col items-center mx-auto">
                         <UAvatar class="mb-2" :src="appointment?.user.image_url" :alt="appointment?.user.full_name"
                             size="3xl" />
 
                         <div class="flex flex-col">
                             <h4 class="font-bold mb-0">{{ appointment?.user.full_name }}</h4>
+                        </div>
+                    </div>
+
+                    <div v-else class="flex flex-col items-center mx-auto">
+                        <UAvatar class="mb-2" :src="appointment?.requester.image_url" :alt="appointment?.requester.full_name"
+                            size="3xl" />
+
+                        <div class="flex flex-col">
+                            <h4 class="font-bold mb-0">{{ appointment?.requester.full_name }}</h4>
                         </div>
                     </div>
 
@@ -54,7 +63,7 @@
                     </div>
                 </dl>
 
-                <div v-if="appointmentStatus(appointment) == 'waiting'" class="grid grid-cols-4 gap-6 mb-4">
+                <div v-if="appointmentStatus(appointment) == 'waiting'  && !readyTojoin" class="grid grid-cols-4 gap-6 mb-4">
                     <div class="flex flex-col">
                         <span
                             class="p-1 bg-green-400 text-primary text-sm text-center font-semibold rounded-md rounded-b-none">DAYS</span>
@@ -104,6 +113,18 @@
                     </div>
                 </div>
 
+                <div v-if="appointmentStatus(appointment) == 'expired'"
+                    class="rounded-md dark:bg-red-600 border border-red-800 bg-red-100 p-4">
+                    <div class="flex items-center dark:text-white text-red-800">
+                        <Icon name="tabler:info-circle" />
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium ">
+                                {{ $t('You missed this appointment') }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
                 <div v-if="appointment?.rejected_at" class="text-red-600">
                     <label class="font-semibold">Rejection reason</label>
                     <p>{{ appointment?.rejected_reason }}</p>
@@ -116,15 +137,28 @@
 
 
                 <UDivider label="" />
+
                 <!-- Accept or reject -->
-                <div v-if="appointmentStatus(appointment) == 'Pending'" class="grid grid-cols-2 space-x-2">
+                <div v-if="appointmentStatus(appointment) == 'Pending' && user.id != appointment.requester.id" class="grid grid-cols-2 space-x-2">
                     <UButton @click="rejectAppointmentModal = true" block label="Reject" color="red" size="lg" />
                     <UButton @click="acceptAppointmentFun" block label="Accept" color="green" size="lg" />
                 </div>
 
-                <!-- Accept or reject -->
-                <div v-if="appointmentStatus(appointment) == 'waiting'" class="grid grid-cols-1 space-x-2">
+                <!-- Cancel before start -->
+                <div v-if="appointmentStatus(appointment) == 'waiting' && !readyTojoin" class="grid grid-cols-1 space-x-2">
                     <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
+                </div>  
+
+                <!-- Start or cancel -->
+                <div v-if="appointmentStatus(appointment) == 'waiting' && !appointment.is_requested_by_me && readyTojoin" class="grid grid-cols-2 space-x-2">
+                    <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
+                    <UButton @click="acceptAppointmentFun" block label="Start" color="green" size="lg" />
+                </div>
+
+                <!-- requster join or cancel -->
+                <div v-if="appointmentStatus(appointment) == 'waiting' && appointment.is_requested_by_me && readyTojoin" class="grid grid-cols-2 space-x-2">
+                    <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
+                    <UButton @click="acceptAppointmentFun" block label="Start" :disabled="!appointment.room_opened_at && appointment.is_requested_by_me" color="green" size="lg" />
                 </div>
 
             </div>
@@ -192,7 +226,9 @@
 <script setup>
 import { getAppointment, acceptAppointment, rejectAppointment, cancelAppointment } from '~/composables/store/useAppointment'
 import { handleApiError } from '~/composables/useApiError'
+import { useAuthStore } from "~/stores/authStore"
 
+const authStore = useAuthStore()
 const appointment = ref()
 const rejectAppointmentModal = ref(false)
 const cancelAppointmentModal = ref(false)
@@ -205,10 +241,15 @@ const seconds = ref(0);
 const now = ref();
 const targetDate = ref()
 const readyTojoin = ref(false)
+
 let interval
 
 const route = useRoute()
 const id = route.params.id
+
+const user = computed(() => authStore.getAuthUser)
+
+const duration = ref(15)
 
 
 definePageMeta({
@@ -222,10 +263,11 @@ const rejected_reason = ref()
 const cancel_reason = ref()
 
 const calculateTimeLeft = () => {
-    if (appointmentStatus(appointment.value) == 'waiting') {
+    if (true) {
         const totalSeconds = targetDate.value.diff(now.value, 'second')
+        
         if (totalSeconds < 0) {
-            interval.clearInterval()
+            roomStarted()
             readyTojoin.value = true
         } else {
             days.value = (Math.floor(totalSeconds / (60 * 60 * 24)) < 0) ? 0 : Math.floor(totalSeconds / (60 * 60 * 24))
@@ -257,8 +299,6 @@ const appointmentStatus = (object) => {
     if (object) {
         const { status: jsonStatus, begin_at, end_at, room_opened_at, room_closed_at, is_requested_by_me } = object;
 
-        // targetDate.value = dayjs(begin_at)
-        // Convert times to UTC
         const beginAt = dayjs.utc(begin_at);
         const endAt = dayjs.utc(end_at);
         const roomOpenedAt = room_opened_at ? dayjs(room_opened_at).utc() : null;
@@ -297,6 +337,18 @@ const appointmentStatus = (object) => {
 
         return status;
     }
+}
+
+const roomStarted = () => {
+    const { begin_at, end_at } = appointment?.value;
+    const beginAt = dayjs.utc(begin_at);
+    const endAt = dayjs.utc(end_at);
+    
+    if(endAt.diff(beginAt, 'minute') < duration.value){
+        readyTojoin.value = true
+    }else{
+        readyTojoin.value = false 
+    }    
 }
 
 const badgeType = (status) => {

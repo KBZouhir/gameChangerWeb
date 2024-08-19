@@ -136,3 +136,16 @@ export const cancelAppointment = async (id, payload) => {
     }
   }
 };
+
+
+export const getRoomToken = async (id) => {
+  
+  const { data, refresh, error, pending } = await useApi(
+    `appointments/${id}/stream`,
+    {
+      initialCache: false,
+      method: "GET",
+    }
+  )
+  console.log(data);
+};
