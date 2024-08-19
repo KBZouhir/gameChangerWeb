@@ -122,6 +122,11 @@
                     <UButton @click="acceptAppointmentFun" block label="Accept" color="green" size="lg" />
                 </div>
 
+                <!-- Accept or reject -->
+                <div v-if="appointmentStatus(appointment) == 'waiting'" class="grid grid-cols-1 space-x-2">
+                    <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
+                </div>
+
             </div>
 
             <nuxt-link to="/calendar">
@@ -131,7 +136,10 @@
             </nuxt-link>
 
         </div>
-        <div>
+
+        <!-- Reject Appointment Modal -->
+        <UModal v-model="rejectAppointmentModal">
+            <div>
                 <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
                     <template #header>
                         <h4 class="font-semibold">{{ $t('Are you sure you want to reject this appointment ?') }}</h4>
@@ -139,7 +147,7 @@
 
                     <div class="flex flex-col space-y-2">
                         <label for="reject_reason">Reject reason</label>
-                        <UTextarea id="reject_reason" :rows="8" v-model="state.rejected_reason" />
+                        <UTextarea id="reject_reason" :rows="8" v-model="rejected_reason" />
                     </div>
 
                     <template #footer>
@@ -151,19 +159,43 @@
                     </template>
                 </UCard>
             </div>
-        <!-- Reject Appointment Modal -->
-        <!-- <UModal v-model="rejectAppointmentModal">
-            
-        </UModal> -->
+        </UModal>
+
+        <!-- Cancel Appointment Modal -->
+        <UModal v-model="cancelAppointmentModal">
+            <div>
+                <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                    <template #header>
+                        <h4 class="font-semibold">{{ $t('Are you sure you want to cancel this appointment ?') }}</h4>
+                    </template>
+
+                    <div class="flex flex-col space-y-2">
+                        <label for="reject_reason">Cancel reason</label>
+                        <UTextarea id="reject_reason"
+                            :placeholder="`Tell Big ben why you want to cancel this appointment`" :rows="8"
+                            v-model="cancel_reason" />
+                    </div>
+
+                    <template #footer>
+                        <div class="grid grid-cols-2 space-x-2">
+                            <UButton @click="cancelAppointmentModal = false" variant="link" block label="Cancel"
+                                :color="$colorMode.value == 'dark' ? 'green' : 'primary'" size="lg" />
+                            <UButton @click="cancelAppointmentFun" block label="Confirm" color="red" size="lg" />
+                        </div>
+                    </template>
+                </UCard>
+            </div>
+        </UModal>
     </div>
 </template>
 
 <script setup>
-import { getAppointment, acceptAppointment, rejectAppointment } from '~/composables/store/useAppointment'
+import { getAppointment, acceptAppointment, rejectAppointment, cancelAppointment } from '~/composables/store/useAppointment'
 import { handleApiError } from '~/composables/useApiError'
 
 const appointment = ref()
 const rejectAppointmentModal = ref(false)
+const cancelAppointmentModal = ref(false)
 const form = ref()
 const dayjs = useDayjs()
 const days = ref(0);
@@ -172,7 +204,8 @@ const minutes = ref(0);
 const seconds = ref(0);
 const now = ref();
 const targetDate = ref()
-let interval;
+const readyTojoin = ref(false)
+let interval
 
 const route = useRoute()
 const id = route.params.id
@@ -185,19 +218,24 @@ definePageMeta({
 })
 
 
-const state = reactive(
-    {
-        'rejected_reason': ''
-    }
-)
+const rejected_reason = ref()
+const cancel_reason = ref()
 
 const calculateTimeLeft = () => {
-    const totalSeconds = targetDate.value.diff(now.value, 'second');
-    days.value = Math.floor(totalSeconds / (60 * 60 * 24))
-    hours.value = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60))
-    minutes.value = Math.floor((totalSeconds % (60 * 60)) / 60)
-    seconds.value = totalSeconds % 60
-};
+    if (appointmentStatus(appointment.value) == 'waiting') {
+        const totalSeconds = targetDate.value.diff(now.value, 'second')
+        if (totalSeconds < 0) {
+            interval.clearInterval()
+            readyTojoin.value = true
+        } else {
+            days.value = (Math.floor(totalSeconds / (60 * 60 * 24)) < 0) ? 0 : Math.floor(totalSeconds / (60 * 60 * 24))
+            hours.value = (Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60)) < 0) ? 0 : Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60))
+            minutes.value = (Math.floor((totalSeconds % (60 * 60)) / 60) < 0) ? 0 : Math.floor((totalSeconds % (60 * 60)) / 60)
+            seconds.value = (totalSeconds % 60 < 0) ? 0 : totalSeconds % 60
+        }
+
+    }
+}
 
 const getDataFromApi = async () => {
     const result = await getAppointment(id)
@@ -218,26 +256,26 @@ const appointmentStatus = (object) => {
 
     if (object) {
         const { status: jsonStatus, begin_at, end_at, room_opened_at, room_closed_at, is_requested_by_me } = object;
-       
-        targetDate.value = dayjs(begin_at)
+
+        // targetDate.value = dayjs(begin_at)
         // Convert times to UTC
         const beginAt = dayjs.utc(begin_at);
         const endAt = dayjs.utc(end_at);
         const roomOpenedAt = room_opened_at ? dayjs(room_opened_at).utc() : null;
         const roomClosedAt = room_closed_at ? dayjs(room_closed_at).utc() : null;
 
-        
+        targetDate.value = beginAt
 
         const appointmentStatusEnumMap = ["Accepted", "Pending", "Refused", "Canceled_before", "Canceled"];
         let status = appointmentStatusEnumMap[jsonStatus - 1];
 
         const duration = 15;
         const now = dayjs.utc()
-        
+
         if (status === "Accepted") {
             const timeToBegin = beginAt.diff(now, 'minute');
             const timeToEnd = endAt.diff(now, 'minute');
-            
+
             if (timeToBegin < duration) {
                 if (timeToEnd < 0) {
                     status = roomOpenedAt ? "ended" : "expired";
@@ -277,28 +315,44 @@ const badgeType = (status) => {
 
 const acceptAppointmentFun = async () => {
     const result = await acceptAppointment(appointment.value?.id)
-    console.log(result);
-
+    if (result?.success) {
+        appointment.value = result?.appointment
+    }
 }
 
 const rejectAppointmentFun = async () => {
-    const result = await rejectAppointment(appointment.value?.id, state)
-    if (result.success) {
+    const data = { rejected_reason: rejected_reason.value }
 
+    const result = await rejectAppointment(appointment.value?.id, data)
+    if (result?.success) {
+        appointment.value = result?.appointment
     } else {
         if (result.error.statusCode == 422) {
             const error = handleApiError(result.error);
             form.value.setErrors(error.errors);
         }
     }
+}
 
+const cancelAppointmentFun = async () => {
+    const data = { rejected_reason: cancel_reason.value }
+
+    const result = await cancelAppointment(appointment.value?.id, data)
+    if (result.success) {
+        appointment.value = result?.appointment
+    } else {
+        if (result.error.statusCode == 422) {
+            const error = handleApiError(result.error);
+            form.value.setErrors(error.errors);
+        }
+    }
 }
 
 onMounted(() => {
-  interval = setInterval(() => {
-    now.value = dayjs();
-    calculateTimeLeft();
-  }, 1000);
+    interval = setInterval(() => {
+        now.value = dayjs();
+        calculateTimeLeft();
+    }, 1000);
 });
 
 watchEffect(() => {

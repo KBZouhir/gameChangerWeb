@@ -24,12 +24,8 @@
                         @click="getConversation(userConversation.user)"
                         :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
                         class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-100 dark:hover:bg-slate-800 ">
-                        <div
-                            class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
-                            <img v-if="userConversation.user.image_url" class="rounded-full object-cover w-full h-full"
-                                :src="userConversation.user.image_url" alt="avatar">
-                            <UAvatar v-else :alt="userConversation.user.full_name" size="sm" />
-                        </div>
+                        <UAvatar :src="userConversation.user.image_url" :alt="userConversation.user.full_name"
+                            size="md" />
                         <div class="flex flex-1 flex-col">
                             <div class="flex items-baseline justify-between space-x-1.5">
                                 <p
@@ -42,11 +38,17 @@
                             <div class="mt-1 flex items-center justify-between space-x-1">
                                 <p class="line-clamp-1 text-xs text-slate-400 dark:text-navy-300">
                                     <span
-                                        v-if="userConversation.conversation.last_message.sender_uid == user.firebase_uuid">You:
+                                        v-if="(userConversation.conversation.last_message.sender_uid == user.firebase_uuid) && userConversation.conversation.last_message.content != null">You:
                                     </span>
-                                    <span
+                                    <span v-if="userConversation.conversation.last_message.content != null"
                                         :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : ''">
                                         {{ userConversation.conversation.last_message.content }}
+                                    </span>
+                                    <span v-if="userConversation.conversation.last_message?.attachments"
+                                        :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : 'italic '">
+                                        {{ userConversation.conversation.last_message?.attachments[0].type == 'image' ?
+                                            'You sent a picture' : 'You sent a video'
+                                        }}
                                     </span>
                                 </p>
                             </div>
@@ -219,7 +221,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-    import { collection, addDoc, query, doc, where, updateDoc, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
+import { collection, addDoc, query, doc, where, updateDoc, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
 import { useAuthStore } from '~/stores/authStore';
 import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation'
 import { useConversationStore } from '~/stores/conversations'
@@ -260,6 +262,7 @@ const getConversationsData = async () => {
     try {
         const conversationsCollection = collection($db, "conversations")
         const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid), orderBy("last_message.created_at", "desc"), where("type", "==", 1))
+
         conversations.value = []
         onSnapshot(q, async (querySnapshot) => {
             conversations.value = []
@@ -267,20 +270,25 @@ const getConversationsData = async () => {
                 conversations.value.push({ id: doc.id, ...doc.data() })
             })
 
+
             conversationIds.value = conversations.value.map(
                 (conversation) => conversation.id
             )
 
+
             if (conversationIds.value.length > 0) {
+
+
                 let arrayConversationIds = []
                 let arrayConversations = []
-                if (conversationIds.value.length > 10) {
-                    arrayConversationIds = conversationIds.value.slice(0, 10)
-                    arrayConversations = conversations.value.slice(0, 10)
-                    showMoreBtn.value = true
-                    page.value += 1
-                }
-                
+                console.log(conversationIds.value.length);
+
+                arrayConversationIds = conversationIds.value.slice(0, 10)
+                arrayConversations = conversations.value.slice(0, 10)
+                showMoreBtn.value = true
+                page.value += 1
+
+
                 await getConversations(arrayConversationIds, arrayConversations, false)
             }
             loadConversations.value = true
@@ -303,7 +311,7 @@ const fetchMoreUsersConversations = async () => {
         try {
             const arrayConversationIds = conversationIds.value.slice((page.value - 1) * 10, page.value * 10)
             const result = await getConversations(arrayConversationIds, conversations.value, true);
-            if (result.length < 10) {
+            if (result?.length < 10) {
                 hasMore.value = false
                 showMoreBtn.value = false
             } else {
@@ -327,6 +335,11 @@ const getConversation = async (user) => {
 
         onSnapshot(messagesQuery, (snapshot) => {
             const messagesList = snapshot.docs.map((doc) => doc.data());
+
+            const filteredMessages = messagesList.filter(
+                (message) => message.sender_uid === selectedUser.value.firebase_uuid
+            );
+
             const groupedMessages = messagesList.reduce((groups, message) => {
                 const date = new Date(message.created_at.seconds * 1000)
                     .toISOString()
@@ -338,7 +351,10 @@ const getConversation = async (user) => {
                 return groups;
             }, {});
 
-            messages.value = groupedMessages;
+
+            if (filteredMessages.length > 0) {
+                messages.value = groupedMessages
+            }
 
             nextTick().then(() => {
                 if (scrollContainer.value) {

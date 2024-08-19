@@ -92,6 +92,7 @@ export const acceptAppointment = async (id) => {
 };
 
 export const rejectAppointment = async (id, payload) => {
+  
   const { data, refresh, error, pending } = await useApi(
     `appointments/${id}/reject`,
     {
@@ -99,16 +100,39 @@ export const rejectAppointment = async (id, payload) => {
       body: payload,
       method: "PUT",
     }
-  );
+  )
   if (data) {
     return {
       success: true,
       data,
-    };
+    }
   } else {
     return {
       success: false,
       error,
-    };
+    }
+  }
+};
+
+export const cancelAppointment = async (id, payload) => {
+  
+  const { data, refresh, error, pending } = await useApi(
+    `appointments/${id}/cancel`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "PUT",
+    }
+  )
+  if (data) {
+    return {
+      success: true,
+      data,
+    }
+  } else {
+    return {
+      success: false,
+      error,
+    }
   }
 };
