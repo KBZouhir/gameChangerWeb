@@ -77,9 +77,11 @@ const login = async (payload) => {
     body: cleanData,
     method: "POST",
   });
+  
+  const { user } = await $signInWithEmailAndPassword($auth, payload.email, payload.password);
 
-  const {user} = await $signInWithEmailAndPassword($auth, payload.email, payload.password);
-
+  console.log(user.uid);
+  
 
  
   if (data) {
