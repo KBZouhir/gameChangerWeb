@@ -7,50 +7,54 @@
             </div>
             <div v-if="readMore" v-html="htmlDescription"></div>
 
-            <div class="text-xs dark:text-white text-primary-500 underline cursor-pointer flex justify-start mt-2">
+            <div class="text-xs text-green-500 font-bold cursor-pointer flex justify-start mt-2">
                 <a class="my-50 mb-1" @click="toggleReadMore" v-if="!readMore">
-                    See more
+                    Show more
                 </a>
                 <a class="my-50 mb-1" v-if="readMore" @click="toggleReadMore">
-                    See less
+                    Show less
                 </a>
             </div>
         </div>
 
-        <div v-else v-html="description"></div>
+        <div v-else v-html="displayDescription"></div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, toRefs } from 'vue'
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     description: String,
     number: Number,
     htmlContent: {
-        type: String,
+        type: Boolean,
         required: false,
         default: true
     }
-})
+});
 
-const readMore = ref(false)
+const readMore = ref(false);
 
 const removeHtmlTags = (htmlString) => {
-  return htmlString.replace(/<\/?[^>]+(>|$)/g, "")
-}
+    return htmlString.replace(/<\/?[^>]+(>|$)/g, "");
+};
 
-const displayDescription = computed(() =>{
-    if(props.htmlContent){
-        return removeHtmlTags(props.description)
-    }else{
-        return props.description
-    }
-})
-const htmlDescription = computed(() => props.description.replaceAll('<br>', ''))
+const extractHashtags = (text) => {
+    return text.replace(/(#[a-zA-Z0-9_]+)/g, '<span class="text-green-400 font-semibold">$1</span>');
+};
+
+const displayDescription = computed(() => {
+    let descriptionText = props.htmlContent ? removeHtmlTags(props.description) : props.description;
+    return extractHashtags(descriptionText);
+});
+
+const htmlDescription = computed(() => {
+    return extractHashtags(props.description.replaceAll('<br>', ''));
+});
 
 const toggleReadMore = () => {
-    readMore.value = !readMore.value
-}
-
+    readMore.value = !readMore.value;
+};
 </script>
+

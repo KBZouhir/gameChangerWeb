@@ -6,13 +6,14 @@
     <NuxtSnackbar />
     <PartialsAuthNavbar />
 
-    <div class="relative flex-1 ">
+    <div class="relative flex-1 z-50">
 
       <div class="relative">
+
         <NuxtPage />
       </div>
     </div>
-
+    <UNotifications class="z-10"/>
     <!-- <img class="absolute top-0 right-0 z-10" :src="yellowBlurEffect" alt="" srcset=""> -->
 
   </div>
@@ -21,7 +22,12 @@
 <script setup>
 import greenBlurEffect from '~/assets/img/green-blur-effect.png'
 import yellowBlurEffect from '~/assets/img/yellow-blur-effect.png'
+
 import { registerToken } from '~/composables/store/useApiAuth'
+
+
+const toast = useToast()
+
 
 const { $messaging, $getToken, $onMessage } = useNuxtApp()
 
@@ -51,16 +57,24 @@ const requestPermission = async () => {
   }
 }
 
-const RegisterFCMToken =  async (token) => {
-  const result = await registerToken({device_token: token})
+const RegisterFCMToken = async (token) => {
+  await registerToken({ device_token: token })
 }
 
 onMounted(() => {
   requestPermission()
-
+    
   $onMessage($messaging, (payload) => {
     console.log("Message on Clinet ", payload);
-    
+
+    toast.add({
+      id: payload.notification.messageId,
+      description: payload.notification.body,
+      avatar: { src: payload.data.image_url },
+      icon: 'i-octicon-desktop-download-24',
+      color: "primary",
+      timeout:"3000"
+    })
   })
 })
 

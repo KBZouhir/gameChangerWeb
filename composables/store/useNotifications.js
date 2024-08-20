@@ -9,16 +9,16 @@ export const getNotifications = async () => {
     method: "GET",
   });
 
- store.setNotifications(data.data);
+ store.setNotifications(data);
 };
 
 export const markAllAsRead = async () => {
-  const { data, refresh, error, pending } = await useApi(`notifications`, {
+  const { data, refresh, error, pending } = await useApi(`notifications/mark-all-as-read`, {
     initialCache: false,
     method: "POST",
   });
 
-
+  return data
 };
 
 export const markAsRead = async (id) => {
@@ -26,7 +26,7 @@ export const markAsRead = async (id) => {
     initialCache: false,
     method: "POST",
   });
-
+  return data
 };
 
 export const deleteNotification = async (id) => {
@@ -34,7 +34,7 @@ export const deleteNotification = async (id) => {
     initialCache: false,
     method: "DELETE",
   });
-
+  return data
 };
 
 export const unreadNotificationsCount = async () => {

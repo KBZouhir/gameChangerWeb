@@ -56,7 +56,7 @@ onMounted(async () => {
     return
   }
 
-  // Fetch the poster image as a blob and set it as the poster URL
+
   const posterBlobUrl = await fetchPosterAsBlob(props.poster)
   poster.value = posterBlobUrl
 
@@ -66,11 +66,11 @@ onMounted(async () => {
     responsive: true,
     fluid: true
   })  
-  console.log(player);
+
   
   player.ready(() => {
 // Ensure VHS is available
-const vhsOptions = player.tech()?.vhs || player.tech()?.hls; // Some environments might use .hls instead of .vhs
+const vhsOptions = player.tech()?.vhs || player.tech()?.hls;
     
     if (vhsOptions) {
       vhsOptions.xhr.beforeRequest = (options) => {

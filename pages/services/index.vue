@@ -65,7 +65,9 @@
                     </div>
                 </template>
                 <template v-if="services?.data?.length > 0" #complete>
-                    <span>No more data found!</span>
+                    <div class="flex justify-center my-4">
+                        <span>No more data found!</span>
+                    </div>
                 </template>
             </InfiniteLoading>
         </div>

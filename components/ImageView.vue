@@ -12,6 +12,7 @@
 
 <script setup>
 import FsLightbox from "fslightbox-vue/v3"
+import { get, getImagebyID } from '~/composables/store/useMedia'
 
 const colorMode = useColorMode()
 const userAccessToken = useCookie('user_access_token')
@@ -38,35 +39,36 @@ const openLightboxOnSlide = () => {
     toggler.value = !toggler.value;
 }
 
-const fetchImageAsBlob = async (url) => {
-  if (!url) return ''
+// const fetchImageAsBlob = async (url) => {
+//   if (!url) return ''
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${userAccessToken.value}`
-      }
-    })
-    if (!response.ok) {
-      console.error('Failed to fetch poster image')
-      return ''
-    }
-    const blob = await response.blob()
-    return URL.createObjectURL(blob)
-  } catch (error) {
-    console.error('Error fetching poster image:', error)
-    return ''
-  }
-}
-
-
+//   try {
+//     const response = await fetch(url, {
+//       headers: {
+//         Authorization: `Bearer ${userAccessToken.value}`
+//       }
+//     })
+//     if (!response.ok) {
+//       console.error('Failed to fetch poster image')
+//       return ''
+//     }
+//     const blob = await response.blob()
+//     return URL.createObjectURL(blob)
+//   } catch (error) {
+//     console.error('Error fetching poster image:', error)
+//     return ''
+//   }
+// }
 
 onMounted(async () => {
     let blob
     if (props.url) {
-        imageSrc.value = await fetchImageAsBlob(props.url)
+        blob = await get(props.url)
     } else {
-        imageSrc.value = await fetchImageAsBlob(props.id)
+        blob = await getImagebyID(props.id)
+    }
+    if (blob) {
+        imageSrc.value = URL.createObjectURL(blob)
     }
 })
 </script>
