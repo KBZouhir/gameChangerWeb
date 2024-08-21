@@ -2699,6 +2699,11 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.4.36.tgz#7551f41684966acb6a307152b49a8308e7f69203"
   integrity sha512-fdPLStwl1sDfYuUftBaUVn2pIrVFDASYerZSrlBvVBfylObPA1gtcWJHy5Ox8jLEJ524zBibss488Q3SZtU1uA==
 
+"@vueform/multiselect@^2.6.9":
+  version "2.6.9"
+  resolved "https://registry.yarnpkg.com/@vueform/multiselect/-/multiselect-2.6.9.tgz#9b6a70d94679a0ea9c8903a8ede95bf53dc768ac"
+  integrity sha512-eW+pMaWFGnK+WGvUPcB/mEwLx/5Y4VB8wRFGFQZ9c5Wi+K/xFrm/nQ/NbtrFQUcX0nbuQWKYnFBmwa5MENGQxw==
+
 "@vuepic/vue-datepicker@^9.0.1":
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/@vuepic/vue-datepicker/-/vue-datepicker-9.0.1.tgz#be602a7b0661bfb77c8b4d488c4b0132df8df8c4"

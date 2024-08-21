@@ -78,9 +78,9 @@ const login = async (payload) => {
     method: "POST",
   });
   
-  const { user } = await $signInWithEmailAndPassword($auth, payload.email, payload.password);
+  // const { user } = await $signInWithEmailAndPassword($auth, payload.email, payload.password);
 
-  console.log(user.uid);
+  // console.log(user.uid);
   
 
  

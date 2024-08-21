@@ -19,6 +19,7 @@
     "@pinia/nuxt": "^0.5.1",
     "@samk-dev/nuxt-vcalendar": "^1.0.4",
     "@sipec/vue3-tags-input": "^3.0.4",
+    "@vueform/multiselect": "^2.6.9",
     "@vuepic/vue-datepicker": "^9.0.1",
     "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.7.2",

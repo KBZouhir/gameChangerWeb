@@ -6,7 +6,7 @@
     <NuxtSnackbar />
     <PartialsAuthNavbar />
 
-    <div class="relative flex-1 z-50">
+    <div class="relative flex-1 z-20">
 
       <div class="relative">
 
