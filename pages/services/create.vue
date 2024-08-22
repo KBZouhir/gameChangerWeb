@@ -26,7 +26,7 @@
                         </div>
 
                         <SelectDomain v-model="state.domains"/>
-
+                        <p v-show="keyExists('domain') && compressedFiles.length <= 0"class="text-red-500 text-[10px]">{{ getErrorMessage('domain') }}</p>
                         <UFormGroup label="Image" name="image">
                             <UInput ref="inputFileImage" type="file" :class="(keyExists('image') && compressedFiles.length <= 0) ? `border border-red-500 rounded-lg` : ``" accept="image/*" @change="onImageFileChange" size="lg"
                                 icon="i-heroicons-folder" />

@@ -79,8 +79,19 @@
                     </div>
 
                     <SelectDomain v-model="state.domains" />
+                    <p v-show="keyExists('domain') "class="text-red-500 text-[10px]">{{ getErrorMessage('domain') }}</p>
+
                     <UFormGroup label="Internal animators" name="price">
-                        <MultiselectCom :items="users" v-model="state.internal_animators" :checkInfiniteScroll="true" />
+                        <!-- <MultiselectCom :items="users" v-model="state.internal_animators" :checkInfiniteScroll="true" /> -->
+                        <USelectMenu v-model="state.internal_animators" searchable
+                            searchable-placeholder="Search a person..." multiple :options="users" size="lg">
+                            <template #label>
+                                <span v-if="state.internal_animators.length" class="truncate"> {{
+                                    state.internal_animators.map(animator => animator.label).join(', ') }}
+                                </span>
+                                <span v-else>Select people</span>
+                            </template>
+                        </USelectMenu>
                     </UFormGroup>
 
                     <UFormGroup label="Image" name="image">
@@ -123,7 +134,7 @@
                     </UButton>
                 </UForm>
             </div>
-
+           
             <div class="col-span-2 py-4 sticky top-0">
                 <div>
 
@@ -135,8 +146,9 @@
 </template>
 
 <script setup>
+import { createMasterClass } from '~/composables/store/useMasterClass'
 
-import VueDatePicker from '@vuepic/vue-datepicker';
+import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import imageCompression from 'browser-image-compression'
 
@@ -157,10 +169,18 @@ const langs = [
     },
 ]
 
-const users = computed(() => userStore.getUsers)
+const users = computed(() => {
+    let data = userStore.getUsers
+    return data?.data?.map(user => ({
+        id: user.id,
+        label: user.full_name
+    }));
+})
+
 const compressedFiles = ref([])
 const inputFileImage = ref(null)
 const errors = ref([])
+const dayjs = useDayjs()
 
 
 
@@ -243,17 +263,49 @@ const getErrorMessage = (key) => {
     return error ? error.value : ''
 }
 
+const convertTo12HourFormat = (dateTime, format) => {
+    const dayjs = useDayjs()
+    const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    return dayjs.utc(dateTime).tz(localTimezone).format(format)
+}
 
 const validationData = () => {
-    if(state.domains.length <= 0) {
+    errors.value = []
+    if (state.domains.length <= 0) {
         errors.value.push({ key: 'domain', value: 'Domains can not be empty' })
     }
 }
 
 const onSubmit = async () => {
     validationData()
-    
-    
+    let formData = new FormData()
+
+    for (const key in state) {
+        if (state.hasOwnProperty(key)) {
+            if (Array.isArray(state[key])) {
+                if (key === 'internal_animators') {
+                    state[key].forEach(item => {
+                        formData.append(`${key}[][user_id]`, (item?.id) ? item.id : item);
+                    })
+                } else {
+                    state[key].forEach(item => {
+                        formData.append(`${key}[]`, (item?.id) ? item.id : item);
+                    })
+                }
+            } else if (key === 'date') {
+                const formattedDate = convertTo12HourFormat(state[key], 'YYYY-MM-DD HH:mm:ss')
+                formData.append(key, formattedDate);
+            } else {
+                formData.append(key, state[key]);
+            }
+        }
+    }
+
+    if (compressedFiles.value[0].file) {
+        formData.append('image', compressedFiles.value[0].file)
+    }
+
+    const result = await createMasterClass(formData)
 
 }
 
