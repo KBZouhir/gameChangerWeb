@@ -24,7 +24,7 @@
                         </UFormGroup>
 
                         <UFormGroup label="Max attendees" name="max_attendees">
-                            <UInput v-model="state.max_attendees" v-only-positive-number size="lg" >
+                            <UInput v-model="state.max_attendees" v-only-positive-number size="lg">
                                 <template #trailing>
                                     <div class="flex items-center space-x-2 text-gray-500 dark:text-gray-400 text-md">
                                         <Icon name="tabler:users-group" />
@@ -78,11 +78,49 @@
                         </UFormGroup>
                     </div>
 
-                    <SelectDomain v-model="state.domains"/>
+                    <SelectDomain v-model="state.domains" />
                     <UFormGroup label="Internal animators" name="price">
-                        <MultiselectCom :items="users"/>
+                        <MultiselectCom :items="users" v-model="state.internal_animators" :checkInfiniteScroll="true" />
                     </UFormGroup>
-                   
+
+                    <UFormGroup label="Image" name="image">
+                        <UInput ref="inputFileImage" type="file"
+                            :class="(keyExists('image') && compressedFiles.length <= 0) ? `border border-red-500 rounded-lg` : ``"
+                            accept="image/*" @change="onImageFileChange" size="lg" icon="i-heroicons-folder" />
+                        <p v-show="keyExists('image') && compressedFiles.length <= 0" class="text-red-500 text-[10px]">
+                            {{ getErrorMessage('image') }}</p>
+                    </UFormGroup>
+                    <div v-if="compressedFiles.length > 0" class="my-4">
+                        <div
+                            class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
+                            <div v-for="(file, index) in compressedFiles" :key="index"
+                                class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
+                                <div class="w-full h-full overflow-hidden border-e">
+                                    <img :src="file.preview" alt="Selected Image" class="object-cover w-full h-full" />
+                                </div>
+                                <div v-if="file.progress < 100"
+                                    class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
+                                    <UButton loading :color="($colorMode.value != 'light') ? 'white' : 'primary'"
+                                        variant="link" disabled>
+                                        {{ $t('Compressing...') }}
+                                    </UButton>
+                                </div>
+                                <div
+                                    class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
+                                    <UButton @click="removeImage(index)" icon="i-heroicons-trash"
+                                        class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
+                                        size="2xs" color="primary" square variant="soft" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <UButton :loading="submitLoading" type="submit" label="Submit"
+                        class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                        size="md">
+                        <template #trailing>
+                            <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
+                        </template>
+                    </UButton>
                 </UForm>
             </div>
 
@@ -92,7 +130,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </template>
 
@@ -100,16 +138,30 @@
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import imageCompression from 'browser-image-compression'
 
 import { usersList } from '~/composables/store/useUser'
 import { useUserStore } from '~/stores/user'
-
+import fallbackImage from '~/assets/img/profile-cover.webp'
 
 const userStore = useUserStore()
 
-const langs = ['French', 'English']
+const langs = [
+    {
+        label: 'French',
+        value: 'fr'
+    },
+    {
+        label: 'English',
+        value: 'en'
+    },
+]
 
 const users = computed(() => userStore.getUsers)
+const compressedFiles = ref([])
+const inputFileImage = ref(null)
+const errors = ref([])
+
 
 
 definePageMeta({
@@ -132,8 +184,6 @@ const state = reactive({
     domains: [],
     internal_animators: [],
     external_animators: [],
-    image: undefined,
-    video_thumbnail: undefined
 })
 
 
@@ -146,12 +196,64 @@ watchEffect(() => {
 });
 
 
-const validationData = () => {
+const onImageFileChange = async (event) => {
 
+    for (const file of event) {
+        const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            fileType: 'image/webp',
+            onProgress: (progress) => {
+                const index = compressedFiles.value.findIndex(f => f.originalFile === file)
+                if (index !== -1) {
+                    compressedFiles.value[index].progress = progress
+                }
+            }
+        }
+
+        const newFileObj = { originalFile: file, progress: 0, preview: '' }
+        compressedFiles.value.push(newFileObj)
+
+        try {
+            const index = compressedFiles.value.findIndex(f => f.originalFile === file)
+            const preview = URL.createObjectURL(file)
+            compressedFiles.value[index].preview = preview
+            const compressedFile = await imageCompression(file, options)
+            compressedFiles.value[index].file = compressedFile
+        } catch (error) {
+            console.error('Error compressing file:', error);
+        }
+    }
+}
+
+const removeImage = (index) => {
+    compressedFiles.value.splice(index, 1);
+    if (compressedFiles.value.length === 0) {
+        inputFileImage.value.value = null;
+    }
+}
+
+const keyExists = (key) => {
+    return errors.value.some(error => error.key === key)
+}
+
+const getErrorMessage = (key) => {
+    const error = errors.value.find(error => error.key === key)
+    return error ? error.value : ''
+}
+
+
+const validationData = () => {
+    if(state.domains.length <= 0) {
+        errors.value.push({ key: 'domain', value: 'Domains can not be empty' })
+    }
 }
 
 const onSubmit = async () => {
-
+    validationData()
+    
+    
 
 }
 
