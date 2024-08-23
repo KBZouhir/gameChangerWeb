@@ -8,7 +8,7 @@ const { $auth, $RecaptchaVerifier } = useNuxtApp();
 definePageMeta({
     layout: 'guest',
     title: 'Login Page',
-    middleware: ['guest']
+    middleware: 'guest'
 })
 
 let showPassword = ref(false)

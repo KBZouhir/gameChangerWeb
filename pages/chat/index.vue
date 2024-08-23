@@ -35,7 +35,7 @@
                 <div
                     class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
                     
-                    <div v-if="UsersConversations.length > 0 || loadConversations"
+                    <div v-if="UsersConversations.length > 0 "
                         v-for="userConversation in UsersConversations" :key="userConversation.id"
                         @click="getConversation(userConversation)"
                         :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
@@ -73,7 +73,7 @@
 
                     </div>
 
-                    <template v-else>
+                    <template v-if="loadConversations">
                         <div v-for="i in 10"
                             class="flex items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
                             <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
@@ -84,7 +84,7 @@
                         </div>
                     </template>
 
-                    <template v-if="loadConversations && UsersConversations.length == 0">
+                    <template v-if="!loadConversations && UsersConversations.length == 0">
                         <div class="flex-1 justify-center flex items-center">
                             <div>
                                 <img class="w-32 mx-auto mb-4 dark:hidden flex"
@@ -275,7 +275,7 @@ definePageMeta({
 })
 
 const getConversationsData = async () => {
-    
+    loadConversations.value = true
     try {
         const conversationsCollection = collection($db, "conversations")
         const q = query(conversationsCollection, where("participants", "array-contains", user.value.firebase_uuid), orderBy("last_message.created_at", "desc"), where("type", "==", conversationType.value))
@@ -309,7 +309,7 @@ const getConversationsData = async () => {
             }else{
                 conversationStore.clearUsersConversations()
             }
-            
+            loadConversations.value = false
         })
     } catch (error) {
         console.error("Error fetching conversations:", error)

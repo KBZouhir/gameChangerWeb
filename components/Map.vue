@@ -115,4 +115,8 @@ onMounted(() => {
 .pac-container.hdpi{
     display: none !important;
 }
+
+.pac-container{
+    display: none !important;
+}
 </style>
