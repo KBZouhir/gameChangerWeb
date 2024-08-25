@@ -5,7 +5,7 @@
         </div>
         <div class="grid grid-cols-5 gap-4 w-full">
             <div class="col-span-3 py-4">
-                <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+                <UForm ref="form":schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                     <UFormGroup label="Title" name="title">
                         <UInput v-model="state.title" size="lg" autofocus />
                     </UFormGroup>
@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <UFormGroup label="Date" name="title">
+                        <UFormGroup label="Date" name="date">
                             <ClientOnly>
                                 <VueDatePicker v-model="state.date" auto-apply :min-date="new Date()"
                                     :dark="$colorMode.value == 'dark' ? true : false">
@@ -43,7 +43,7 @@
                             </ClientOnly>
                         </UFormGroup>
 
-                        <UFormGroup label="Duration" name="title">
+                        <UFormGroup label="Duration" name="duration">
                             <UInput v-model="state.duration" maxlength="3" v-only-positive-number="{ max: 120 }"
                                 size="lg">
                                 <template #trailing>
@@ -77,9 +77,10 @@
                             </UInput>
                         </UFormGroup>
                     </div>
-
-                    <SelectDomain v-model="state.domains" />
-                    <p v-show="keyExists('domain') "class="text-red-500 text-[10px]">{{ getErrorMessage('domain') }}</p>
+                    <UFormGroup label="" name="domains">
+                        <SelectDomain v-model="state.domains" />
+                    </UFormGroup>
+                    
 
                     <UFormGroup label="Internal animators" name="price">
                         <!-- <MultiselectCom :items="users" v-model="state.internal_animators" :checkInfiniteScroll="true" /> -->
@@ -147,14 +148,13 @@
 
 <script setup>
 import { createMasterClass } from '~/composables/store/useMasterClass'
-
+import { handleApiError } from '~/composables/useApiError'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import imageCompression from 'browser-image-compression'
 
 import { usersList } from '~/composables/store/useUser'
 import { useUserStore } from '~/stores/user'
-import fallbackImage from '~/assets/img/profile-cover.webp'
 
 const userStore = useUserStore()
 
@@ -181,6 +181,8 @@ const compressedFiles = ref([])
 const inputFileImage = ref(null)
 const errors = ref([])
 const dayjs = useDayjs()
+
+const form = ref()
 
 
 
@@ -263,10 +265,9 @@ const getErrorMessage = (key) => {
     return error ? error.value : ''
 }
 
-const convertTo12HourFormat = (dateTime, format) => {
+const convertTimeToUTC= (dateTime, format) => {
     const dayjs = useDayjs()
-    const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    return dayjs.utc(dateTime).tz(localTimezone).format(format)
+    return dayjs.utc(dateTime).format(format)
 }
 
 const validationData = () => {
@@ -293,7 +294,7 @@ const onSubmit = async () => {
                     })
                 }
             } else if (key === 'date') {
-                const formattedDate = convertTo12HourFormat(state[key], 'YYYY-MM-DD HH:mm:ss')
+                const formattedDate = convertTimeToUTC(state[key], 'YYYY-MM-DD HH:mm:ss')
                 formData.append(key, formattedDate);
             } else {
                 formData.append(key, state[key]);
@@ -304,9 +305,18 @@ const onSubmit = async () => {
     if (compressedFiles.value[0].file) {
         formData.append('image', compressedFiles.value[0].file)
     }
-
+    
     const result = await createMasterClass(formData)
-
+    if (result?.success) {
+        // redicrect to masterclass
+    } else {
+        if (result.error.statusCode == 422) {
+            const error = handleApiError(result.error);
+            console.log(error);
+            
+            form.value.setErrors(error.errors);
+        }
+    }
 }
 
 

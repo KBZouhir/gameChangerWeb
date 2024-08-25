@@ -10,7 +10,7 @@
             <div class="py-6">
                 <div class="grid grid-cols-3 gap-4">
                     <div class="col-span-2">
-                        <h1 class="text-3xl text-white font-semibold mb-4">{{ service?.title }}</h1>
+                        <h1 class="text-3xl dark:text-white font-semibold mb-4">{{ service?.title }}</h1>
                         <div>
                             {{ service?.description  }}
                         </div>

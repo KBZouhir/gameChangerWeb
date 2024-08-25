@@ -1,10 +1,209 @@
 <template>
     <div class="max-w-screen-xl mx-auto py-4">
-        zaezaez
+
+
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-6 p-6">
+            <div class="md:col-span-4">
+                <div class="rounded-lg overflow-hidden mb-6 h-80">
+                    <img v-if="masterclass?.image_url" :src="masterclass?.image_url" draggable="false"
+                        class="w-full h-full object-cover" alt="" srcset="">
+                    <USkeleton class="w-full h-full" />
+                </div>
+
+                <UTabs :items="items" class="mb-8">
+                    <template #item="{ item }">
+                        <div v-if="item.key === 'general'">
+                            <div class="flex justify-between pt-6">
+                                <div>
+                                    <div class="flex items-center space-x-2 text-xs mb-4">
+                                        <span>By:</span>
+                                        <div class="flex items-center space-x-1">
+                                            <div class="w-4 h-4 rounded-full border dark:border-gray-500">
+                                                <img :src="masterclass?.user.image_url" alt="" srcset="">
+                                            </div>
+
+                                            <span>{{ masterclass?.user.full_name }}</span>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-8">
+                                        <h1 class="text-2xl font-bold">{{ masterclass?.title }}</h1>
+                                    </div>
+                                </div>
+                                <div
+                                    class="p-4 w-16 h-16 bg-green-400 text-black rounded-md flex flex-col justify-center items-center">
+                                    <p class="text-2xl font-semibold ">{{ $dayjs(masterclass?.date).format('DD') }}</p>
+                                    <p class="text-md font-semibold ">{{ $dayjs(masterclass?.date).format('MMM') }}</p>
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <h2 class="text-xl font-bold mb-2">Short description</h2>
+                                <p>{{ masterclass?.short_description }}</p>
+                            </div>
+
+                            <div>
+                                <h2 class="text-xl font-bold mb-2">Description</h2>
+                                <p v-html="masterclass?.full_description"></p>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4 my-4" v-if="item.key === 'animator'">
+                            <UCard class="relative" :ui="{ body: 'p-0' }" v-for="animator in masterclass?.animators ">
+                                <div class="h-44 overflow-hidden relative">
+                                    <img :src="fallbackImage" alt="" class="rounded-tr-lg rounded-tl-lg" srcset="">
+                                    <div
+                                        class="absolute top-0 left-0 bg-gradient-to-t from-black/80 to-transparent  opacity-80 w-full h-full">
+                                    </div>
+                                </div>
+                                <div class="p-4 -mt-16 flex items-center space-x-4 z-50 relative">
+                                    <UAvatar size="xl" class="border-2 border-slate-800"
+                                        :src="animator?.user?.image_url"
+                                        :alt="(animator.external_user_email ? animator.external_user_name : animator.user.full_name)" />
+                                    <div class="flex flex-col items-start">
+                                        <h2 class="font-bold capitalize text-white">
+                                            {{ animator.external_user_email ?
+                                                animator.external_user_name :
+                                                animator.user.full_name }}
+                                        </h2>
+
+                                    </div>
+                                </div>
+                                <span v-if="animator?.external_user_name"
+                                    class="inline-flex items-center top-2 left-2 absolute  rounded-md bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20">
+                                    External user
+                                </span>
+                                <span v-if="animator?.user"
+                                    class="inline-flex items-center top-2 left-2 absolute rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                                    Internal user
+                                </span>
+
+                            </UCard>
+                        </div>
+                    </template>
+
+                </UTabs>
+
+                <UDivider class="my-4" />
+                <div class="flex flex-wrap items-center ">
+                    <UBadge v-if="masterclass?.length <= 0" :label="`Domain ${i}`" color="white" size="xs"
+                        class="px-3 m-1 text-[10px]" v-for="i in 4" />
+                    <UBadge :label="domain.translated_name" color="white" size="xs" class="px-3 m-1 text-[10px] "
+                        v-for="domain in masterclass?.domains" />
+                </div>
+            </div>
+
+            <div class="md:col-span-2 sticky top-4">
+                <div v-if="masterclass"
+                    class="rounded-2xl overflow-hidden relative bg-white dark:bg-white/5 p-8 ring-2 ring-green-500 xl:p-10">
+                    <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                        class="w-12 absolute top-0 right-0" alt="" srcset="">
+                    <div class="flex items-center justify-between">
+                        <p class="mt-6 flex items-baseline gap-x-1">
+                            <span v-if="masterclass?.is_subscribed"
+                                class="text-4xl font-bold tracking-tight dark:text-white"><sup>$</sup>
+                                {{ masterclass?.price }}
+                            </span>
+                            <span v-if="!masterclass?.is_subscribed"
+                                class="text-4xl font-bold tracking-tight dark:text-white"><sup>$</sup>
+                                {{ masterclass?.subscribers_price }}
+                            </span>
+                        </p>
+
+                    </div>
+                    <UDivider class="my-4" />
+                    <ul role="list" class="mt-4 space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-6">
+                        <li class="flex items-center gap-x-3">
+                            <Icon name="tabler:calendar-event" />
+                            <span>Date :</span>
+                            <span class="font-bold">{{ $dayjs(masterclass?.date).format('D/M/YYYY hh:mm A') }}</span>
+                        </li>
+
+                        <li class="flex items-center gap-x-3">
+                            <Icon name="tabler:users" />
+                            <span>Places left :</span>
+                            <span class="font-bold" :class="masterclass?.places_left <= 5 ? 'text-red-600' : ''">{{
+                                masterclass?.places_left }} / {{ masterclass?.max_attendees }}</span>
+                        </li>
+
+                        <li class="flex items-center gap-x-3">
+                            <Icon name="tabler:language" />
+                            <span>Langage :</span>
+                            <span class="font-bold">{{ langage }}</span>
+                        </li>
+
+                        <li class="flex items-center gap-x-3">
+                            <Icon name="tabler:clock-hour-1" />
+                            <span>Duration :</span>
+                            <span class="font-bold">{{ masterclass?.duration }} min</span>
+                        </li>
+
+                    </ul>
+
+                    <UButton block :loading="submitLoading" size="lg"
+                        class="dark:bg-green-500 hidden disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
+                        v-if="!IsPassed" @click="subscribeUser" label="Subscribe" />
+
+                    
+                    <UButton block :disabled="true" :loading="submitLoading" size="lg"
+                        class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
+                        v-if="!IsPassed" @click="subscribeUser" :label="countdownLabel" />
+
+                    <div v-if="IsPassed" class="flex justify-center mt-4">
+                        <UDivider label="Masterclass end" />
+                    </div>
+                </div>
+                <USkeleton v-else class="w-full h-96" />
+            </div>
+        </div>
     </div>
+
 </template>
 
 <script setup>
+import { showMasterClass, subscribeMasterClass } from '~/composables/store/useMasterClass'
+import fallbackImage from '~/assets/img/profile-cover.webp'
+
+const route = useRoute()
+const id = route.params.id
+const masterclass = ref()
+const submitLoading = ref(false)
+const countdownLabel = ref('');
+const dayjs = useDayjs()
+const now = ref()
+
+const calculateCountdown = () => {
+    const totalSeconds = dayjs(masterclass.value?.date).diff(now.value, 'second')
+
+    const days = (Math.floor(totalSeconds / (60 * 60 * 24)) < 0) ? 0 : Math.floor(totalSeconds / (60 * 60 * 24))
+    const hours = (Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60)) < 0) ? 0 : Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60))
+    const minutes = (Math.floor((totalSeconds % (60 * 60)) / 60) < 0) ? 0 : Math.floor((totalSeconds % (60 * 60)) / 60)
+    const seconds = (totalSeconds % 60 < 0) ? 0 : totalSeconds % 60
+    countdownLabel.value = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+};
+
+let countdownInterval;
+
+const langage = computed(() => {
+    return langs.find(lang => lang.value === masterclass?.value?.lang)?.label
+})
+
+const IsPassed = computed(() => {
+    const masterclassDate = dayjs(masterclass.value.date).local()
+    const currentDate = dayjs()
+    return masterclassDate.isBefore(currentDate)
+})
+
+const items = [{
+    key: 'general',
+    label: 'General',
+    icon: 'i-heroicons-information-circle',
+}, {
+    key: 'animator',
+    label: 'Animators',
+    icon: 'i-heroicons-eye-dropper',
+}]
 
 definePageMeta({
     layout: 'auth',
@@ -12,5 +211,46 @@ definePageMeta({
     middleware: ['auth']
 })
 
+const langs = [
+    {
+        label: 'French',
+        value: 'fr'
+    },
+    {
+        label: 'English',
+        value: 'en'
+    },
+]
+
+const getDataFromApi = async () => {
+    const result = await showMasterClass(id)
+    if (result?.success) {
+        masterclass.value = result.data
+    }
+}
+
+watchEffect(() => {
+    getDataFromApi();
+})
+
+const subscribeUser = async () => {
+    submitLoading.value = true
+    const result = await subscribeMasterClass(id)
+    if (result) {
+        submitLoading.value = false
+        window.open(result, '_blank')
+    }
+}
+
+onMounted(() => {
+    setInterval(() => {
+        now.value = dayjs();
+        calculateCountdown();
+    }, 1000);
+})
+
+onUnmounted(() => {
+    clearInterval(countdownInterval);
+});
 
 </script>

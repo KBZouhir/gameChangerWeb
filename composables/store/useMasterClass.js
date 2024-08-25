@@ -1,12 +1,26 @@
 import { useApi } from "~/composables/useApi";
 import { useMasterClassStore } from '~/stores/masterclass'
+
 export const createMasterClass = async (payload) => {
+  
   const { data, refresh, error, pending } = await useApi(`masterclasses`, {
     initialCache: false,
     body: payload,
     method: "POST",
   });
-};
+
+  if (data) {
+    return {
+      success: true,
+      data,
+    }
+  } else {
+    return {
+      success: false,
+      error,
+    }
+  }
+}
 
 export const listMasterClass = async () => {
   const store = useMasterClassStore()
@@ -17,7 +31,7 @@ export const listMasterClass = async () => {
   store.setMasterClassList(data)
   console.log(data);
   
-};
+}
 
 export const showMasterClass = async (id) => {
   const { data, refresh, error, pending } = await useApi(
@@ -27,6 +41,8 @@ export const showMasterClass = async (id) => {
       method: "GET",
     }
   );
+
+  return data
 };
 
 export const subscribeMasterClass = async (id) => {
@@ -37,6 +53,9 @@ export const subscribeMasterClass = async (id) => {
       method: "GET",
     }
   );
+
+  return data;
+  
 };
 
 export const guestSubscribeMasterClass = async (id, payload) => {
