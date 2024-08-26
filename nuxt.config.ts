@@ -52,7 +52,6 @@ export default defineNuxtConfig({
     duration: 5000,
   },
 
-  plugins: [{ src: "~/plugins/vue-tags-input", mode: "client" }],
 
   tailwindcss: {
     config: {
@@ -108,12 +107,14 @@ export default defineNuxtConfig({
     vueI18n: "./i18n.config.ts",
   },
 
-  vite: {
-    optimizeDeps: {
-      include: ["@sipec/vue3-tags-input"],
-    },
-    ssr: {
-      noExternal: ["@sipec/vue3-tags-input"],
+  nitro: {
+    routeRules: {
+      '/**': {
+        headers: {
+          'Cross-Origin-Opener-Policy': 'same-origin',
+          'Cross-Origin-Embedder-Policy': 'require-corp',
+        },
+      },
     },
   },
 });
