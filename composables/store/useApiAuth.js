@@ -124,15 +124,16 @@ const completeProfile = async (payload) => {
 
 const logout = async () => {
   const authStore = useAuthStore();
+  const authCookie  = useCookie("user_access_token")
   const { data, refresh, error, pending } = await useApi(`/logout`, {
     initialCache: false,
     method: "POST",
   })
   
   if (data?.success) {
+    
     authStore.syncAuthUser(null)
     authStore.syncLoginState(false)
-    const authCookie  = useCookie("user_access_token")
     authCookie.value = null
   }
 };
@@ -151,6 +152,8 @@ async function useUser() {
     });
 
     if (error) {
+      const authCookie  = useCookie("user_access_token")
+      authCookie.value = null
       authStore.syncAuthUser(null);
     }
 

@@ -35,12 +35,12 @@
 <script>
 import daily from "@daily-co/daily-js";
 
-// import leave from "../assets/leave_call.svg";
-// import micOff from "../assets/mic_off.svg";
-// import micOn from "../assets/mic_on.svg";
-// import screenShare from "../assets/screenshare.svg";
-// import videoOff from "../assets/vid_off.svg";
-// import videoOn from "../assets/vid_on.svg";
+import leave from "~/assets/svg/icons/call.svg";
+import micOff from "~/assets/svg/icons/call.svg";
+import micOn from "~/assets/svg/icons/call.svg";
+import screenShare from "~/assets/svg/icons/call.svg";
+import videoOff from "~/assets/svg/icons/call.svg";
+import videoOn from "~/assets/svg/icons/call.svg";
 
 export default {
   name: "CallControls",

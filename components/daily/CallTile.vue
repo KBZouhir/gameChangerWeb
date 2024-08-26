@@ -52,7 +52,7 @@
 import daily from '@daily-co/daily-js';
 
 
-const props = defineProps(['leaveCall', 'name', 'roomUrl']);
+const props = defineProps(['leaveCall', 'name', 'roomUrl', 'token']);
 
 const callObject = ref(null);
 const participants = ref(null);
@@ -140,6 +140,7 @@ const leaveAndCleanUp = () => {
 onMounted(() => {
   const option = {
     url: props.roomUrl,
+    token: props.token
   };
 
   const co = daily.createCallObject(option);

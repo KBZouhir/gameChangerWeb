@@ -107,14 +107,14 @@ export default defineNuxtConfig({
     vueI18n: "./i18n.config.ts",
   },
 
-  nitro: {
-    routeRules: {
-      '/**': {
-        headers: {
-          'Cross-Origin-Opener-Policy': 'same-origin',
-          'Cross-Origin-Embedder-Policy': 'require-corp',
-        },
-      },
-    },
-  },
+  // nitro: {
+  //   routeRules: {
+  //     '/**': {
+  //       headers: {
+  //         'Cross-Origin-Opener-Policy': 'same-origin',
+  //         'Cross-Origin-Embedder-Policy': 'require-corp',
+  //       },
+  //     },
+  //   },
+  // },
 });

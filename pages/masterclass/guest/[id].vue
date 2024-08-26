@@ -28,7 +28,7 @@
                                     <div class="mb-8">
                                         <h1 class="text-2xl font-bold">{{ masterclass?.title }}</h1>
                                     </div>
-                                </div>
+                                </div>  
                                 <div
                                     class="p-4 w-16 h-16 bg-green-400 text-black rounded-md flex flex-col justify-center items-center">
                                     <p class="text-2xl font-semibold ">{{ $dayjs(masterclass?.date).format('DD') }}</p>
@@ -140,9 +140,9 @@
                             v-if="!IsPassed" @click="subscribeUser" label="Subscribe" />
 
 
-                        <UButton block :disabled="true" size="lg"
+                        <UButton block  @click="joinMasterClassModal = true" size="lg"
                             class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                            v-if="!IsPassed" :label="countdownLabel" />
+                            v-if="!IsPassed" label="Join" />
 
                         <UButton v-if="!IsPassed && (!paymentSuccess || paymentSuccess != 1)" block variant="outline"
                             color="green" :loading="submitLoading" size="lg" class="my-4" @click="subscribeUser"
@@ -160,7 +160,7 @@
 
                     </div>
 
-                    <UAlert icon="i-heroicons-check" color="green" variant="subtle" title="Payment successfully"
+                    <UAlert v-if="paymentSuccess" icon="i-heroicons-check" color="green" variant="subtle" title="Payment successfully"
                         description="Please check your email for the credentials to join the masterclass." />
                 </div>
 
@@ -211,7 +211,7 @@
                 <div class="flex flex-col items-center justify-center ">
                     <img class="w-1/3 flex dark:hidden" src="~/assets/svg/vectors/masterclass.svg" alt="">
                     <img class="w-1/3 hidden dark:flex" src="~/assets/svg/vectors/masterclass-white.svg" alt="">
-                    <h2 class="text-xl md:text-3xl font-bold">{{ $t('Subscribe to masterclass') }}</h2>
+                    <h2 class="text-xl md:text-3xl font-bold">{{ $t('Resend Credentials') }}</h2>
                     <p class="text-blueGray-900 dark:text-slate-300">{{ $t('login.please_log_in') }}</p>
                 </div>
 
@@ -235,12 +235,61 @@
                 </UForm>
             </UCard>
         </UModal>
-    </div>
 
+        <UModal v-model="joinMasterClassModal">
+            <UCard class="w-full p-0 pt-0 relative z-50 overflow-hidden">
+                <template #header>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                            {{ $t('Join to masterclass') }}
+                        </h3>
+                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1 z-50" @click="joinMasterClassModal = false" />
+                    </div>
+                </template>
+                <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                    class="w-12 absolute top-0 right-0" alt="" srcset="">
+                <div class="flex flex-col items-center justify-center ">
+                    <img class="w-1/3 flex dark:hidden" src="~/assets/svg/vectors/masterclass.svg" alt="">
+                    <img class="w-1/3 hidden dark:flex" src="~/assets/svg/vectors/masterclass-white.svg" alt="">
+                    <h2 class="text-xl md:text-3xl font-bold">{{ $t('Join to masterclass') }}</h2>
+                    <p class="text-blueGray-900 dark:text-slate-300">{{ $t('login.please_log_in') }}</p>
+                </div>
+
+                <UForm ref="form" :schema="externalUserJoinSchema" :state="externalUserJoinState"
+                    @submit="submitExternalUserJoin" class="mt-8 space-y-4 p-4">
+
+                    <UFormGroup label="Email" name="email">
+                        <UInput size="lg" type="email" v-model="externalUserJoinState.email" />
+                    </UFormGroup>
+
+                    <UFormGroup label="Password" name="password">
+                        <UInput size="lg" type="password" v-model="externalUserJoinState.password" />
+                    </UFormGroup>
+
+
+                    <div class="flex flex-col justify-between space-y-2">
+                        <UButton v-if="masterclassStarted && !IsPassed" block :loading="loadingSubmit" size="lg" :color="$colorMode.value == 'dark' ? 'green' : 'primary'" type="submit">
+                            {{ $t('Submit') }}
+                        </UButton>
+
+                        <UButton :disabled="true" v-if="!masterclassStarted && !IsPassed" block :loading="loadingSubmit" size="lg" :color="$colorMode.value == 'dark' ? 'green' : 'primary'" type="submit">
+                            Masterclass started: {{ countdownLabel }}
+                        </UButton>
+                    </div>
+                    <div v-if="!IsPassed">
+                            <UDivider label="" class="my-2" />
+                            <UButton block @click="{joinMasterClassModal= false;resendCredentialsModal = true;}" variant="link" color="green"
+                                label="Resend Credentials" />
+                        </div>
+                </UForm>
+            </UCard>
+        </UModal>
+
+    </div>
 </template>
 
 <script setup>
-import { showMasterClass, subscribeMasterClass, guestSubscribeMasterClass, resendExternalCredentials } from '~/composables/store/useMasterClass'
+import { showMasterClass, externalUserJoin, guestSubscribeMasterClass, resendExternalCredentials } from '~/composables/store/useMasterClass'
 import fallbackImage from '~/assets/img/profile-cover.webp'
 import { z } from "zod"
 
@@ -256,6 +305,7 @@ const form = ref()
 const loadingSubmit = ref(false)
 const isOpen = ref(false)
 const resendCredentialsModal = ref(false)
+const joinMasterClassModal = ref(false)
 const paymentSuccess = route.query?.payment_successfully
 
 const snackbar = useSnackbar();
@@ -274,11 +324,17 @@ const langage = computed(() => {
 })
 
 const IsPassed = computed(() => {
-    const masterclassDate = dayjs(masterclass.value.date).local()
-    const masterclassEndDate = masterclassDate.add(masterclass.value.duration, 'hours')
+    const masterclassDate = dayjs(masterclass.value?.date).local()
+    const masterclassEndDate = masterclassDate.add(masterclass.value?.duration, 'minutes')
     const currentDate = dayjs()
 
     return masterclassEndDate.isBefore(currentDate)
+})
+
+const masterclassStarted = computed(() => {
+    const masterclassDate = dayjs(masterclass.value?.date).local()
+    const currentDate = dayjs()
+    return currentDate.isAfter(masterclassDate)
 })
 
 const items = [{
@@ -313,6 +369,11 @@ const resendCredentialSchema = z.object({
     email: z.string().nonempty("Email is required").email("Invalid email address"),
 });
 
+const externalUserJoinSchema = z.object({
+    email: z.string().nonempty("Email is required").email("Invalid email address"),
+    password: z.string().min(8, "Must be at least 8 characters"),
+});
+
 const subscribeState = reactive({
     name: '',
     email: ''
@@ -320,6 +381,11 @@ const subscribeState = reactive({
 
 const resendCredentialState = reactive({
     email: ''
+})
+
+const externalUserJoinState = reactive({
+    email: '',
+    password: ''
 })
 
 
@@ -370,7 +436,50 @@ const submitResendCredentials = async () => {
         const result = await resendExternalCredentials(id, resendCredentialState)
         loadingSubmit.value = false
 
-        console.log(result);
+
+        if(result?.success){
+            console.log(result.data)
+        }else{
+            const {data, statusCode} = result.data
+            snackbar.add({
+                type: 'error',
+                text: `${data?.message}`
+            })
+        }
+        
+
+    } catch (error) {
+        loadingSubmit.value = false
+        console.error('Error during subscription:', error)
+    }
+}
+
+const submitExternalUserJoin = async () => {
+    loadingSubmit.value = true;
+
+    try {
+        const result = await externalUserJoin(id, externalUserJoinState)
+        loadingSubmit.value = false
+
+       if(result?.success){
+            
+            await navigateTo(
+                {
+                    path: '/room',
+                    query: {
+                        link: result.data.room.link,
+                        token: result.data.token
+                    }
+                }
+            )
+        }else{
+            const {data, statusCode} = result.data
+            snackbar.add({
+                type: 'error',
+                text: `${data?.message}`
+            })
+            
+        }
 
     } catch (error) {
         loadingSubmit.value = false

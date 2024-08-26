@@ -84,7 +84,42 @@ export const resendExternalCredentials = async (id, payload) => {
     }
   );
 
-  console.log(data);
+  if(data){
+    return{
+      success: true,
+      data: data
+    }
+  }else{
+    return{
+      success: false,
+      data: error
+    }
+  }
+  
+};
+
+
+export const externalUserJoin = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(
+    `masterclasses/${id}/attendees/join`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+
+  if(data){
+    return{
+      success: true,
+      data: data
+    }
+  }else{
+    return{
+      success: false,
+      data: error
+    }
+  }
   
 };
 

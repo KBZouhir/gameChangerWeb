@@ -41,12 +41,6 @@ const videoSource = ref(null);
 const audioSource = ref(null);
 const username = ref('Guest');
 
-// Watch for participant changes
-watch(() => props.participant, (newParticipant) => {
-  username.value = newParticipant?.user_name;
-  handleVideo(newParticipant);
-  handleAudio(newParticipant);
-}, { immediate: true });
 
 const handleVideo = (participant) => {
   if (!participant?.video) return;
@@ -83,6 +77,14 @@ const updateSource = (stream, newTrack) => {
   }
   return null;
 };
+
+
+// Watch for participant changes
+watch(() => props.participant, (newParticipant) => {
+  username.value = newParticipant?.user_name;
+  handleVideo(newParticipant);
+  handleAudio(newParticipant);
+}, { immediate: true });
 </script>
 
 <style scoped>
