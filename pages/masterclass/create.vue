@@ -5,7 +5,7 @@
         </div>
         <div class="grid grid-cols-5 gap-4 w-full">
             <div class="col-span-3 py-4">
-                <UForm ref="form":schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+                <UForm ref="form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                     <UFormGroup label="Title" name="title">
                         <UInput v-model="state.title" size="lg" autofocus />
                     </UFormGroup>
@@ -80,7 +80,7 @@
                     <UFormGroup label="" name="domains">
                         <SelectDomain v-model="state.domains" />
                     </UFormGroup>
-                    
+
 
                     <UFormGroup label="Internal animators" name="price">
                         <!-- <MultiselectCom :items="users" v-model="state.internal_animators" :checkInfiniteScroll="true" /> -->
@@ -94,6 +94,50 @@
                             </template>
                         </USelectMenu>
                     </UFormGroup>
+
+                    <div class="border border-gray-300 dark:border-[#374151] dark:bg-transparent bg-white p-6 rounded-md">
+                        <div class="flex flex-col mb-4">
+                            <h3 class="text-xl font-semibold ">External animators</h3>
+                            <p class="text-sm text-slate-500">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                Harum fugit optio
+                                earum inventore quam vero cupiditate voluptatum, velit saepe reiciendis quod nisi iste,
+                                voluptates rem amet
+                                doloribus similique incidunt! Quae?</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col text-sm space-y-1">
+                                <label class="font-semibold " for="full_name">Full name</label>
+                                <UInput v-model="externalUserName" id="full_name" size="lg" />
+                            </div>
+
+                            <div class="flex flex-col text-sm space-y-1">
+                                <label class="font-semibold " for="email">Email</label>
+                                <UInput type="email" v-model="externalUserEmail" id="email" size="lg" />
+                            </div>
+                            <div class="col-span-2">
+                                <UButton block @click="addExternalUser" size="lg" color="green" label="Add" />
+                            </div>
+                            <p v-show="keyExists('externalUserName')" class="text-red-500 text-[10px]">
+                                {{ getErrorMessage('externalUserName') }}</p>
+                        </div>
+                        <UDivider class="my-4" />
+                        <div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div v-for="(external_animator, index) in state.external_animators" class="flex justify-between px-4 py-2 items-center bg-white dark:bg-gray-900 border dark:border-slate-700 rounded-md">
+                                    <div class="flex flex-col">
+                                        <h4 class="font-semibold text-md capitalize">
+                                            {{ external_animator.external_user_name }}
+                                        </h4>
+                                        <p class="text-slate-500 text-xs">
+                                            {{ external_animator.external_user_email }}
+                                        </p>
+                                    </div>
+                                    <UButton @click="removeExternalUser(index)" icon="i-heroicons-trash" size="xs" color="red" variant="solid" :trailing="false" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <UFormGroup label="Image" name="image">
                         <UInput ref="inputFileImage" type="file"
@@ -135,7 +179,7 @@
                     </UButton>
                 </UForm>
             </div>
-           
+
             <div class="col-span-2 py-4 sticky top-0">
                 <div>
 
@@ -181,9 +225,11 @@ const compressedFiles = ref([])
 const inputFileImage = ref(null)
 const errors = ref([])
 const dayjs = useDayjs()
-
+const submitLoading = ref(false)
 const form = ref()
 
+const externalUserName = ref()
+const externalUserEmail = ref()
 
 
 definePageMeta({
@@ -265,9 +311,33 @@ const getErrorMessage = (key) => {
     return error ? error.value : ''
 }
 
-const convertTimeToUTC= (dateTime, format) => {
+const convertTimeToUTC = (dateTime, format) => {
     const dayjs = useDayjs()
     return dayjs.utc(dateTime).format(format)
+}
+
+
+const isValidEmail = (email) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+}
+
+const addExternalUser = () => {
+    errors.value = errors.value.filter(error => error.key !== 'externalUserName');  
+    if (externalUserName.value && isValidEmail(externalUserEmail.value)) {
+        state.external_animators.push({ external_user_name: externalUserName.value, external_user_email: externalUserEmail.value })
+        externalUserName.value = ""
+        externalUserEmail.value = ""
+    } else {
+        errors.value.push({ key: 'externalUserName', value: 'Invalid Full name or email.' })
+    }
+}
+
+
+const removeExternalUser = (index) => {
+    if (index > -1 && index < state.external_animators.length) {
+        state.external_animators.splice(index, 1);
+    }
 }
 
 const validationData = () => {
@@ -285,13 +355,20 @@ const onSubmit = async () => {
         if (state.hasOwnProperty(key)) {
             if (Array.isArray(state[key])) {
                 if (key === 'internal_animators') {
-                    state[key].forEach(item => {
-                        formData.append(`${key}[][user_id]`, (item?.id) ? item.id : item);
+                    state[key].forEach((item, index) => {
+                        formData.append(`${key}[${index}][user_id]`, (item?.id) ? item.id : item);
+                    })
+                } if(key === 'external_animators'){
+                    state[key].forEach((item, index) => {
+                        formData.append(`${key}[${index}][external_user_name]`, (item?.external_user_name))
+                        formData.append(`${key}[${index}][external_user_email]`, (item?.external_user_email) )
                     })
                 } else {
-                    state[key].forEach(item => {
-                        formData.append(`${key}[]`, (item?.id) ? item.id : item);
-                    })
+                   if(key != 'external_animators' && key != 'internal_animators'){
+                        state[key].forEach((item, index) => {
+                            formData.append(`${key}[${index}]`, (item?.id) ? item.id : item);
+                        })
+                   }
                 }
             } else if (key === 'date') {
                 const formattedDate = convertTimeToUTC(state[key], 'YYYY-MM-DD HH:mm:ss')
@@ -305,18 +382,21 @@ const onSubmit = async () => {
     if (compressedFiles.value[0].file) {
         formData.append('image', compressedFiles.value[0].file)
     }
-    
+    submitLoading.value = true
     const result = await createMasterClass(formData)
     if (result?.success) {
         // redicrect to masterclass
+        await navigateTo('/masterclass')
     } else {
         if (result.error.statusCode == 422) {
             const error = handleApiError(result.error);
             console.log(error);
-            
+
             form.value.setErrors(error.errors);
         }
     }
+
+    submitLoading.value = false
 }
 
 

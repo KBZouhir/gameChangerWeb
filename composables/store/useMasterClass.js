@@ -34,6 +34,7 @@ export const listMasterClass = async () => {
 }
 
 export const showMasterClass = async (id) => {
+  
   const { data, refresh, error, pending } = await useApi(
     `masterclasses/${id}`,
     {
@@ -41,7 +42,8 @@ export const showMasterClass = async (id) => {
       method: "GET",
     }
   );
-
+  
+  
   return data
 };
 
@@ -67,6 +69,23 @@ export const guestSubscribeMasterClass = async (id, payload) => {
       method: "POST",
     }
   );
+
+  return data
+};
+
+
+export const resendExternalCredentials = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(
+    `masterclasses/${id}/send-external-user-informations`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+
+  console.log(data);
+  
 };
 
 export const getInformationsByEmail = async (id) => {

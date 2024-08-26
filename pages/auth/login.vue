@@ -94,7 +94,12 @@ async function onSubmit(event) {
         }
     }
     if (result.data?.success) {
-        const { is_completed, is_email_verified, is_phone_verified, phone, email } = result.data.user
+        const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = result.data.user
+
+        if (role.id == 3) {
+            navigateTo('/home')
+        }
+
         if (is_completed && (is_email_verified || is_phone_verified)) {
             // go to dashboard
             navigateTo('/home')
@@ -129,7 +134,9 @@ async function onSubmit(event) {
 <template>
     <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-3/5 w-full p-8 relative z-50">
+            <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden z-50">
+                <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                        class="w-12 absolute top-0 right-0" alt="" srcset="">
                 <h2 class="text-3xl font-bold">{{ $t('login.welcome_back') }}</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">{{ $t('login.please_log_in') }}</p>
 
@@ -177,24 +184,28 @@ async function onSubmit(event) {
 
                     <p class="mb-6 mt-4 text-center text-sm">{{ $t('login.or_log_in_with') }}</p>
                     <div class="flex justify-center space-x-4">
-                        <UButton size="lg" square class="bg-[#d14938] hover:bg-[#d14938] dark:bg-transparent dark:hover:bg-white/5">
+                        <UButton size="lg" square
+                            class="bg-[#d14938] hover:bg-[#d14938] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
                                 <Icon name="tabler:brand-google-filled" size="20" class="text-white" />
                             </template>
                         </UButton>
 
-                        <UButton size="lg" square class="bg-[#1877f2] hover:bg-[#1877f2] dark:bg-transparent dark:hover:bg-white/5">
+                        <UButton size="lg" square
+                            class="bg-[#1877f2] hover:bg-[#1877f2] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
-                                <Icon name="tabler:brand-facebook-filled" size="20" class="dark:text-white text-white" />
+                                <Icon name="tabler:brand-facebook-filled" size="20"
+                                    class="dark:text-white text-white" />
                             </template>
                         </UButton>
 
-                        <UButton size="lg" square class="bg-[#0f6ac5] hover:bg-[#0f6ac5] dark:bg-transparent dark:hover:bg-white/5">
+                        <UButton size="lg" square
+                            class="bg-[#0f6ac5] hover:bg-[#0f6ac5] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
                                 <Icon name="tabler:brand-linkedin" size="20" class="text-white" />
                             </template>
                         </UButton>
-                        
+
                         <!-- <MediaButton type="google" @click="googleLogin()" />
                         <MediaButton type="twitter" /> -->
                     </div>

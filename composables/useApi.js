@@ -12,7 +12,7 @@ export const useApi = async (url, options) => {
   const cookie = useCookie("user_access_token");
   let token = cookie.value;
   const apiRoute = "https://gc-dev.informatikab.com/api/v1";
-
+  
   const DEFAULT_HEADERS = {
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest",

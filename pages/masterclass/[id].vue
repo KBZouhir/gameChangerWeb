@@ -1,7 +1,5 @@
 <template>
     <div class="max-w-screen-xl mx-auto py-4">
-
-
         <div class="grid grid-cols-1 md:grid-cols-6 gap-6 p-6">
             <div class="md:col-span-4">
                 <div class="rounded-lg overflow-hidden mb-6 h-80">
@@ -59,12 +57,12 @@
                                 <div class="p-4 -mt-16 flex items-center space-x-4 z-50 relative">
                                     <UAvatar size="xl" class="border-2 border-slate-800"
                                         :src="animator?.user?.image_url"
-                                        :alt="(animator.external_user_email ? animator.external_user_name : animator.user.full_name)" />
+                                        :alt="(animator.external_user_email ? animator.external_user_name : animator.user?.full_name)" />
                                     <div class="flex flex-col items-start">
                                         <h2 class="font-bold capitalize text-white">
                                             {{ animator.external_user_email ?
                                                 animator.external_user_name :
-                                                animator.user.full_name }}
+                                                animator.user?.full_name }}
                                         </h2>
 
                                     </div>
@@ -172,6 +170,14 @@ const countdownLabel = ref('');
 const dayjs = useDayjs()
 const now = ref()
 
+
+definePageMeta({
+    layout: 'auth',
+    title: 'Masterclass',
+    middleware: ['masterclass']
+})
+
+
 const calculateCountdown = () => {
     const totalSeconds = dayjs(masterclass.value?.date).diff(now.value, 'second')
 
@@ -181,7 +187,7 @@ const calculateCountdown = () => {
     const seconds = (totalSeconds % 60 < 0) ? 0 : totalSeconds % 60
     countdownLabel.value = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-};
+}
 
 let countdownInterval;
 
@@ -205,11 +211,6 @@ const items = [{
     icon: 'i-heroicons-eye-dropper',
 }]
 
-definePageMeta({
-    layout: 'auth',
-    title: 'Masterclass',
-    middleware: ['auth']
-})
 
 const langs = [
     {
@@ -238,7 +239,7 @@ const subscribeUser = async () => {
     const result = await subscribeMasterClass(id)
     if (result) {
         submitLoading.value = false
-        window.open(result, '_blank')
+        window.location.replace(result)
     }
 }
 
