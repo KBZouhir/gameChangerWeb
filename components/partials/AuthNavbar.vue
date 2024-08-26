@@ -38,7 +38,6 @@ const items = [
 </script>
 
 
-
 <template>
     <nav class="bg-white dark:bg-slate-800 sticky top-0 z-50">
         <div class="mx-auto w-full max-w-screen-xl px-2">
@@ -72,7 +71,7 @@ const items = [
                         </nuxt-link>
                         <nuxt-link to="/masterclass"
                             class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
-                            <Icon name="tabler:calendar" />
+                            <Icon name="tabler:device-tv" />
                             <span>Masterclass</span>
                         </nuxt-link>
 

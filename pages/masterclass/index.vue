@@ -3,7 +3,7 @@
 
         <div class="flex justify-between mb-4">
             <span>
-                Total services: <span class="font-bold">{{ masterClassList?.meta?.total }}</span>
+                Total masterclass: <span class="font-bold">{{ masterClassList?.meta?.total }}</span>
             </span>
             <nuxt-link :to="`/masterclass/create`">
                 <UButton label="Create" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white"
@@ -82,11 +82,11 @@ const convertTo12HourFormat = (dateTime, format) => {
 
 const getDataFromApi = async () => {
     await listMasterClass()
-};
+}
 
 watchEffect(() => {
     getDataFromApi();
-});
+})
 
 
 </script>

@@ -225,9 +225,11 @@ const onSubmit = async () => {
     })
 
     const result = await createService(formData)
-    if(result.success){
+    console.log(result);
+    
+    /*if(result.success){
         submitLoading.value = false
-    }
+    }*/ 
 }
 
 

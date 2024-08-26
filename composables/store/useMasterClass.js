@@ -1,12 +1,26 @@
 import { useApi } from "~/composables/useApi";
 import { useMasterClassStore } from '~/stores/masterclass'
+
 export const createMasterClass = async (payload) => {
+  
   const { data, refresh, error, pending } = await useApi(`masterclasses`, {
     initialCache: false,
     body: payload,
     method: "POST",
   });
-};
+
+  if (data) {
+    return {
+      success: true,
+      data,
+    }
+  } else {
+    return {
+      success: false,
+      error,
+    }
+  }
+}
 
 export const listMasterClass = async () => {
   const store = useMasterClassStore()
@@ -17,9 +31,10 @@ export const listMasterClass = async () => {
   store.setMasterClassList(data)
   console.log(data);
   
-};
+}
 
 export const showMasterClass = async (id) => {
+  
   const { data, refresh, error, pending } = await useApi(
     `masterclasses/${id}`,
     {
@@ -27,6 +42,9 @@ export const showMasterClass = async (id) => {
       method: "GET",
     }
   );
+  
+  
+  return data
 };
 
 export const subscribeMasterClass = async (id) => {
@@ -37,6 +55,9 @@ export const subscribeMasterClass = async (id) => {
       method: "GET",
     }
   );
+
+  return data;
+  
 };
 
 export const guestSubscribeMasterClass = async (id, payload) => {
@@ -48,6 +69,23 @@ export const guestSubscribeMasterClass = async (id, payload) => {
       method: "POST",
     }
   );
+
+  return data
+};
+
+
+export const resendExternalCredentials = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(
+    `masterclasses/${id}/send-external-user-informations`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+
+  console.log(data);
+  
 };
 
 export const getInformationsByEmail = async (id) => {

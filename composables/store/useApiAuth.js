@@ -127,12 +127,13 @@ const logout = async () => {
   const { data, refresh, error, pending } = await useApi(`/logout`, {
     initialCache: false,
     method: "POST",
-  });
+  })
+  
   if (data?.success) {
-    authStore.syncAuthUser(null);
-    authStore.syncLoginState(false);
-    const cookie = useCookie("user_access_token");
-    cookie.value = null;
+    authStore.syncAuthUser(null)
+    authStore.syncLoginState(false)
+    const authCookie  = useCookie("user_access_token")
+    authCookie.value = null
   }
 };
 
