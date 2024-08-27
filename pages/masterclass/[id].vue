@@ -149,7 +149,7 @@
                         @click="joinRoom" label="Join" />
 
 
-                    <UButton block :disabled="true" :loading="submitLoading" size="lg"
+                    <UButton block :disabled="true"  size="lg"
                         class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
                         v-if="!IsPassed && !masterclassStarted" :label="countdownLabel" />
 

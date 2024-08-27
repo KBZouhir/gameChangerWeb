@@ -3,31 +3,31 @@
     <div class="devices">
       <button @click="handleAudioClick">
         <template v-if="participant.audio">
-          <img class="icon" :src="micOn" alt="" />
+          <Icon name="tabler:microphone" />
         </template>
         <template v-else>
-          <img class="icon" :src="micOff" alt="" />
+          <Icon name="tabler:microphone-off" />
         </template>
       </button>
 
       <button @click="handleVideoClick">
         <template v-if="participant.video">
-          <img class="icon" :src="videoOn" alt="" />
+          <Icon name="tabler:video" />
         </template>
         <template v-else>
-          <img class="icon" :src="videoOff" alt="" />
+          <Icon name="tabler:video-off" />
         </template>
       </button>
 
       <template v-if="supportsScreenshare">
         <button :disabled="disableScreenShare" @click="handleScreenshareClick">
-          <img class="icon" :src="screenShare" alt="" />
+          <Icon name="tabler:screen-share" />
         </button>
       </template>
     </div>
 
     <button class="leave" @click="leaveCall">
-      <!-- <img class="icon" :src="leave" alt="" /> -->
+      <Icon name="tabler:phone-off" />
     </button>
   </div>
 </template>
@@ -35,12 +35,6 @@
 <script>
 import daily from "@daily-co/daily-js";
 
-import leave from "~/assets/svg/icons/call.svg";
-import micOff from "~/assets/svg/icons/call.svg";
-import micOn from "~/assets/svg/icons/call.svg";
-import screenShare from "~/assets/svg/icons/call.svg";
-import videoOff from "~/assets/svg/icons/call.svg";
-import videoOn from "~/assets/svg/icons/call.svg";
 
 export default {
   name: "CallControls",
@@ -54,17 +48,10 @@ export default {
   ],
   data() {
     return {
-      leave,
-      micOn,
-      micOff,
-      screenShare,
-      videoOn,
-      videoOff,
       supportsScreenshare: false,
     };
   },
   mounted() {
-    // Only show the screen share button if the browser supports it
     this.supportsScreenshare = daily.supportedBrowser().supportsScreenShare;
   },
 };

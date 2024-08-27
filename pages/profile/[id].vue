@@ -68,7 +68,7 @@
 
                             <nuxt-link :to="`/appointment/availability/${profile?.id}`"
                                 v-if="profile?.can_book_appointment">
-                                <UButton>
+                                <UButton color="green">
                                     <Icon name="tabler:calendar-plus" />
                                     {{ $t('Appointment') }}
                                 </UButton>

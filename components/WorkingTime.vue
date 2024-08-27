@@ -1,8 +1,17 @@
 <template>
-    <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
-        <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
-            <UButton size="lg" @click="isOpen = true"
-                class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500">Open</UButton>
+    <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
+            <UAlert variant="subtle" color="green" title="Setup working Time" icon="i-heroicons-clock">
+                <template #title="{ title }">
+                    <span v-html="title" />
+                </template>
+
+                <template #description>
+                    You can config your working time <UButton variant="link" color="green" size="xs" @click="isOpen = true" >
+                        Set Working Time
+                    </UButton>
+                </template>
+            </UAlert>
+            
 
             <USlideover v-model="isOpen" >
                 <div class="flex-1 overflow-y-auto">
@@ -100,14 +109,13 @@
                     </div>
 
                     <div class="sticky bottom-0 p-4 bg-white dark:bg-gray-900 border-t dark:border-t-gray-800 z-50">
-                        <UButton @click="onSubmit"
+                        <UButton @click="onSubmit" :loading="loadingSubmit"
                             class="dark:bg-green-600 disabled:dark:bg-green-300 dark:hover:bg-green-500"
                             :disabled="allow || !allRangesValid" block size="lg">Submit</UButton>
                     </div>
                 </div>
             </USlideover>
         </div>
-    </div>
 </template>
 
 <script setup>
@@ -117,9 +125,11 @@ import { useAuthStore } from '~/stores/authStore'
 import VueTimepicker from 'vue3-timepicker'
 import 'vue3-timepicker/dist/VueTimepicker.css'
 
+const snackbar = useSnackbar();
 
 const isOpen = ref(false)
 const meetDuration = ref(15)
+const loadingSubmit = ref(false)
 
 const authStore = useAuthStore();
 
@@ -244,7 +254,16 @@ const onSubmit = async () => {
     });
     if (opening_hours.length > 0) {
         let payload = { opening_hours: opening_hours }
+        loadingSubmit.value = true
         const result = await storeOpeningHours(payload)
+
+        if(result?.success){
+            loadingSubmit.value = false
+            snackbar.add({
+                type: 'success',
+                text: 'Working time updated successfully'
+            })
+        }
 
     }
 }

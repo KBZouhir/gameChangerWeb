@@ -1,6 +1,9 @@
 <template>
     <div>
         <div class="w-full px-4 py-4 max-w-screen-md mx-auto">
+            
+            <WorkingTime />
+
             <ClientOnly>
                 <VCalendar ref="calendarRef" expanded color="green" @dayclick="selectDay" @did-move="calendarSwipePage"
                     :attributes="attributes" :is-dark="$colorMode.value == 'dark' ? true : false"></VCalendar>

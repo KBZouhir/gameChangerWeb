@@ -36,7 +36,7 @@
               </template>
 
               <template v-if="count === 1">
-                <dailyWaitingCard :url="roomUrl" />
+                <!-- <dailyWaitingCard :url="roomUrl" /> -->
               </template>
             </div>
           </div>
@@ -102,7 +102,10 @@ const handleAudioClick = () => {
 };
 
 const handleVideoClick = () => {
+  alert('request open cam')
   const videoOn = callObject.value.localVideo();
+  console.log(videoOn);
+  
   callObject.value.setLocalVideo(!videoOn);
 };
 

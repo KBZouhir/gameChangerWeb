@@ -13,6 +13,6 @@ const roomLink = route.query.link
 const token = route.query.token
 
 const leaveCall = () => {
-    console.log('leaveCall')
+    navigateTo('/home')
 }
 </script>

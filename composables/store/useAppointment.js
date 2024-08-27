@@ -10,7 +10,7 @@ export const storeOpeningHours = async (payload) => {
     }
   );
 
-  console.log(data);
+ return data
 };
 
 export const getUserOpeningHours = async (id) => {
