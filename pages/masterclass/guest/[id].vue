@@ -109,27 +109,27 @@
                         <ul role="list" class="mt-4 space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-6">
                             <li class="flex items-center gap-x-3">
                                 <Icon name="tabler:calendar-event" />
-                                <span>Date :</span>
+                                <span>{{ $t('Date') }} :</span>
                                 <span class="font-bold">{{ $dayjs(masterclass?.date).format('D/M/YYYY hh:mm A')
                                     }}</span>
                             </li>
 
                             <li class="flex items-center gap-x-3">
                                 <Icon name="tabler:users" />
-                                <span>Places left :</span>
+                                <span>{{ $t('Places left') }} :</span>
                                 <span class="font-bold" :class="masterclass?.places_left <= 5 ? 'text-red-600' : ''">{{
                                     masterclass?.places_left }} / {{ masterclass?.max_attendees }}</span>
                             </li>
 
                             <li class="flex items-center gap-x-3">
                                 <Icon name="tabler:language" />
-                                <span>Langage :</span>
+                                <span>{{ $t('Langage') }} :</span>
                                 <span class="font-bold">{{ langage }}</span>
                             </li>
 
                             <li class="flex items-center gap-x-3">
                                 <Icon name="tabler:clock-hour-1" />
-                                <span>Duration :</span>
+                                <span>{{ $t('Duration') }} :</span>
                                 <span class="font-bold">{{ masterclass?.duration }} min</span>
                             </li>
 
@@ -137,14 +137,14 @@
 
                         <UButton block :loading="submitLoading" size="lg"
                             class="dark:bg-green-500 hidden disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                            v-if="!IsPassed" @click="subscribeUser" label="Subscribe" />
+                            v-if="!IsPassed && !masterclassGotStarted" @click="subscribeUser" label="Subscribe" />
 
 
                         <UButton block  @click="joinMasterClassModal = true" size="lg"
                             class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
                             v-if="!IsPassed" label="Join" />
 
-                        <UButton v-if="!IsPassed && (!paymentSuccess || paymentSuccess != 1)" block variant="outline"
+                        <UButton v-if="!IsPassed && (!paymentSuccess || paymentSuccess != 1) && !masterclassStarted" block variant="outline"
                             color="green" :loading="submitLoading" size="lg" class="my-4" @click="subscribeUser"
                             label="Subscribe" />
 
@@ -176,7 +176,7 @@
                     <img class="w-1/3 flex dark:hidden" src="~/assets/svg/vectors/masterclass.svg" alt="">
                     <img class="w-1/3 hidden dark:flex" src="~/assets/svg/vectors/masterclass-white.svg" alt="">
                     <h2 class="text-xl md:text-3xl font-bold">{{ $t('Subscribe to masterclass') }}</h2>
-                    <p class="text-blueGray-900 dark:text-slate-300">{{ $t('login.please_log_in') }}</p>
+                    <p class="text-gray-600 dark:text-slate-300 text-sm text-center">{{ $t('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry') }}</p>
                 </div>
 
                 <UForm ref="form" :schema="schema" :state="subscribeState" @submit="submitSubscribeForm"
@@ -216,7 +216,7 @@
                 </div>
 
                 <UForm ref="form" :schema="resendCredentialSchema" :state="resendCredentialState"
-                    @submit="submitResendCredentials" class="mt-8 space-y-4">
+                    @submit="submitResendCredentials" @error="onError" class="mt-8 space-y-4">
 
                     <UFormGroup label="Email" name="email">
                         <UInput size="lg" type="email" v-model="resendCredentialState.email" />
@@ -273,7 +273,7 @@
                         </UButton>
 
                         <UButton :disabled="true" v-if="!masterclassStarted && !IsPassed" block :loading="loadingSubmit" size="lg" :color="$colorMode.value == 'dark' ? 'green' : 'primary'" type="submit">
-                            Masterclass started: {{ countdownLabel }}
+                            {{ $t('Masterclass started') }}: {{ countdownLabel }}
                         </UButton>
                     </div>
                     <div v-if="!IsPassed">
@@ -307,6 +307,7 @@ const isOpen = ref(false)
 const resendCredentialsModal = ref(false)
 const joinMasterClassModal = ref(false)
 const paymentSuccess = route.query?.payment_successfully
+const masterclassGotStarted = ref(false)
 
 const snackbar = useSnackbar();
 
@@ -336,6 +337,7 @@ const masterclassStarted = computed(() => {
     const currentDate = dayjs()
     return currentDate.isAfter(masterclassDate)
 })
+
 
 const items = [{
     key: 'general',
@@ -398,7 +400,19 @@ const calculateCountdown = () => {
     const seconds = (totalSeconds % 60 < 0) ? 0 : totalSeconds % 60
 
     countdownLabel.value = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+    if(days == 0 && hours==0 && minutes==0 && seconds==0){
+        masterclassGotStarted.value = true
+    }
 }
+
+
+
+watch(masterclassGotStarted, async (newValue, oldValue) => {
+    if(newValue){
+        clearInterval(countdownInterval)
+    } 
+})
 
 const getDataFromApi = async () => {
     const result = await showMasterClass(id)
@@ -434,9 +448,7 @@ const submitResendCredentials = async () => {
 
     try {
         const result = await resendExternalCredentials(id, resendCredentialState)
-        loadingSubmit.value = false
-
-
+        
         if(result?.success){
             console.log(result.data)
         }else{
@@ -446,12 +458,11 @@ const submitResendCredentials = async () => {
                 text: `${data?.message}`
             })
         }
-        
 
     } catch (error) {
-        loadingSubmit.value = false
-        console.error('Error during subscription:', error)
+        console.error('Error during resend credentials:', error)
     }
+    loadingSubmit.value = false
 }
 
 const submitExternalUserJoin = async () => {
@@ -487,6 +498,12 @@ const submitExternalUserJoin = async () => {
     }
 }
 
+
+async function onError (event) {
+  const element = document.getElementById(event.errors[0].id)
+  element?.focus()
+  element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
 
 const subscribeUser = async () => {
     isOpen.value = true

@@ -30,4 +30,22 @@ const getService = async (id) => {
   return data
 };
 
-export { getServices, createService, getService };
+const updateService = async (id, payload) => {
+  const data = await useApi(`/services/${id}`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+  return data
+};
+
+
+const deleteService = async (id) => {
+  const data = await useApi(`/services/${id}`, {
+    initialCache: false,
+    method: "DELETE",
+  });
+  return data
+};
+
+export { getServices, createService, getService, updateService ,deleteService };

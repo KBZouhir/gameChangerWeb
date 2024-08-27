@@ -27,9 +27,9 @@ export const listMasterClass = async () => {
   const { data, refresh, error, pending } = await useApi(`masterclasses`, {
     initialCache: false,
     method: "GET",
-  });
+  })
+  
   store.setMasterClassList(data)
-  console.log(data);
   
 }
 
@@ -98,6 +98,30 @@ export const resendExternalCredentials = async (id, payload) => {
   
 };
 
+
+export const joinMasterClass = async (id) => {
+  const { data, refresh, error, pending } = await useApi(
+    `masterclasses/${id}/join`,
+    {
+      initialCache: false,
+      method: "GET",
+    }
+  );
+  console.log(error);
+  
+  if(data){
+    return{
+      success: true,
+      data: data
+    }
+  }else{
+    return{
+      success: false,
+      data: error
+    }
+  }
+  
+};
 
 export const externalUserJoin = async (id, payload) => {
   const { data, refresh, error, pending } = await useApi(

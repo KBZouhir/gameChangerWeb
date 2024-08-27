@@ -105,18 +105,42 @@ const businessSectors = computed(() => businessSectorStore.getBusinessSectors);
 const domainLoading = ref(false)
 const isOpen = ref(false)
 const selectedDomains = ref([])
-const selectedSector = ref(null)
+const selectedSector = ref([])
 const showDomains = ref(false)
 const selectedViewDomains = ref([])
 
 const errors = ref([])
 
 const emit = defineEmits(['update:modelValue']);
+const props = defineProps(['domains']);
 
 
+onMounted(() => {
+    if (props.domains && props.domains.length > 0) {
+        selectedViewDomains.value = props.domains
+        selectedDomains.value = [...props.domains]
+        props.domains.forEach(domain => {
+            if (!selectedSector.value.includes(domain.business_sector_id)) {
+                selectedSector.value.push(domain.business_sector_id)
+            }
+        });
+    }
+});
+
+watch(() => props.domains, (newDomains) => {
+    if (newDomains && newDomains.length > 0) {
+        selectedViewDomains.value = newDomains
+        selectedDomains.value = [...newDomains]
+        newDomains.forEach(domain => {
+            if (!selectedSector.value.includes(domain.business_sector_id)) {
+                selectedSector.value.push(domain.business_sector_id)
+            }
+        })
+    }
+}, { immediate: true })
 
 const getDataFromApi = async () => {
-    await apiGetBusinessSectors()
+    await apiGetBusinessSectors()    
 }
 
 watchEffect(() => {

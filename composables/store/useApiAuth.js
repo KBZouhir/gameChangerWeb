@@ -78,16 +78,18 @@ const login = async (payload) => {
     method: "POST",
   });
   
-  // const { user } = await $signInWithEmailAndPassword($auth, payload.email, payload.password);
-
-  // console.log(user.uid);
-  
-
- 
   if (data) {
-    const userTokenCookie = useCookie("user_access_token");
-    userTokenCookie.value = data.token;
-    authStore.syncAuthUser(data.user);
+    const userTokenCookie = useCookie("user_access_token")
+    userTokenCookie.value = data.token
+    authStore.syncAuthUser(data.user)
+
+    const { role } = data.user
+    
+    if(role.id != 3){
+      const { user } = await $signInWithEmailAndPassword($auth, payload.email, payload.password);
+
+    }
+  
   }
   return { data, error, refresh, pending };
 };

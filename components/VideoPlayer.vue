@@ -1,15 +1,8 @@
 <template>
   <div :class="id ? 'w-72 h-auto' : ''">
-    <video
-      ref="videoPlayer"
-      class="video-js vjs-default-skin w-full h-full"
-      controls
-      preload="auto"
-      :poster="poster"
-    >
+    <video ref="videoPlayer" class="video-js vjs-default-skin w-full h-full" controls preload="auto" :poster="poster">
       <source :src="videoSrc" type="video/mp4" />
     </video>
-     {{ videoSrc }}
   </div>
 </template>
 
@@ -65,13 +58,13 @@ onMounted(async () => {
     controls: true,
     responsive: true,
     fluid: true
-  })  
+  })
 
-  
+
   player.ready(() => {
-// Ensure VHS is available
-const vhsOptions = player.tech()?.vhs || player.tech()?.hls;
-    
+    // Ensure VHS is available
+    const vhsOptions = player.tech()?.vhs || player.tech()?.hls;
+
     if (vhsOptions) {
       vhsOptions.xhr.beforeRequest = (options) => {
         options.headers = options.headers || {}

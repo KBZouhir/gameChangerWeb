@@ -19,7 +19,16 @@ const create = async (payload) => {
     method: "POST",
   });
 
-  console.log(data);
+  return data
+};
+
+const deletePost = async (id) => {
+  const { data, refresh, error, pending } = await useApi(`/posts/${id}`, {
+    initialCache: false,
+    method: "DELETE",
+  });
+
+  return data
 };
 
 const toogleReaction = async (id, payload) => {
@@ -91,4 +100,4 @@ const getPaginationsComments = async (url) => {
   return data
 };
 
-export { index, create, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments };
+export { index, create, deletePost, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments };

@@ -36,12 +36,12 @@
                                 </div>
                             </div>
                             <div class="mb-6">
-                                <h2 class="text-xl font-bold mb-2">Short description</h2>
+                                <h2 class="text-xl font-bold mb-2">{{ $t('Short description') }}</h2>
                                 <p>{{ masterclass?.short_description }}</p>
                             </div>
 
                             <div>
-                                <h2 class="text-xl font-bold mb-2">Description</h2>
+                                <h2 class="text-xl font-bold mb-2">{{ $t('Description') }}</h2>
                                 <p v-html="masterclass?.full_description"></p>
                             </div>
                         </div>
@@ -69,11 +69,11 @@
                                 </div>
                                 <span v-if="animator?.external_user_name"
                                     class="inline-flex items-center top-2 left-2 absolute  rounded-md bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20">
-                                    External user
+                                    {{ $t('External user') }}
                                 </span>
                                 <span v-if="animator?.user"
                                     class="inline-flex items-center top-2 left-2 absolute rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
-                                    Internal user
+                                    {{ $t('Internal user') }}
                                 </span>
 
                             </UCard>
@@ -113,42 +113,52 @@
                     <ul role="list" class="mt-4 space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-6">
                         <li class="flex items-center gap-x-3">
                             <Icon name="tabler:calendar-event" />
-                            <span>Date :</span>
+                            <span>{{ $t('Date') }} :</span>
                             <span class="font-bold">{{ $dayjs(masterclass?.date).format('D/M/YYYY hh:mm A') }}</span>
                         </li>
 
                         <li class="flex items-center gap-x-3">
                             <Icon name="tabler:users" />
-                            <span>Places left :</span>
+                            <span>{{ $t('Places left') }} :</span>
                             <span class="font-bold" :class="masterclass?.places_left <= 5 ? 'text-red-600' : ''">{{
                                 masterclass?.places_left }} / {{ masterclass?.max_attendees }}</span>
                         </li>
 
                         <li class="flex items-center gap-x-3">
                             <Icon name="tabler:language" />
-                            <span>Langage :</span>
+                            <span>{{ $t('Langage') }} :</span>
                             <span class="font-bold">{{ langage }}</span>
                         </li>
 
                         <li class="flex items-center gap-x-3">
                             <Icon name="tabler:clock-hour-1" />
-                            <span>Duration :</span>
+                            <span>{{ $t('Duration') }} :</span>
                             <span class="font-bold">{{ masterclass?.duration }} min</span>
                         </li>
 
                     </ul>
 
                     <UButton block :loading="submitLoading" size="lg"
-                        class="dark:bg-green-500 hidden disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                        v-if="!IsPassed" @click="subscribeUser" label="Subscribe" />
+                        class="dark:bg-green-500  disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
+                        v-if="!IsPassed && !masterclass.is_subscribed && !masterclassStarted && user.role.id != 3" @click="subscribeUser"
+                        label="Subscribe" />
 
-                    
+                    <UButton block :loading="joinRoomLoading" size="lg"
+                        class="dark:bg-green-500  disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
+                        v-if="!IsPassed && masterclassStarted && (masterclass?.is_subscribed || masterclass?.is_animator || user.role.id === 3)" 
+                        @click="joinRoom" label="Join" />
+
+
                     <UButton block :disabled="true" :loading="submitLoading" size="lg"
                         class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                        v-if="!IsPassed" @click="subscribeUser" :label="countdownLabel" />
+                        v-if="!IsPassed && !masterclassStarted" :label="countdownLabel" />
 
                     <div v-if="IsPassed" class="flex justify-center mt-4">
                         <UDivider label="Masterclass end" />
+                    </div>
+
+                    <div v-if="!IsPassed && !masterclass?.is_subscribed && masterclassStarted" class="flex justify-center mt-4">
+                        <UDivider label="Masterclass Started" />
                     </div>
                 </div>
                 <USkeleton v-else class="w-full h-96" />
@@ -159,17 +169,21 @@
 </template>
 
 <script setup>
-import { showMasterClass, subscribeMasterClass } from '~/composables/store/useMasterClass'
+import { showMasterClass, subscribeMasterClass, joinMasterClass } from '~/composables/store/useMasterClass'
 import fallbackImage from '~/assets/img/profile-cover.webp'
+import { useAuthStore } from '~/stores/authStore'
+
+const authStore = useAuthStore()
 
 const route = useRoute()
 const id = route.params.id
 const masterclass = ref()
 const submitLoading = ref(false)
-const countdownLabel = ref('');
+const joinRoomLoading = ref(false)
+const countdownLabel = ref('')
 const dayjs = useDayjs()
 const now = ref()
-
+const user = computed(() => authStore.getAuthUser)
 
 definePageMeta({
     layout: 'auth',
@@ -196,9 +210,17 @@ const langage = computed(() => {
 })
 
 const IsPassed = computed(() => {
-    const masterclassDate = dayjs(masterclass.value.date).local()
+    const masterclassDate = dayjs(masterclass.value?.date).local()
+    const masterclassEndDate = masterclassDate.add(masterclass.value?.duration, 'minutes')
     const currentDate = dayjs()
-    return masterclassDate.isBefore(currentDate)
+
+    return masterclassEndDate.isBefore(currentDate)
+})
+
+const masterclassStarted = computed(() => {
+    const masterclassDate = dayjs(masterclass.value?.date).local()
+    const currentDate = dayjs()
+    return currentDate.isAfter(masterclassDate)
 })
 
 const items = [{
@@ -243,6 +265,34 @@ const subscribeUser = async () => {
     }
 }
 
+const joinRoom = async () => {
+    joinRoomLoading.value = true
+    const result = await joinMasterClass(masterclass.value.id)
+    console.log(result);
+    
+    if (result?.success) {
+
+        await navigateTo(
+            {
+                path: '/room',
+                query: {
+                    link: result.data.room.link,
+                    token: result.data.token
+                }
+            }
+        )
+    } else {
+        const { data, statusCode } = result.error
+        snackbar.add({
+            type: 'error',
+            text: `${data?.message}`
+        })
+
+    }
+
+    joinRoomLoading.value = false
+}
+
 onMounted(() => {
     setInterval(() => {
         now.value = dayjs();
@@ -252,6 +302,6 @@ onMounted(() => {
 
 onUnmounted(() => {
     clearInterval(countdownInterval);
-});
+})
 
 </script>

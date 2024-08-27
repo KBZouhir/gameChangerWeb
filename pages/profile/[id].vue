@@ -73,11 +73,13 @@
                                     {{ $t('Appointment') }}
                                 </UButton>
                             </nuxt-link>
-
-                            <UButton v-if="profile?.can_discuss">
+                            <nuxt-link :to="`/chat?user_id=${profile?.id}`">
+                                <UButton color="green" variant="outline" v-if="profile?.can_discuss">
                                 <Icon name="tabler:message" />
                                 {{ $t('Message') }}
                             </UButton>
+                            </nuxt-link>
+                            
                         </div>
                     </div>
                 </div>

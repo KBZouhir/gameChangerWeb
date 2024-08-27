@@ -51,3 +51,25 @@ export const toggleFollow = async (id) => {
 
   return data
 };
+
+export const updateCoverPage = async (payload) => {
+
+  const { data, refresh, error, pending } = await useApi(`profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data
+};
+
+export const updateProfilePicture = async (payload) => {
+
+  const { data, refresh, error, pending } = await useApi(`profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data
+};

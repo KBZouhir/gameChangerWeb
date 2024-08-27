@@ -3,7 +3,7 @@ import { logout, useUser } from '~/composables/store/useApiAuth'
 import { useAuthStore } from '~/stores/authStore'
 
 const authStore = useAuthStore();
-const user = computed(() => authStore.getAuthUser);
+const user = computed(() => authStore.getAuthUser)
 
 
 watchEffect(() => {
@@ -74,23 +74,17 @@ const items = [
                             <Icon name="tabler:device-tv" />
                             <span>Masterclass</span>
                         </nuxt-link>
-
-                        <nuxt-link to="/"
-                            class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
-                            <Icon name="tabler:calendar" />
-                            <span>Contact</span>
-                        </nuxt-link>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <UButton size="sm" square
+                    <!-- <UButton size="sm" square
                         class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5"
                         color="primary">
                         <template #leading>
                             <Icon name="tabler:search" size="20" class="dark:text-white text-primary" />
                         </template>
-                    </UButton>
+                    </UButton> -->
                     <nuxt-link to="/notifications">
                         <UButton size="sm" square
                             class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
@@ -101,7 +95,7 @@ const items = [
                     </nuxt-link>
 
                     <SwitchMode />
-                    <nuxt-link to="/chat">
+                    <nuxt-link v-if="user?.role.id != 3" to="/chat">
                         <UButton size="sm" square
                             class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>

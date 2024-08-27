@@ -112,7 +112,7 @@
 
                                 <template #item="{ item }">
                                     <button class="w-full flex items-center justify-between"
-                                        @click="item.function(comment)">
+                                        @click="item.function(post)">
                                         <span class="truncate">{{ item.label }}</span>
                                         <UIcon :name="item.icon"
                                             class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
@@ -131,24 +131,6 @@
                     </ClientOnly>
                     <div>
                         <ImageView v-if="post.image" :url="`${post.image.url}`" />
-                        <!-- <div class="w-full grid  gap-3" :class="(images?.length > 1 ? 'grid-cols-2' : 'grid-cols-1')">
-                        <button class="w-full max-h-[250px]" :class="conditionalClass(index)"
-                            v-for="(image, index) in images" @click="openLightboxOnSlide(index)">
-                            <div class="relative h-full">
-                                <img alt="gallery" draggable="false" v-if="index < 4"
-                                    class="block h-full w-full rounded-lg object-cover object-center" :src="image" />
-                                <div v-if="index == 3 && images.length > 4">
-                                    <div
-                                        class="absolute top-0 left-0 w-full h-full bg-slate-900 opacity-60 rounded-lg flex justify-center items-center">
-                                    </div>
-                                    <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center">
-                                        <span class="font-bold text-3xl text-white absolute">+{{ images.length - 4 }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                    <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="images" /> -->
 
                         <div class="flex items-center space-x-4 my-4 text-sm">
                             <div class="flex items-center">
@@ -203,36 +185,25 @@
                             </div>
 
                             <UButton @click="getPostComments(post.id)" size="sm" color="primary" square variant="link"
-                                class="flex items-center space-x-0 font-semibold cursor-pointer">
+                                class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
                                 <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
-                                <span class="dark:text-white text-black">{{ post.comments_count }}</span>
+                                <span class="dark:text-white text-black hover:no-underline">{{ post.comments_count }}</span>
                             </UButton>
                         </div>
-
-                        <!-- <div
-                            class="p-2 ring-1 ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex space-x-4">
-                            <div class="w-10 h-10 rounded-full bg-red-100 shadow-sm overflow-hidden">
-                                <img :src="user?.image_url" class="object-cover" alt="" srcset="">
-                            </div>
-                            <div class="flex-1">
-                                <UTextarea :rows="0" :padded="false" autoresize placeholder="Write a comment"
-                                    variant="none" class="w-full pt-2" />
-                            </div>
-                        </div> -->
                     </div>
                 </div>
-                
+
             </UCard>
             <InfiniteLoading @infinite="fetchMorePosts">
-                    <template #spinner>
-                        <div class="flex justify-center w-full">
-                            <LoadingIcon />
-                        </div>
-                    </template>
-                    <template v-if="posts?.data.length > 0" #complete>
-                        <span>No more data found!</span>
-                    </template>
-                </InfiniteLoading>
+                <template #spinner>
+                    <div class="flex justify-center w-full">
+                        <LoadingIcon />
+                    </div>
+                </template>
+                <template v-if="posts?.data?.length > 0" #complete>
+                    <span>{{ $t('No more data found!') }}</span>
+                </template>
+            </InfiniteLoading>
 
             <div v-if="!posts" class="flex flex-1 flex-col items-center justify-center py-4">
                 <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
@@ -492,7 +463,7 @@
 
 
 <script setup>
-import { create, index, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments } from '~/composables/store/usePost'
+import { create, index, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, deletePost } from '~/composables/store/usePost'
 import { usePostStore } from "~/stores/posts"
 import FsLightbox from "fslightbox-vue/v3"
 import { QuillEditor } from '@vueup/vue-quill'
@@ -516,8 +487,7 @@ definePageMeta({
     middleware: ['auth']
 })
 
-const toggler = ref(false)
-const slide = ref(1)
+
 const isOpen = ref(false)
 const maxLength = ref(200);
 const charCount = computed(() => countChars(content.value));
@@ -527,7 +497,7 @@ const posts = computed(() => postStore.getPosts);
 const content = ref('');
 const inputFileImage = ref(null)
 const isLoading = ref(false)
-const tag = ref()
+
 const page = ref(1)
 const tags = ref([])
 const errors = ref([])
@@ -540,6 +510,8 @@ const postCommnets = ref(null)
 const comment = ref('')
 const selectedPost = ref(null)
 const selectedComment = ref(null)
+const snackbar = useSnackbar();
+
 
 const options = ref({
     modules: {
@@ -559,29 +531,11 @@ defineShortcuts({
 
 const getDataFromApi = async () => {
     await index()
-};
+}
 
 watchEffect(() => {
     getDataFromApi();
-});
-
-const conditionalClass = (index) => {
-    let classList = []
-    if (index > 3) {
-        classList.push('hidden')
-    }
-
-    if (index == images.value.length - 1 && images.value.length && images.value.length % 2 != 0) {
-        classList.push('col-span-2')
-    }
-
-    return classList
-}
-
-const openLightboxOnSlide = (number) => {
-    slide.value = number + 1;
-    toggler.value = !toggler.value;
-}
+})
 
 const keyExists = (key) => {
     return errors.value.some(error => error.key === key)
@@ -651,6 +605,18 @@ const onImageFileChange = async (event) => {
     }
 }
 
+const deletePostFun = async (post) => {
+    const result = await deletePost(post?.id);
+    
+    if (result?.success) {
+        posts.value.data = posts.value.data.filter((item) => item.id !== post?.id)
+        
+        snackbar.add({
+            type: 'success',
+            text: 'Post deleted successfully',
+        });
+    }
+};
 const togglePostReaction = async (postID, reaction_id) => {
     const post = posts.value.data.find(post => post.id === postID);
     if (post) {
@@ -734,6 +700,7 @@ const submitForm = async () => {
     let hashtags = []
     isLoading.value = true
     validationData()
+
     if (errors.value.length > 0) {
         isLoading.value = false
         return
@@ -743,19 +710,29 @@ const submitForm = async () => {
         hashtags.push(tag.text)
     })
 
-    let formData = new FormData();
+    let formData = new FormData()
     formData.append('description', content.value)
 
     if (hashtags.length > 0) {
-        formData.append('hashtags', hashtags);
+        formData.append('hashtags', hashtags)
     }
 
-    if (compressedFiles.value[0].file) {
+    if (compressedFiles.value[0]?.file) {
         formData.append('image', compressedFiles.value[0].file)
     }
 
     const result = await create(formData)
-    console.log(result);
+    if(result?.success){
+        console.log(result?.post);
+        
+        posts.value.data.push(result?.post)
+        isOpen.value = false
+
+        snackbar.add({
+            type: 'success',
+            text: 'Post added successfully',
+        });
+    }
     isLoading.value = false
 }
 
@@ -809,7 +786,7 @@ const postDropDown = [
         }, {
             label: 'Delete',
             icon: 'i-heroicons-trash',
-            function: deletePostCommnet
+            function: deletePostFun
         }
     ]
 ]

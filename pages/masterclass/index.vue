@@ -3,9 +3,9 @@
 
         <div class="flex justify-between mb-4">
             <span>
-                Total masterclass: <span class="font-bold">{{ masterClassList?.meta?.total }}</span>
+                {{ $t('Total masterclass') }}: <span class="font-bold">{{ masterClassList?.meta?.total }}</span>
             </span>
-            <nuxt-link :to="`/masterclass/create`">
+            <nuxt-link v-if="user?.role.id == 3" :to="`/masterclass/create`">
                 <UButton label="Create" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white"
                     color="primary" size="md"></UButton>
             </nuxt-link>
@@ -19,7 +19,7 @@
                 <div class="p-8 w-full h-full flex flex-col space-y-4 bg-gradient-to-r from-primary to-transparent">
                     <div>
                         <div class="flex items-center space-x-2 text-xs">
-                            <span>By:</span>
+                            <span>{{ $t('By') }}:</span>
                             <div class="flex items-center space-x-1">
                                 <div class="w-4 h-4 rounded-full border dark:border-gray-500">
                                     <img :src="masterclass.user.image_url" alt="" srcset="">
@@ -56,15 +56,15 @@
 
 import { listMasterClass } from '~/composables/store/useMasterClass'
 import { useMasterClassStore } from '~/stores/masterclass'
+import { useAuthStore } from '~/stores/authStore'
+
+const authStore = useAuthStore();
+const user = computed(() => authStore.getAuthUser)
 
 
 const store = useMasterClassStore()
-
-
 const masterClassList = computed(() => store.getMasterClassList)
 
-
-console.log(masterClassList.value);
 
 
 definePageMeta({
@@ -72,13 +72,6 @@ definePageMeta({
     title: "Notification Page",
     middleware: ['auth']
 })
-
-
-const convertTo12HourFormat = (dateTime, format) => {
-    const dayjs = useDayjs()
-    const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    return dayjs.utc(dateTime).tz(localTimezone).format(format)
-}
 
 const getDataFromApi = async () => {
     await listMasterClass()

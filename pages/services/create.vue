@@ -225,11 +225,11 @@ const onSubmit = async () => {
     })
 
     const result = await createService(formData)
-    console.log(result);
     
-    /*if(result.success){
+    if(result.success){
         submitLoading.value = false
-    }*/ 
+        await navigateTo(`/services/details/${result?.service?.id}`)
+    }
 }
 
 
