@@ -40,7 +40,6 @@ const requestPermission = async () => {
 
       $getToken($messaging, { vapidKey: 'BJXJpMYEoxBnfQRx74LugwKT6Bs29NW39m6Wh8exW1bb8nrMElyc4c8VfuCj-ZnhZSOuiEiiKsuq9djzsLVSqgU' }).then((currentToken) => {
         if (currentToken) {
-          console.log(currentToken)
           RegisterFCMToken(currentToken)
         } else {
           console.log('No registration token available. Request permission to generate one.')

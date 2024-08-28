@@ -69,7 +69,18 @@ export const guestSubscribeMasterClass = async (id, payload) => {
       method: "POST",
     }
   );
-
+  if(data){
+    return {
+      status: true,
+      data: data
+    }
+  }else{
+    return {
+      status: false,
+      data: error
+    }
+  }
+  
   return data
 };
 

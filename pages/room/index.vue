@@ -80,7 +80,6 @@ const joinRoom = () => {
         Object.keys(ps).forEach(p => {
             let participant = ps[p]
             if (participant.owner) {
-                // participant.session_id
                 callFrame.value.updateParticipant(participant.session_id, {
                     updatePermissions: {
                         canSend: new Set(['video', 'audio']),  
@@ -103,7 +102,18 @@ const joinRoom = () => {
     }
 
     const raiseHand = () => {
-        console.log('raiseHand');
+        let ps = callFrame.value.participants();
+            
+
+            Object.keys(ps).forEach(p => {
+                let participant = ps[p];
+            console.log(participant);
+            
+                if (participant.owner) {
+                    return;
+                }
+
+            });
     }
 
     const leaveCall = () => {
@@ -118,6 +128,7 @@ const joinRoom = () => {
     const frame = DailyIframe.createFrame(callWrapper);
     callFrame.value = frame;
 
+
     frame
         .on("loaded", logEvent)
         .on("started-camera", logEvent)
@@ -125,18 +136,18 @@ const joinRoom = () => {
         .on("joining-meeting", joiningMeeting)
         .on("joined-meeting", joinedMeeting)
         .on("left-meeting", leaveCall)
-        .on("raise-hand", raiseHand)
         .on("participant-joined", participantJoined)
         .on("participant-left", updateParticipants)
 
     frame.join({ url: roomLink, token: token, showFullscreenButton: true, showLeaveButton: true });
-
 
 }
 
 onBeforeUnmount(() => {
 
 })
+    
+
 
 </script>
 

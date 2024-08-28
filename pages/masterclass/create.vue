@@ -5,7 +5,7 @@
         </div>
         <div class="grid grid-cols-5 gap-4 w-full">
             <div class="col-span-3 py-4">
-                <UForm ref="form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+                <UForm ref="form" :state="state" class="space-y-4" @submit="onSubmit">
                     <UFormGroup label="Title" name="title">
                         <UInput v-model="state.title" size="lg" autofocus />
                     </UFormGroup>
@@ -95,7 +95,8 @@
                         </USelectMenu>
                     </UFormGroup>
 
-                    <div class="border border-gray-300 dark:border-[#374151] dark:bg-transparent bg-white p-6 rounded-md">
+                    <div
+                        class="border border-gray-300 dark:border-[#374151] dark:bg-transparent bg-white p-6 rounded-md">
                         <div class="flex flex-col mb-4">
                             <h3 class="text-xl font-semibold ">External animators</h3>
                             <p class="text-sm text-slate-500">Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -123,7 +124,8 @@
                         <UDivider class="my-4" />
                         <div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div v-for="(external_animator, index) in state.external_animators" class="flex justify-between px-4 py-2 items-center bg-white dark:bg-gray-900 border dark:border-slate-700 rounded-md">
+                                <div v-for="(external_animator, index) in state.external_animators"
+                                    class="flex justify-between px-4 py-2 items-center bg-white dark:bg-gray-900 border dark:border-slate-700 rounded-md">
                                     <div class="flex flex-col">
                                         <h4 class="font-semibold text-md capitalize">
                                             {{ external_animator.external_user_name }}
@@ -132,7 +134,8 @@
                                             {{ external_animator.external_user_email }}
                                         </p>
                                     </div>
-                                    <UButton @click="removeExternalUser(index)" icon="i-heroicons-trash" size="xs" color="red" variant="solid" :trailing="false" />
+                                    <UButton @click="removeExternalUser(index)" icon="i-heroicons-trash" size="xs"
+                                        color="red" variant="solid" :trailing="false" />
                                 </div>
                             </div>
                         </div>
@@ -323,7 +326,7 @@ const isValidEmail = (email) => {
 }
 
 const addExternalUser = () => {
-    errors.value = errors.value.filter(error => error.key !== 'externalUserName');  
+    errors.value = errors.value.filter(error => error.key !== 'externalUserName');
     if (externalUserName.value && isValidEmail(externalUserEmail.value)) {
         state.external_animators.push({ external_user_name: externalUserName.value, external_user_email: externalUserEmail.value })
         externalUserName.value = ""
@@ -358,17 +361,17 @@ const onSubmit = async () => {
                     state[key].forEach((item, index) => {
                         formData.append(`${key}[${index}][user_id]`, (item?.id) ? item.id : item);
                     })
-                } if(key === 'external_animators'){
+                } if (key === 'external_animators') {
                     state[key].forEach((item, index) => {
                         formData.append(`${key}[${index}][external_user_name]`, (item?.external_user_name))
-                        formData.append(`${key}[${index}][external_user_email]`, (item?.external_user_email) )
+                        formData.append(`${key}[${index}][external_user_email]`, (item?.external_user_email))
                     })
                 } else {
-                   if(key != 'external_animators' && key != 'internal_animators'){
+                    if (key != 'external_animators' && key != 'internal_animators') {
                         state[key].forEach((item, index) => {
                             formData.append(`${key}[${index}]`, (item?.id) ? item.id : item);
                         })
-                   }
+                    }
                 }
             } else if (key === 'date') {
                 const formattedDate = convertTimeToUTC(state[key], 'YYYY-MM-DD HH:mm:ss')
@@ -398,8 +401,6 @@ const onSubmit = async () => {
 
     submitLoading.value = false
 }
-
-
 
 </script>
 

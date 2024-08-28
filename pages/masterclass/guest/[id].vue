@@ -28,7 +28,7 @@
                                     <div class="mb-8">
                                         <h1 class="text-2xl font-bold">{{ masterclass?.title }}</h1>
                                     </div>
-                                </div>  
+                                </div>
                                 <div
                                     class="p-4 w-16 h-16 bg-green-400 text-black rounded-md flex flex-col justify-center items-center">
                                     <p class="text-2xl font-semibold ">{{ $dayjs(masterclass?.date).format('DD') }}</p>
@@ -140,13 +140,13 @@
                             v-if="!IsPassed && !masterclassGotStarted" @click="subscribeUser" label="Subscribe" />
 
 
-                        <UButton block  @click="joinMasterClassModal = true" size="lg"
+                        <UButton block @click="joinMasterClassModal = true" size="lg"
                             class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
                             v-if="!IsPassed" label="Join" />
 
-                        <UButton v-if="!IsPassed && (!paymentSuccess || paymentSuccess != 1) && !masterclassStarted" block variant="outline"
-                            color="green" :loading="submitLoading" size="lg" class="my-4" @click="subscribeUser"
-                            label="Subscribe" />
+                        <UButton v-if="!IsPassed && (!paymentSuccess || paymentSuccess != 1) && !masterclassStarted"
+                            block variant="outline" color="green" :loading="submitLoading" size="lg" class="my-4"
+                            @click="subscribeUser" label="Subscribe" />
 
                         <div v-if="IsPassed" class="flex justify-center mt-4">
                             <UDivider label="Masterclass end" />
@@ -160,7 +160,8 @@
 
                     </div>
 
-                    <UAlert v-if="paymentSuccess" icon="i-heroicons-check" color="green" variant="subtle" title="Payment successfully"
+                    <UAlert v-if="paymentSuccess" icon="i-heroicons-check" color="green" variant="subtle"
+                        title="Payment successfully"
                         description="Please check your email for the credentials to join the masterclass." />
                 </div>
 
@@ -176,7 +177,10 @@
                     <img class="w-1/3 flex dark:hidden" src="~/assets/svg/vectors/masterclass.svg" alt="">
                     <img class="w-1/3 hidden dark:flex" src="~/assets/svg/vectors/masterclass-white.svg" alt="">
                     <h2 class="text-xl md:text-3xl font-bold">{{ $t('Subscribe to masterclass') }}</h2>
-                    <p class="text-gray-600 dark:text-slate-300 text-sm text-center">{{ $t('Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry') }}</p>
+                    <p class="text-gray-600 dark:text-slate-300 text-sm text-center">{{
+                        $t(
+                            'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry')
+                        }}</p>
                 </div>
 
                 <UForm ref="form" :schema="schema" :state="subscribeState" @submit="submitSubscribeForm"
@@ -243,7 +247,8 @@
                         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
                             {{ $t('Join to masterclass') }}
                         </h3>
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1 z-50" @click="joinMasterClassModal = false" />
+                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1 z-50"
+                            @click="joinMasterClassModal = false" />
                     </div>
                 </template>
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
@@ -268,19 +273,21 @@
 
 
                     <div class="flex flex-col justify-between space-y-2">
-                        <UButton v-if="masterclassStarted && !IsPassed" block :loading="loadingSubmit" size="lg" :color="$colorMode.value == 'dark' ? 'green' : 'primary'" type="submit">
+                        <UButton v-if="masterclassStarted && !IsPassed" block :loading="loadingSubmit" size="lg"
+                            :color="$colorMode.value == 'dark' ? 'green' : 'primary'" type="submit">
                             {{ $t('Submit') }}
                         </UButton>
 
-                        <UButton :disabled="true" v-if="!masterclassStarted && !IsPassed" block :loading="loadingSubmit" size="lg" :color="$colorMode.value == 'dark' ? 'green' : 'primary'" type="submit">
+                        <UButton :disabled="true" v-if="!masterclassStarted && !IsPassed" block :loading="loadingSubmit"
+                            size="lg" :color="$colorMode.value == 'dark' ? 'green' : 'primary'" type="submit">
                             {{ $t('Masterclass started') }}: {{ countdownLabel }}
                         </UButton>
                     </div>
                     <div v-if="!IsPassed">
-                            <UDivider label="" class="my-2" />
-                            <UButton block @click="{joinMasterClassModal= false;resendCredentialsModal = true;}" variant="link" color="green"
-                                label="Resend Credentials" />
-                        </div>
+                        <UDivider label="" class="my-2" />
+                        <UButton block @click="{ joinMasterClassModal = false; resendCredentialsModal = true; }"
+                            variant="link" color="green" label="Resend Credentials" />
+                    </div>
                 </UForm>
             </UCard>
         </UModal>
@@ -401,7 +408,7 @@ const calculateCountdown = () => {
 
     countdownLabel.value = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-    if(days == 0 && hours==0 && minutes==0 && seconds==0){
+    if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
         masterclassGotStarted.value = true
     }
 }
@@ -409,9 +416,9 @@ const calculateCountdown = () => {
 
 
 watch(masterclassGotStarted, async (newValue, oldValue) => {
-    if(newValue){
+    if (newValue) {
         clearInterval(countdownInterval)
-    } 
+    }
 })
 
 const getDataFromApi = async () => {
@@ -433,9 +440,16 @@ const submitSubscribeForm = async () => {
         const result = await guestSubscribeMasterClass(id, subscribeState)
         loadingSubmit.value = false
 
-        if (result) {
+        if (result.status) {
             form.value.clear()
-            window.location.replace(result)
+            window.location.replace(result.data)
+        } else {
+            const { data } = result.data            
+            snackbar.add({
+                type: 'error',
+                text: data.message
+            })
+
         }
     } catch (error) {
         loadingSubmit.value = false
@@ -448,11 +462,11 @@ const submitResendCredentials = async () => {
 
     try {
         const result = await resendExternalCredentials(id, resendCredentialState)
-        
-        if(result?.success){
+
+        if (result?.success) {
             console.log(result.data)
-        }else{
-            const {data, statusCode} = result.data
+        } else {
+            const { data, statusCode } = result.data
             snackbar.add({
                 type: 'error',
                 text: `${data?.message}`
@@ -472,8 +486,8 @@ const submitExternalUserJoin = async () => {
         const result = await externalUserJoin(id, externalUserJoinState)
         loadingSubmit.value = false
 
-       if(result?.success){
-            
+        if (result?.success) {
+
             await navigateTo(
                 {
                     path: '/room',
@@ -483,13 +497,13 @@ const submitExternalUserJoin = async () => {
                     }
                 }
             )
-        }else{
-            const {data, statusCode} = result.data
+        } else {
+            const { data, statusCode } = result.data
             snackbar.add({
                 type: 'error',
                 text: `${data?.message}`
             })
-            
+
         }
 
     } catch (error) {
@@ -499,10 +513,10 @@ const submitExternalUserJoin = async () => {
 }
 
 
-async function onError (event) {
-  const element = document.getElementById(event.errors[0].id)
-  element?.focus()
-  element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+async function onError(event) {
+    const element = document.getElementById(event.errors[0].id)
+    element?.focus()
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 }
 
 const subscribeUser = async () => {
