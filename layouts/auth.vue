@@ -13,7 +13,7 @@
         <NuxtPage />
       </div>
     </div>
-    <UNotifications class="z-10"/>
+    <!-- <UNotifications class="z-10"/> -->
     <!-- <img class="absolute top-0 right-0 z-10" :src="yellowBlurEffect" alt="" srcset=""> -->
 
   </div>
