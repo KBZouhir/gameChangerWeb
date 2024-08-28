@@ -9,7 +9,7 @@ const { locale, setLocale } = useI18n()
 const { $moment } = useNuxtApp()
 $moment.locale('fr')
 
-
+ 
 
 </script>
 
