@@ -44,13 +44,13 @@ const items = [
             <div class="relative flex h-20 items-center justify-between">
                 <div class="flex items-center justify-center sm:items-stretch sm:justify-start">
                     <div class="flex flex-shrink-0 items-center dark:hidden">
-                        <nuxt-link to="/home">
+                        <nuxt-link to="/">
                             <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
                         </nuxt-link>
                     </div>
 
                     <div class="hidden flex-shrink-0 items-center dark:flex">
-                        <nuxt-link to="/home">
+                        <nuxt-link to="/">
                             <img class="h-6 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg"
                                 alt="Game changer">
                         </nuxt-link>

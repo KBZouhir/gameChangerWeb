@@ -12,8 +12,8 @@
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
-            <nuxt-link :to="`/masterclass/${masterclass.id}`" v-for="(masterclass, index) in masterClassList?.data" :key="masterclass.id"
-                :style="`background-image: url(${masterclass.image_url});`"
+            <div v-for="(masterclass, index) in masterClassList?.data"
+                :key="masterclass.id" :style="`background-image: url(${masterclass.image_url});`"
                 class="text-white bg-cover rounded-lg overflow-hidden">
 
                 <div class="p-8 w-full h-full flex flex-col space-y-4 bg-gradient-to-r from-primary to-transparent">
@@ -46,8 +46,21 @@
                         </nuxt-link>
                     </div>
                 </div>
-            </nuxt-link>
+            </div>
         </div>
+
+        <InfiniteLoading @infinite="fetchMoreMasterClass">
+            <template #spinner>
+                <div class="flex justify-center w-full">
+                    <LoadingIcon />
+                </div>
+            </template>
+            <template v-if="masterClassList?.data?.length > 0" #complete>
+                <div class="flex justify-center my-4">
+                    <span>No more data found!</span>
+                </div>
+            </template>
+        </InfiniteLoading>
     </div>
 </template>
 
@@ -57,6 +70,9 @@
 import { listMasterClass } from '~/composables/store/useMasterClass'
 import { useMasterClassStore } from '~/stores/masterclass'
 import { useAuthStore } from '~/stores/authStore'
+import { getPaginationsComments } from '~/composables/store/usePost'
+import InfiniteLoading from "v3-infinite-loading"
+import "v3-infinite-loading/lib/style.css"
 
 const authStore = useAuthStore();
 const user = computed(() => authStore.getAuthUser)
@@ -75,6 +91,22 @@ definePageMeta({
 
 const getDataFromApi = async () => {
     await listMasterClass()
+}
+
+
+const fetchMoreMasterClass = async $state => {
+    console.log("fetch more data");
+
+    if (masterClassList.value?.links?.next == null) { $state.complete(); return }
+    try {
+        const result = await getPaginationsComments(masterClassList.value.links.next)
+        masterClassList.value.data.push(...result.data)
+        masterClassList.value.links = result.links
+        if (result.data.length < 10) $state.complete()
+
+    } catch (error) {
+        $state.error()
+    }
 }
 
 watchEffect(() => {
