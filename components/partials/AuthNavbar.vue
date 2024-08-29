@@ -5,6 +5,7 @@ import { useAuthStore } from '~/stores/authStore'
 const authStore = useAuthStore();
 const user = computed(() => authStore.getAuthUser)
 
+const isOpen = ref(false)
 
 watchEffect(() => {
     useUser();
@@ -42,19 +43,26 @@ const items = [
     <nav class="bg-white dark:bg-slate-800 sticky top-0 z-50">
         <div class="mx-auto w-full max-w-screen-xl px-2">
             <div class="relative flex h-20 items-center justify-between">
-                <div class="flex items-center justify-center sm:items-stretch sm:justify-start">
-                    <div class="flex flex-shrink-0 items-center dark:hidden">
+                <div class="flex items-center justify-center space-x-2 sm:items-stretch sm:justify-start">
+                    <UButton @click="isOpen = true" size="lg" square
+                        class="block md:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
+                        <template #leading>
+                            <Icon name="tabler:list" size="20" class="dark:text-white text-primary" />
+                        </template>
+                    </UButton>
+                    <div class="flex-shrink-0 items-center dark:hidden hidden md:flex">
                         <nuxt-link to="/">
                             <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
                         </nuxt-link>
                     </div>
 
-                    <div class="hidden flex-shrink-0 items-center dark:flex">
+                    <div class="flex-shrink-0 items-center dark:flex hidden dark:md:flex">
                         <nuxt-link to="/">
-                            <img class="h-6 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg"
+                            <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg"
                                 alt="Game changer">
                         </nuxt-link>
                     </div>
+
                 </div>
 
                 <div class="hidden sm:ml-16 sm:flex items-center">
@@ -146,5 +154,56 @@ const items = [
                 </div>
             </div>
         </div>
+
+        <USlideover v-model="isOpen">
+            <div class="p-4">
+                <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
+                    class="flex sm:hidden absolute end-5 top-5 z-10" square padded @click="isOpen = false" />
+                <div @click="isOpen = false" class="flex flex-shrink-0 items-center dark:hidden">
+                    <nuxt-link to="/">
+                        <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
+                    </nuxt-link>
+                </div>
+
+                <div @click="isOpen = false" class="hidden flex-shrink-0 items-center dark:flex">
+                    <nuxt-link to="/">
+                        <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Game changer">
+                    </nuxt-link>
+                </div>
+            </div>
+
+           <div class="p-4">
+            <ul role="list" class="-mx-2 space-y-1 my-4">
+                <li @click="isOpen = false">
+                    <nuxt-link to="/"
+                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                        <Icon name="tabler:home" />
+                        Home
+                    </nuxt-link>
+                </li>
+                <li @click="isOpen = false">
+                    <nuxt-link to="/services"
+                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                        <Icon name="tabler:briefcase" />
+                        Services
+                    </nuxt-link>
+                </li>
+                <li @click="isOpen = false">
+                    <nuxt-link to="/calendar" 
+                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                        <Icon name="tabler:calendar" />
+                        Calendar
+                    </nuxt-link>
+                </li>
+                <li @click="isOpen = false">
+                    <nuxt-link to="/masterclass"
+                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                        <Icon name="tabler:device-tv" />
+                        Masterclass
+                    </nuxt-link>
+                </li>
+            </ul>
+           </div>
+        </USlideover>
     </nav>
 </template>

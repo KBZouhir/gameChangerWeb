@@ -126,7 +126,7 @@
                     </div>
 
                     <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
-                        <VideoPlayer :videoSrc="`https://gc-dev.informatikab.com/api/v1${post.video.path}`"
+                        <VideoPlayer :videoSrc="`${post?.video?.url}`"
                             :poster="post.video.thumbnail_url" />
                     </ClientOnly>
                     <div>
@@ -194,6 +194,7 @@
                 </div>
 
             </UCard>
+
             <InfiniteLoading @infinite="fetchMorePosts">
                 <template #spinner>
                     <div class="flex justify-center w-full">

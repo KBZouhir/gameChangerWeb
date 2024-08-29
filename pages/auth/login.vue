@@ -97,12 +97,12 @@ async function onSubmit(event) {
         const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = result.data.user
 
         if (role.id == 3) {
-            navigateTo('/home')
+            navigateTo('/')
         }
 
         if (is_completed && (is_email_verified || is_phone_verified)) {
             // go to dashboard
-            navigateTo('/home')
+            navigateTo('/')
             return
         }
 
@@ -114,6 +114,7 @@ async function onSubmit(event) {
 
         if (!is_email_verified && email && !phone) {
             await ResendValidationMail();
+            navigateTo('/auth/validation')
             return
         }
 

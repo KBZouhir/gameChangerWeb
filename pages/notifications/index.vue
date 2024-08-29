@@ -18,7 +18,7 @@
 
             <ul v-if="notifications?.data?.length > 0" role="list" class="">
                 <li v-for="(notification, index) in notifications?.data" :key="index"
-                    class="flex items-start p-4 shadow mb-4 rounded-md relative bg-transparent border border-slate-800/40">
+                    class="flex items-start p-4 shadow mb-4 rounded-md relative bg-transparent border dark:border-slate-800/40">
                     <div class="flex-1">
                         <div class="flex items-center space-x-4 ">
                             <UAvatar :src="notification.data.image_url" alt="" size="md" />

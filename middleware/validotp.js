@@ -6,7 +6,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const authStore = useAuthStore();
   var user = authStore.getAuthUser;
 
-  if(user.is_completed){
+  if (!authStore.isLoggedIn) {
+    return navigateTo("/auth/login");
+  }
+
+  if(user?.is_email_verified || user?.is_phone_verified){
     return navigateTo("/");
   }
 });

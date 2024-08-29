@@ -12,7 +12,7 @@
 
                 <div class="flex flex-col space-y-4 mt-8">
                     <UButton @click="joinRoom" block size="lg" color="green">Rejoin to meeting</UButton>
-                    <nuxt-link to="/home">
+                    <nuxt-link to="/">
                         <UButton block size="lg" color="red">Back home</UButton>
                     </nuxt-link>
                 </div>

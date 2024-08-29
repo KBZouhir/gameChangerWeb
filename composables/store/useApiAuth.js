@@ -32,12 +32,19 @@ const validationMail = async (payload) => {
     body: payload,
     method: "POST",
   });
-
-  if (data) {
-    // successAlert(data.message);
-    // store.setSeason(data.season);
+  
+  if(data){
+   
+    return {
+      success: true,
+      data: data
+    }
+  }else{
+    return {
+      success: false,
+      data: error
+    }
   }
-  return { data, error, refresh, pending };
 };
 
 const sendOtp = async (payload) => {
@@ -52,10 +59,14 @@ const sendOtp = async (payload) => {
 };
 
 const ResendValidationMail = async () => {
-  return await useApi(`/email/resend`, {
+  const { data, refresh, error, pending } = await useApi(`/email/resend`, {
     initialCache: false,
     method: "POST",
   });
+
+  return data
+  
+  
 };
 
 const login = async (payload) => {
@@ -82,7 +93,7 @@ const login = async (payload) => {
     const userTokenCookie = useCookie("user_access_token")
     userTokenCookie.value = data.token
     authStore.syncAuthUser(data.user)
-
+    getSettings()
     const { role } = data.user
     
     if(role.id != 3){
@@ -120,7 +131,7 @@ const completeProfile = async (payload) => {
     body: payload,
     method: "POST",
   });
-
+  
   return { data, error, refresh, pending };
 };
 

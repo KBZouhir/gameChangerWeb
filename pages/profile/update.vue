@@ -32,8 +32,9 @@
                         class="flex md:flex-row flex-col items-center md:items-start space-x-4 space-y-2 w-3/4 mx-auto ">
                         <div
                             class="w-32 h-32 bg-white dark:bg-slate-900 shadow-sm p-1 rounded-2xl relative -mt-12 md:mx-0 mx-auto md:block">
-                            <img v-if="!selectedProfileImage" :src="user?.image_url"
+                            <img v-if="!selectedProfileImage && user?.image_url" :src="user?.image_url"
                                 class="w-full h-full object-cover rounded-2xl" :alt="user.full_name">
+                                <div v-if="!user?.image_url && !selectedProfileImage" class="w-full h-full flex items-center justify-center text-2xl font-bold">{{ getInitials(user.full_name) }}</div>
                             <img v-if="selectedProfileImage" :src="selectedProfileImage"
                                 class="w-full h-full object-cover rounded-2xl" :alt="user.full_name">
                             <UButton @click="triggerProfileUpload" :ui="{ rounded: 'rounded-full' }"
@@ -263,6 +264,13 @@ const uploadProfilePictureFun = async () => {
     uploadProfileLoading.value = false
 }
 
+
+const getInitials = (fullName) => {
+    return fullName
+        .split(' ')           
+        .map(name => name[0]) 
+        .join('');            
+}
 
 </script>
 

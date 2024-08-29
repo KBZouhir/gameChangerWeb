@@ -6,12 +6,12 @@
 
         <input ref="phoneInput" type="tel" id="phone" @input="onInput" autofocus class="text-sm w-full"
             :value="modelValue" @blur="validatePhone" />
-        <span v-if="user.is_phone_verified" class="flex space-x-4 text-[#34d399] text-xs absolute right-4 top-9">
-            Verified
+        <span v-if="user.is_phone_verified" class="flex items-center space-x-1 text-[#34d399] text-xs absolute right-4 top-9">
+           <span>Verified</span> 
             <Icon name="tabler:circle-check" size="18" />
         </span>
-        <span v-else class="text-amber-600 text-xs absolute right-4 top-9">
-            Not verified
+        <span v-else class="flex items-center space-x-1 text-amber-600 text-xs absolute right-4 top-9">
+           <span> Not verified</span>
             <Icon name="tabler:alert-octagon" size="18" />
         </span>
 
@@ -39,7 +39,7 @@ const validationMessage = ref();
 
 onMounted(() => {
     iti.value = intlTelInput(phoneInput.value, {
-        initialCountry: 'dz',
+        initialCountry: 'fr',
         geoIpLookup: function (success, failure) {
             fetch("https://ipapi.co/json")
                 .then(function (res) { return res.json(); })

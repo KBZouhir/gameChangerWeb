@@ -4,7 +4,7 @@
             <div class="pt-8">
                 <h1 class="mb-3 text-2xl font-bold">Create Service</h1>
             </div>
-            <div class="grid grid-cols-5 gap-4 w-full">
+            <div class="grid md:grid-cols-5 grid-cols-1 gap-4 w-full">
                 <div class="col-span-3 py-4">
                     <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                         <UFormGroup label="Title" name="title">
@@ -70,7 +70,7 @@
 
                 </div>
 
-                <div class="col-span-2 py-4 sticky top-0">
+                <div class="col-span-2 py-4 sticky top-0 hidden md:block">
                     <UCard :ui="{ body: 'p-0' }" class="overflow-hidden">
                         <div :class="`h-64 rounded-tr-lg rounded-tl-lg  bg-cover`"
                             :style="`background-image: url(${ compressedFiles[0]?.preview || (state.image) ? state.image : fallbackImage});`">

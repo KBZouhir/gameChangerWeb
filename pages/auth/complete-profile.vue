@@ -211,7 +211,6 @@ const formValidation = () => {
 
 const submitForm = async () => {
   formValidation();
-  console.log(formData);
   
   let payload = {
     address: null,
@@ -234,15 +233,16 @@ const submitForm = async () => {
 
   
   const result = await completeProfile(payload);
-
+  console.log(result);
+  
   if (!result.data) {
     const error = handleApiError(result.error);
     if (error.status === 422) {
       form.value.setErrors(error.errors);
     }
   }
-  if (result?.success) {
-    await navigateTo('/home')
+  if (result?.data?.success) {
+    await navigateTo('/')
   }
 };
 </script>

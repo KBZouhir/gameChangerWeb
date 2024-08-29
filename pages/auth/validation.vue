@@ -1,25 +1,26 @@
 <script setup>
 
 import { validationMail, ResendValidationMail, sendOtp } from '~/composables/store/useApiAuth'
-import {useAuthStore} from "~/stores/authStore";
+import { useAuthStore } from "~/stores/authStore";
 import VOtpInput from "vue3-otp-input";
-
-
 
 
 definePageMeta({
     layout: 'auth',
     title: 'Validation',
-    middleware: 'auth'
+    middleware: ['validotp']
 })
 
 const error = ref(false)
-const timeLeft = ref(30)
+const timeLeft = ref(2)
 const form = ref()
 const loading = ref(false)
 let intervalId = null
 
 const authStore = useAuthStore();
+const snackbar = useSnackbar();
+const router = useRouter()
+
 
 const state = reactive({
     code: undefined,
@@ -52,9 +53,7 @@ const counter = () => {
 
 
 async function validationOtp() {
-    loading.value = true
-    form.value.setErrors([])
-    const result = null
+
     const { is_email_verified, is_phone_verified, phone, email } = authStore.user
 
     if (state.code.length <= 5) {
@@ -62,24 +61,21 @@ async function validationOtp() {
         return
     }
 
-    if(!is_email_verified && email && !phone) {
-        console.log("validation mail");
-        result = await validationMail(state);
+    if (!is_email_verified && email && !phone) {
+        loading.value = true
+        const result = await validationMail(state);
         loading.value = false
-        console.log(result);
+
+        if (result?.success) {
+            await navigateTo('/auth/complete-profile')
+        } else {
+            snackbar.add({
+                type: 'error',
+                text: result.message
+            })
+        }
     }
 
-    // if (!result.data) {
-    //     console.log("oioiezoipoipzaoizaeoizeaoizaeiopzaeopiezaopizaoizaopizeaoipezaoip");
-    //     const error = handleApiError(result.error);
-    //     if (error.status === 422) {
-    //         form.value.setErrors(error.errors);
-    //     }
-    // }
-
-    // if (result.data?.success) {
-    //     await navigateTo({ path: '/' })
-    // }
 }
 
 async function resendOtp() {
@@ -87,13 +83,20 @@ async function resendOtp() {
     timeLeft.value = 30
     counter()
 
-    const result = ResendValidationMail()
-    if (!result.data) {
-        const error = handleApiError(result.error);
-        if (error.status === 422) {
-            form.value.setErrors(error.errors);
-        }
+    const result = await ResendValidationMail()
+
+    console.log(result);
+    if (result?.success) {
+        snackbar.add({
+            type: 'success',
+            text: result.data.message
+        })
+    }else{
+
     }
+
+
+
 }
 
 </script>
@@ -117,8 +120,10 @@ async function resendOtp() {
 
 
                     <div class="mt-4">
-                        <UButton type="submit" block class="px-6 py-3 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500 dark:disabled:bg-emerald-300" :loading="loading"
-                            @click="validationOtp" :disabled="!state.code || state.code.length < 6">Continue</UButton>
+                        <UButton type="submit" block
+                            class="px-6 py-3 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500 dark:disabled:bg-emerald-300"
+                            :loading="loading" @click="validationOtp" :disabled="!state.code || state.code.length < 6">
+                            Continue</UButton>
                     </div>
 
                     <UDivider label="" class="my-6" />
@@ -170,7 +175,7 @@ async function resendOtp() {
     background-color: #1e293b;
 }
 
-.dark .otp-input  {
+.dark .otp-input {
     border-color: #1e293b;
 }
 

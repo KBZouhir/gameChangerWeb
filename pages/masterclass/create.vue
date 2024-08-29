@@ -4,7 +4,7 @@
             <h1 class="mb-3 text-2xl font-bold">Create masterclass</h1>
         </div>
         <div class="grid grid-cols-5 gap-4 w-full">
-            <div class="col-span-3 py-4">
+            <div class="col-span-5 py-4">
                 <UForm ref="form" :state="state" class="space-y-4" @submit="onSubmit">
                     <UFormGroup label="Title" name="title">
                         <UInput v-model="state.title" size="lg" autofocus />

@@ -30,28 +30,27 @@ export default defineNuxtConfig({
     "dayjs-nuxt",
   ],
 
-  icon: {
-    customCollections: [
-      {
-        prefix: "my-icon",
-        dir: "./assets/svg/icons",
-      },
-    ],
-  },
+  // icon: {
+  //   customCollections: [
+  //     {
+  //       prefix: "my-icon",
+  //       dir: "./assets/svg/icons",
+  //     },
+  //   ],
+  // },
 
   pinia: {
     storesDirs: ["./stores/**"],
   },
 
   build: {
-    transpile: ["@vuepic/vue-datepicker"],
+    transpile: ["@vuepic/vue-datepicker", '@fawmi/vue-google-maps', '@googlemaps/markerclusterer'],
   },
 
   snackbar: {
     bottom: true,
     duration: 5000,
   },
-
 
   tailwindcss: {
     config: {
@@ -98,15 +97,6 @@ export default defineNuxtConfig({
     },
   },
 
-  i18n: {
-    locales: [
-      { code: "en", name: "English", flag: "🇬🇧" },
-      { code: "fr", name: "Français", flag: "🇫🇷" },
-    ],
-    defaultLocale: "en",
-    vueI18n: "./i18n.config.ts",
-  },
-
   // nitro: {
   //   routeRules: {
   //     '/**': {
@@ -117,4 +107,14 @@ export default defineNuxtConfig({
   //     },
   //   },
   // },
+  i18n: {
+    locales: [
+      { code: "en", name: "English", flag: "🇬🇧" },
+      { code: "fr", name: "Français", flag: "🇫🇷" },
+    ],
+    defaultLocale: "en",
+    vueI18n: "./i18n.config.ts",
+  },
+
+  compatibilityDate: "2024-08-29",
 });

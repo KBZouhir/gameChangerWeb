@@ -1,10 +1,55 @@
 <template>
     <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl px-2 ">
-            <div class="pt-8">
-                <h1 class="mb-3 text-2xl font-bold">Create Service</h1>
+            <div class="my-4">
+                <nav class="flex w-full" aria-label="Breadcrumb">
+                    <ol role="list" class="flex space-x-4 rounded-md bg-white dark:bg-slate-800 px-6 shadow">
+                        <li class="flex">
+                            <div class="flex items-center">
+                                <nuxt-link to="/">
+                                    <div class="text-gray-400 hover:text-gray-500">
+                                        <Icon name="tabler:home" size="16" color="white" />
+                                        <span class="sr-only">{{ $t('Home') }}</span>
+                                    </div>
+                                </nuxt-link>
+                            </div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex items-center">
+                                <svg class="h-full w-6 flex-shrink-0 dark:text-slate-900 text-gray-200"
+                                    viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor"
+                                    aria-hidden="true">
+                                    <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+                                </svg>
+                                <nuxt-link to="/services">
+                                    <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700">
+                                        {{ $t('Services') }}
+                                    </div>
+                                </nuxt-link>
+                                
+                            </div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex items-center">
+                                <svg class="h-full w-6 flex-shrink-0 dark:text-slate-900 text-gray-200"
+                                    viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor"
+                                    aria-hidden="true">
+                                    <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+                                </svg>
+                                <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700" aria-current="page">
+                                    {{ $t('Create Service') }}
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
             </div>
-            <div class="grid grid-cols-5 gap-4 w-full">
+            <div class="pt-2">
+                <h1 class="mb-3 text-2xl font-bold">
+                    {{ $t('Create Service') }}
+                </h1>
+            </div>
+            <div class="grid md:grid-cols-5 grid-cols-1 gap-4 w-full">
                 <div class="col-span-3 py-4">
                     <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                         <UFormGroup label="Title" name="title">
@@ -25,14 +70,17 @@
                             </div>
                         </div>
 
-                        <SelectDomain v-model="state.domains"/>
-                        <p v-show="keyExists('domain') && compressedFiles.length <= 0"class="text-red-500 text-[10px]">{{ getErrorMessage('domain') }}</p>
+                        <SelectDomain v-model="state.domains" />
+                        <p v-show="keyExists('domain') && compressedFiles.length <= 0" class="text-red-500 text-[10px]">
+                            {{ getErrorMessage('domain') }}</p>
                         <UFormGroup label="Image" name="image">
-                            <UInput ref="inputFileImage" type="file" :class="(keyExists('image') && compressedFiles.length <= 0) ? `border border-red-500 rounded-lg` : ``" accept="image/*" @change="onImageFileChange" size="lg"
-                                icon="i-heroicons-folder" />
-                                <p v-show="keyExists('image') && compressedFiles.length <= 0"class="text-red-500 text-[10px]">{{ getErrorMessage('image') }}</p>
+                            <UInput ref="inputFileImage" type="file"
+                                :class="(keyExists('image') && compressedFiles.length <= 0) ? `border border-red-500 rounded-lg` : ``"
+                                accept="image/*" @change="onImageFileChange" size="lg" icon="i-heroicons-folder" />
+                            <p v-show="keyExists('image') && compressedFiles.length <= 0"
+                                class="text-red-500 text-[10px]">{{ getErrorMessage('image') }}</p>
                         </UFormGroup>
-                       
+
 
                         <div v-if="compressedFiles.length > 0" class="my-4">
                             <div
@@ -60,7 +108,9 @@
                             </div>
                         </div>
 
-                        <UButton :loading="submitLoading" type="submit" label="Submit" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary" size="md">
+                        <UButton :loading="submitLoading" type="submit" label="Submit"
+                            class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                            size="md">
                             <template #trailing>
                                 <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
                             </template>
@@ -69,10 +119,10 @@
 
                 </div>
 
-                <div class="col-span-2 py-4 sticky top-0">
+                <div class="col-span-2 py-4 sticky top-0 hidden md:block">
                     <UCard :ui="{ body: 'p-0' }" class="overflow-hidden">
                         <div :class="`h-64 rounded-tr-lg rounded-tl-lg  bg-cover`"
-                            :style="`background-image: url(${ compressedFiles[0]?.preview || fallbackImage});`">
+                            :style="`background-image: url(${compressedFiles[0]?.preview || fallbackImage});`">
                         </div>
                         <div class="flex justify-end -mt-2 ">
                             <UBadge color="green" size="xs" class="px-4" :ui="{ rounded: 'rounded-none' }">
@@ -95,8 +145,8 @@
                         </div>
                         <template #footer>
                             <div class="flex flex-wrap items-center">
-                                <UBadge v-if="state.domains.length <= 0" :label="`Domain ${i}`" color="white"
-                                    size="xs" class="px-3 m-1 text-[10px]" v-for="i in 4" />
+                                <UBadge v-if="state.domains.length <= 0" :label="`Domain ${i}`" color="white" size="xs"
+                                    class="px-3 m-1 text-[10px]" v-for="i in 4" />
                                 <UBadge :label="domain.translated_name" color="white" size="xs"
                                     class="px-3 m-1 text-[10px] " v-for="domain in state.domains" />
                             </div>
@@ -193,20 +243,20 @@ const getErrorMessage = (key) => {
 }
 
 const validationData = () => {
-    if(state.domains.length <= 0){
+    if (state.domains.length <= 0) {
         errors.value.push({ key: 'domain', value: 'Domains can not be empty' })
     }
 
-    if(compressedFiles.value.length <= 0){
+    if (compressedFiles.value.length <= 0) {
         errors.value.push({ key: 'image', value: 'Image can not be empty' })
     }
 
-    return errors.value.length <= 0 
+    return errors.value.length <= 0
 }
 
 const onSubmit = async () => {
-    
-    if(!validationData()) return
+
+    if (!validationData()) return
 
     submitLoading.value = true
 
@@ -216,7 +266,7 @@ const onSubmit = async () => {
     formData.append('description', state.description)
     formData.append('image', compressedFiles.value[0].file)
 
-    if(!estimate.value){
+    if (!estimate.value) {
         formData.append('price', state.price)
     }
 
@@ -225,8 +275,8 @@ const onSubmit = async () => {
     })
 
     const result = await createService(formData)
-    
-    if(result.success){
+
+    if (result.success) {
         submitLoading.value = false
         await navigateTo(`/services/details/${result?.service?.id}`)
     }

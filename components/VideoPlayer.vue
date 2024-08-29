@@ -7,8 +7,8 @@
 </template>
 
 <script setup>
-import { useNuxtApp } from '#app'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useNuxtApp, useCookie } from '#app'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
 const userAccessToken = useCookie('user_access_token')
 
@@ -20,7 +20,7 @@ const props = defineProps({
 
 const videoPlayer = ref(null)
 const { $videojs } = useNuxtApp()
-const poster = ref()
+const poster = ref(props.poster) 
 
 const fetchPosterAsBlob = async (posterUrl) => {
   if (!posterUrl) return ''
@@ -49,9 +49,10 @@ onMounted(async () => {
     return
   }
 
-
-  const posterBlobUrl = await fetchPosterAsBlob(props.poster)
-  poster.value = posterBlobUrl
+  if (props.poster) {
+    const posterBlobUrl = await fetchPosterAsBlob(props.poster)
+    poster.value = posterBlobUrl
+  }
 
   const player = $videojs(videoPlayer.value, {
     autoplay: false,
@@ -61,19 +62,29 @@ onMounted(async () => {
   })
 
 
-  player.ready(() => {
-    // Ensure VHS is available
-    const vhsOptions = player.tech()?.vhs || player.tech()?.hls;
+  try {
+      const response = await fetch(props.videoSrc, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${userAccessToken.value}`,
+        },
+      });
 
-    if (vhsOptions) {
-      vhsOptions.xhr.beforeRequest = (options) => {
-        options.headers = options.headers || {}
-        options.headers.Authorization = `Bearer ${userAccessToken.value}`
-        return options
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video: ${response.statusText}`);
       }
-    } else {
-      console.error('VHS or HLS is not properly initialized.')
+
+      const videoBlob = await response.blob();
+      const videoUrl = URL.createObjectURL(videoBlob);
+      
+      videoPlayer.value.src = videoUrl;
+
+    } catch (error) {
+      console.error('Error fetching video:', error);
     }
+
+  player.on('error', (e) => {
+    console.error('Video.js error:', e)
   })
 
   onBeforeUnmount(() => {
@@ -82,6 +93,7 @@ onMounted(async () => {
     }
   })
 })
+
 </script>
 
 <style scoped>

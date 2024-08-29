@@ -49,6 +49,12 @@
             </div>
         </div>
 
+        <div v-if="masterClassList.length == 0 && !masterClassList?.meta" class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
+            <div v-for="i in 9" class="text-white bg-cover rounded-lg overflow-hidden border dark:border-slate-900">
+                <USkeleton class="h-64 w-full" />
+            </div>
+        </div>
+
         <InfiniteLoading @infinite="fetchMoreMasterClass">
             <template #spinner>
                 <div class="flex justify-center w-full">

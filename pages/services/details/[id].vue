@@ -1,6 +1,49 @@
 <template>
     <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
+            <div class="my-4">
+                <nav class="flex w-full" aria-label="Breadcrumb">
+                    <ol role="list" class="flex space-x-4 rounded-md bg-white dark:bg-slate-800 px-6 shadow">
+                        <li class="flex">
+                            <div class="flex items-center">
+                                <nuxt-link to="/">
+                                    <div class="text-gray-400 hover:text-gray-500">
+                                        <Icon name="tabler:home" size="16" color="white" />
+                                        <span class="sr-only">{{ $t('Home') }}</span>
+                                    </div>
+                                </nuxt-link>
+                            </div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex items-center">
+                                <svg class="h-full w-6 flex-shrink-0 dark:text-slate-900 text-gray-200"
+                                    viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor"
+                                    aria-hidden="true">
+                                    <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+                                </svg>
+                                <nuxt-link to="/services">
+                                    <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700">
+                                        {{ $t('Services') }}
+                                    </div>
+                                </nuxt-link>
+                                
+                            </div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex items-center">
+                                <svg class="h-full w-6 flex-shrink-0 dark:text-slate-900 text-gray-200"
+                                    viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor"
+                                    aria-hidden="true">
+                                    <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+                                </svg>
+                                <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700" aria-current="page">
+                                    {{ service?.title}}
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
             <div class="relative overflow-hidden rounded-lg  px-6 h-[450px] sm:py-32 lg:px-8">
                 <USkeleton class="absolute inset-0 z-10 h-full w-full object-cover" />
                 <img v-if="service?.image_url" draggable="false" :src="service?.image_url" alt=""
@@ -8,7 +51,7 @@
             </div>
 
             <div class="py-6">
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid md:grid-cols-3 grid-cols-1 gap-4">
                     <div class="col-span-2">
                         <h1 class="text-3xl dark:text-white font-semibold mb-4">{{ service?.title }}</h1>
                         <div>

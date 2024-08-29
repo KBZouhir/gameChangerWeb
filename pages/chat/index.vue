@@ -205,18 +205,16 @@
                         <div class="absolute bottom-0  h-full w-full bg-gradient-to-t from-primary to-transparent">
                         </div>
                         <div class="flex flex-col justify-center items-center relative z-50">
-                            <span class="relative inline-block">
-                                <img class="h-16 w-16 rounded-full"
-                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                    alt="">
-                            </span>
-                            <h2 class="text-xl font-semibold text-white">Lina Krouse</h2>
+                            <UAvatar size="2xl" :src="selectedUser?.image_url" :alt="selectedUser?.full_name" />
+                            <h2 class="text-xl font-semibold text-white">{{ selectedUser?.full_name }}</h2>
                         </div>
 
                         <div class="flex justify-between items-center space-x-3 relative z-50">
-                            <UButton icon="i-heroicons-user" :ui="{ rounded: 'rounded-full' }"
+                            <nuxt-link :to="`/profile/${selectedUser?.id}`">
+                                <UButton icon="i-heroicons-user" :ui="{ rounded: 'rounded-full' }"
                                 class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white"
                                 size="lg" color="primary" square variant="soft" />
+                            </nuxt-link>
                             <UButton icon="i-heroicons-video-camera" :ui="{ rounded: 'rounded-full' }"
                                 class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white"
                                 size="lg" color="primary" square variant="soft" />

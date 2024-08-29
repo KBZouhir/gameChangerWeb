@@ -10,7 +10,7 @@
                         color="primary" size="md"></UButton>
                 </nuxt-link>
             </div>
-            <div class="grid grid-cols-3 gap-4 ">
+            <div class="grid md:grid-cols-3 grid-cols-1 gap-4">
                 <UCard :ui="{ body: 'p-0' }" class="overflow-hidden" v-for="(service, index) in services?.data">
                     <div :class="`relative h-64 rounded-tr-lg rounded-tl-lg bg-cover`"
                         :style="`background-image:url('${service.image_url}')`">
@@ -25,26 +25,27 @@
                     </div>
                     <div class="p-4">
                         <div class="flex items-center space-x-4 mb-4">
-                            <nuxt-link :to="`/profile/${service.user.id}`">
+                            <nuxt-link :to="`/profile/${service?.user.id}`">
                                 <UAvatar :src="service.user.image_url" :alt="service.user.full_name" size="sm" />
                             </nuxt-link>
 
                             <div class="flex flex-col">
-                                <nuxt-link :to="`/profile/${service.user.id}`">
+                                <nuxt-link :to="`/profile/${service?.user.id}`">
                                     <h4 class="font-bold mb-0">{{ service.user.full_name }}</h4>
                                 </nuxt-link>
-                                <span class="text-xs text-slate-400 -mt-[0.5px]">{{ $dayjs(service.created_at).format("DD/MM/YYYY h:MM A")
+                                <span class="text-xs text-slate-400 -mt-[0.5px]">{{
+                                    $dayjs(service.created_at).format("DD/MM/YYYY h:MM A")
                                     }}</span>
                             </div>
                         </div>
 
                         <div class="min-h-32">
-                            <nuxt-link :to="`/services/details/${service.id}`">
-                                <h3 class="text-lg font-semibold truncate mb-2">{{ service.title }} </h3>
+                            <nuxt-link :to="`/services/details/${service?.id}`">
+                                <h3 class="text-lg font-semibold truncate mb-2">{{ service?.title }} </h3>
                             </nuxt-link>
 
                             <div class="text-xs text-slate-600 dark:text-gray-400 line-clamp-4">
-                                {{ service.description }}
+                                {{ service?.description }}
                             </div>
                         </div>
 
@@ -58,6 +59,42 @@
                 </UCard>
 
             </div>
+
+            <div v-if="services.length == 0" class="grid md:grid-cols-3 grid-cols-1 gap-4 ">
+                <UCard :ui="{ body: 'p-0' }" class="overflow-hidden" v-for="i in 9">
+                    <USkeleton class="h-64 w-full" />
+
+                    
+                    <div class="p-4">
+                        <div class="flex items-center space-x-4">
+                            <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
+                            <div class="space-y-2">
+                                <USkeleton class="h-4 w-[250px]" />
+                                <USkeleton class="h-4 w-[200px]" />
+                            </div>
+                        </div>
+
+                        <div class="min-h-32">
+                            <h3 class="text-lg font-semibold truncate mt-2 mb-6">
+                                
+                            </h3>
+                            <div class="flex flex-col space-y-4">
+                                <USkeleton class="h-4 w-full" />
+                                <USkeleton class="h-4 w-full" />
+                                <USkeleton class="h-4 w-full" />
+                                <USkeleton class="h-4 w-[200px]" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <template #footer>
+                        <div class="flex flex-wrap space-x-3 items-center">
+                            <USkeleton class="h-6 w-[70px]" v-for="i in 4" />
+                        </div>
+                    </template>
+                </UCard>
+            </div>
+
             <InfiniteLoading @infinite="fetchMoreServices">
                 <template #spinner>
                     <div class="flex justify-center w-full">
@@ -95,7 +132,6 @@ const services = computed(() => servicesStore.getServices);
 const user = computed(() => authStore.getAuthUser);
 
 const fetchMoreServices = async $state => {
-    console.log("fetch more data");
 
     if (services.value?.links?.next == null) { $state.complete(); return }
     try {
