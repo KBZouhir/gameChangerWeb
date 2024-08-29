@@ -2,7 +2,7 @@
     <div class="mx-auto w-full h-full">
         <div class="overflow-hidden h-full grid grid-cols-5 bg-[#F1F5F9]">
             <div
-                class="bg-white hidden dark:bg-[#111827] dark:border-[#0d121d] border-r border-t lg:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
+                class="bg-white hidden lg:col-span-1 col-span-2 dark:bg-[#111827] dark:border-[#0d121d] border-r border-t md:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
                 <div class="p-4">
                     <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
                         <template #leading>
@@ -17,13 +17,15 @@
 
                     <div class="pt-4">
                         <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
-                            <button @click="{conversationType = 1;selectedUser= null}" :class="conversationType == 1 ? 'dark:bg-white text-black' : ''"
+                            <button @click="{ conversationType = 1; selectedUser = null }"
+                                :class="conversationType == 1 ? 'dark:bg-white text-black' : ''"
                                 class=" flex space-x-1 justify-center items-center text-center rounded-full p-2">
                                 <Icon name="tabler:message-2" />
                                 <span class="font-semibold text-sm">{{ $t('Chat') }}</span>
                             </button>
 
-                            <button @click="{conversationType = 2;selectedUser= null}" :class="conversationType == 2 ? 'dark:bg-white text-black' : ''"
+                            <button @click="{ conversationType = 2; selectedUser = null }"
+                                :class="conversationType == 2 ? 'dark:bg-white text-black' : ''"
                                 class="flex space-x-1 justify-center items-center text-center rounded-full p-2">
                                 <Icon name="tabler:briefcase" />
                                 <span class="font-semibold text-sm">{{ $t('Services') }}</span>
@@ -34,20 +36,21 @@
 
                 <div
                     class="is-scrollbar-hidden relative mt-3 flex flex-1 grow flex-col overflow-y-auto divide-y-[1px] divide-slate-200 dark:divide-slate-800">
-                    
-                    <div v-if="UsersConversations.length > 0 "
-                        v-for="userConversation in UsersConversations" :key="userConversation.id"
-                        @click="getConversation(userConversation)"
+
+                    <div v-if="UsersConversations.length > 0" v-for="userConversation in UsersConversations"
+                        :key="userConversation.id" @click="getConversation(userConversation)"
                         :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
                         class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-100 dark:hover:bg-slate-800 ">
 
-                        <UAvatar :src="(userConversation.conversationable) ? userConversation.conversationable.image_url : userConversation.user.image_url" :alt="userConversation.user.full_name"
-                            size="md" />
+                        <UAvatar
+                            :src="(userConversation.conversationable) ? userConversation.conversationable.image_url : userConversation.user.image_url"
+                            :alt="userConversation.user.full_name" size="md" />
                         <div class="flex flex-1 flex-col">
                             <div class="flex items-baseline justify-between space-x-1.5">
                                 <p
                                     class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
-                                    {{ (userConversation.conversationable) ? userConversation.conversationable.title :  userConversation.user.full_name}}
+                                    {{ (userConversation.conversationable) ? userConversation.conversationable.title :
+                                        userConversation.user.full_name }}
                                 </p>
                                 <span class="text-xs text-slate-400 dark:text-navy-300"> {{
                                     firebaseTimeGo(userConversation.conversation.last_message.created_at) }}</span>
@@ -106,16 +109,19 @@
                 </div>
             </div>
 
-            <div v-if="selectedUser" class="flex flex-col col-span-5 lg:col-span-4">
+            <div v-if="selectedUser" class="flex flex-col col-span-5 md:col-span-3 lg:col-span-4 ml-20 md:ml-0">
                 <div
                     class="h-16 flex justify-between items-center border-y bg-white dark:border-[#0d121d] dark:bg-[#111827]">
                     <div class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
-                        
-                        <UAvatar v-if="selectedService" :src="selectedService.image_url" :alt="selectedService.title" size="md" />
+
+                        <UAvatar v-if="selectedService" :src="selectedService.image_url" :alt="selectedService.title"
+                            size="md" />
                         <UAvatar v-else :src="selectedUser.image_url" :alt="selectedUser.full_name" size="md" />
 
                         <div class="flex flex-col">
-                            <span class="dark:text-white">{{ (selectedService) ? selectedService.title : selectedUser?.full_name }}</span>
+                            <span class="dark:text-white">{{ (selectedService) ? selectedService.title :
+                                selectedUser?.full_name
+                                }}</span>
                             <span class="text-xs text-gray-400 font-light -mt-1">Last seen </span>
                         </div>
                     </div>
@@ -128,7 +134,8 @@
                             icon="i-heroicons-information-circle" size="sm" color="primary" square variant="link" />
                     </ul>
                 </div>
-                <div  class="relative h-[calc(100vh-13rem)] bg-repeat bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
+                <div
+                    class="relative h-[calc(100vh-13rem)] bg-repeat bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
                     <div v-if="selectedService" class="w-full p-2 dark:bg-slate-800 sticky top-0 z-50">
                         {{ selectedService.title }}
                     </div>
@@ -185,8 +192,27 @@
                 </div>
             </div>
 
-            <div v-else class="dark:bg-slate-900 flex flex-col justify-center items-center col-span-4">
-                <div>
+            <div class="dark:border-[#0d121d] bg-white border-t border-r dark:bg-[#111827] p-4 col-span-1 h-full fixed flex flex-col space-y-4 w-20 md:hidden">
+                <UButton @click="isOpen = true" size="lg" square
+                        class="block md:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
+                        <template #leading>
+                            <Icon name="tabler:list" size="20" class="dark:text-white text-primary" />
+                        </template>
+                    </UButton>
+                <div v-if="UsersConversations.length > 0" v-for="userConversation in UsersConversations"
+                    :key="userConversation.id" @click="getConversation(userConversation)"
+                    :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
+                    class="cursor-pointer font-inter ">
+
+                    <UAvatar
+                        :src="(userConversation.conversationable) ? userConversation.conversationable.image_url : userConversation.user.image_url"
+                        :alt="userConversation.user.full_name" size="md" />
+                </div>
+            </div>
+
+            <div v-if="!selectedUser"
+                class="dark:bg-slate-900 grid grid-cols-3 gap-4 col-span-5 md:col-span-3 lg:col-span-4 h-full">
+                <div class="flex flex-col items-center justify-center col-span-5 ml-20">
                     <img class="w-32 mx-auto mb-4 dark:hidden flex" src="~/assets/svg/vectors/chat-illustration.svg"
                         alt="" srcset="">
                     <img class="w-32 mx-auto mb-4 dark:flex hidden"
@@ -212,8 +238,8 @@
                         <div class="flex justify-between items-center space-x-3 relative z-50">
                             <nuxt-link :to="`/profile/${selectedUser?.id}`">
                                 <UButton icon="i-heroicons-user" :ui="{ rounded: 'rounded-full' }"
-                                class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white"
-                                size="lg" color="primary" square variant="soft" />
+                                    class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white"
+                                    size="lg" color="primary" square variant="soft" />
                             </nuxt-link>
                             <UButton icon="i-heroicons-video-camera" :ui="{ rounded: 'rounded-full' }"
                                 class="bg-white/30 hover:bg-white/65 dark:bg-white/30 text-white dark:text-white"
@@ -225,6 +251,10 @@
 
                     </div>
                 </div>
+            </USlideover>
+
+            <USlideover v-model="openSidebar">
+                
             </USlideover>
         </div>
     </div>
@@ -304,7 +334,7 @@ const getConversationsData = async () => {
 
 
                 await getConversations(arrayConversationIds, arrayConversations, false)
-            }else{
+            } else {
                 conversationStore.clearUsersConversations()
             }
             loadConversations.value = false
@@ -339,12 +369,12 @@ const getConversation = async (conversationData) => {
     let id = (conversationData.conversation.conversationable_id) ? conversationData.conversation.conversationable_id : conversationData.user.id
     selectedUser.value = conversationData.user;
     selectedService.value = conversationData.conversationable;
-    const conversationID = await getOrCreateConversation(id , conversationType.value)
+    const conversationID = await getOrCreateConversation(id, conversationType.value)
     console.log(conversationID.conversationable);
-    
+
     selectedConversation.value = conversationID?.id
     messages.value = []
-    
+
     try {
         const messagesCollectionRef = collection($db, "conversations", selectedConversation.value, "messages");
         const messagesQuery = query(messagesCollectionRef, orderBy("created_at", "asc"));
@@ -352,11 +382,11 @@ const getConversation = async (conversationData) => {
         onSnapshot(messagesQuery, (snapshot) => {
             const messagesList = snapshot.docs.map((doc) => doc.data());
             console.log(messagesList);
-            
+
             const filteredMessages = messagesList.filter(
                 (message) => message.sender_uid === selectedUser.value.firebase_uuid
             )
-            
+
             const groupedMessages = messagesList.reduce((groups, message) => {
                 const date = new Date(message.created_at.seconds * 1000)
                     .toISOString()
@@ -384,13 +414,6 @@ const getConversation = async (conversationData) => {
         console.error("Error fetching messages:", error);
     }
 }
-
-const getInitials = (name) => {
-    const nameParts = name.split(' ');
-    const initials = nameParts.map(part => part[0]).join('');
-    return initials;
-}
-
 
 const sendMessage = async () => {
     if (selectedConversation.value) {

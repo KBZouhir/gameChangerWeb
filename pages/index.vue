@@ -126,8 +126,7 @@
                     </div>
 
                     <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
-                        <VideoPlayer :videoSrc="`${post?.video?.url}`"
-                            :poster="post.video.thumbnail_url" />
+                        <VideoPlayer :videoSrc="`${post?.video?.url}`" :poster="post.video.thumbnail_url" />
                     </ClientOnly>
                     <div>
                         <ImageView v-if="post.image" :url="`${post.image.url}`" />
@@ -187,7 +186,8 @@
                             <UButton @click="getPostComments(post.id)" size="sm" color="primary" square variant="link"
                                 class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
                                 <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
-                                <span class="dark:text-white text-black hover:no-underline">{{ post.comments_count }}</span>
+                                <span class="dark:text-white text-black hover:no-underline">{{ post.comments_count
+                                    }}</span>
                             </UButton>
                         </div>
                     </div>
@@ -242,7 +242,91 @@
                                 <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
                                     class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
-                                <!-- <VueTagsInput v-model="tag" :tags="tags" @tags-changed="newTags => tags = newTags" /> -->
+                                <div v-if="compressedFiles.length > 0" class="my-4">
+                                    <div
+                                        class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
+                                        <div v-for="(file, index) in compressedFiles" :key="index"
+                                            class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
+                                            <div class="w-full h-full overflow-hidden border-e">
+                                                <img :src="file.preview" alt="Selected Image"
+                                                    class="object-cover w-full h-full" />
+                                            </div>
+                                            <div v-if="file.progress < 100"
+                                                class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
+                                                <UButton loading
+                                                    :color="(colorMode.value != 'light') ? 'white' : 'primary'"
+                                                    variant="link" disabled>
+                                                    Compressing...
+                                                </UButton>
+                                            </div>
+                                            <div
+                                                class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
+                                                <UButton @click="removeImage(index)" icon="i-heroicons-trash"
+                                                    class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
+                                                    size="2xs" color="primary" square variant="soft" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="videoUrl" class="my-4 rounded-md overflow-hidden relative">
+                                    <video :src="videoUrl" controls width="100%" />
+                                    <UButton @click="removeVideo" icon="i-heroicons-trash"
+                                        class="absolute top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
+                                        size="2xs" color="primary" square variant="soft" />
+                                </div>
+                                <div class="flex space-x-4 items-center pt-4">
+                                    <input ref="inputFileImage" type="file" id="file-input-image"
+                                        @change="onImageFileChange" accept="image/*" hidden :multiple="multiple" />
+                                    <input ref="inputVideoPicker" type="file" id="file-input-video"
+                                        @change="onVideoFileChange" accept="video/*" hidden :multiple="multiple" />
+                                    <UButton :disabled="postHasMedia" @click="triggerFileInput" icon="i-heroicons-photo"
+                                        size="xs" color="primary" square variant="ghost"
+                                        class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
+                                        label="Image" />
+                                    <UButton :disabled="postHasMedia" @click="triggerVideoPicker"
+                                        icon="i-heroicons-video-camera" size="xs"
+                                        class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
+                                        color="primary" square variant="ghost" label="Video" />
+                                </div>
+                            </div>
+
+                        </div>
+                        <template #footer>
+                            <div class="flex justify-end">
+                                <UButton size="lg" @click="submitForm" :disabled="submitBtn" :loading="isLoading"
+                                    class="dark:bg-emerald-500 dark:text-white px-4 py-2" icon="i-heroicons-arrow-right"
+                                    trailing>Post</UButton>
+                            </div>
+                        </template>
+                    </UCard>
+                </UModal>
+
+                <UModal v-model="editPost" :ui="{ width: 'w-full sm:w-full' }" prevent-close>
+                    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
+                                    {{ $t('Create publication') }}
+                                </h3>
+                                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                                    @click="closeEdit" />
+                            </div>
+                        </template>
+                        <div class="flex flex-col space-y-4 relative">
+                            <div class="flex flex-col">
+                                <div class="relative"
+                                    :class="(keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == '') ? 'border-[1px] border-red-400 rounded-md' : ''">
+                                    <QuillEditor :class="(colorMode.value == 'dark' ? 'dark-theme' : '')"
+                                        :options="options" theme="bubble" @text-change="onTextChange"
+                                        v-model:content="content" contentType="html" />
+                                    <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
+                                        :class="(charCount >= maxLength) ? 'text-red-400' : 'text-slate-400'">
+                                        {{ charCount }} / {{ maxLength }}
+                                    </p>
+                                </div>
+                                <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
+                                    class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
                                 <div v-if="compressedFiles.length > 0" class="my-4">
                                     <div
@@ -271,20 +355,24 @@
                                     </div>
                                 </div>
 
-                                <div v-if="videoUrl" class="my-4 rounded-md overflow-hidden">
+                                <div v-if="videoUrl" class="my-4 rounded-md overflow-hidden relative">
                                     <video :src="videoUrl" controls width="100%" />
+                                    <UButton @click="removeVideo" icon="i-heroicons-trash"
+                                        class="absolute top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
+                                        size="2xs" color="primary" square variant="soft" />
                                 </div>
                                 <div class="flex space-x-4 items-center pt-4">
                                     <input ref="inputFileImage" type="file" id="file-input-image"
                                         @change="onImageFileChange" accept="image/*" hidden :multiple="multiple" />
                                     <input ref="inputVideoPicker" type="file" id="file-input-video"
                                         @change="onVideoFileChange" accept="video/*" hidden :multiple="multiple" />
-                                    <UButton @click="triggerFileInput" icon="i-heroicons-photo" size="xs"
-                                        color="primary" square variant="ghost"
-                                        class="hover:bg-primary dark:text-white transition-all duration-300 ease-in-out hover:text-white px-2"
+                                    <UButton :disabled="postHasMedia" @click="triggerFileInput" icon="i-heroicons-photo"
+                                        size="xs" color="primary" square variant="ghost"
+                                        class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
                                         label="Image" />
-                                    <UButton @click="triggerVideoPicker" icon="i-heroicons-video-camera" size="xs"
-                                        class="hover:bg-primary dark:text-white transition-all duration-300 ease-in-out hover:text-white px-2"
+                                    <UButton :disabled="postHasMedia" @click="triggerVideoPicker"
+                                        icon="i-heroicons-video-camera" size="xs"
+                                        class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
                                         color="primary" square variant="ghost" label="Video" />
                                 </div>
                             </div>
@@ -292,10 +380,9 @@
                         </div>
                         <template #footer>
                             <div class="flex justify-end">
-
                                 <UButton size="lg" @click="submitForm" :disabled="submitBtn" :loading="isLoading"
                                     class="dark:bg-emerald-500 dark:text-white px-4 py-2" icon="i-heroicons-arrow-right"
-                                    trailing>Post</UButton>
+                                    trailing>{{ $t('Submit') }}</UButton>
                             </div>
                         </template>
                     </UCard>
@@ -470,10 +557,11 @@
 
 
 <script setup>
-import { create, index, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, deletePost } from '~/composables/store/usePost'
+import { create, index, update, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, deletePost } from '~/composables/store/usePost'
+import { get, getImagebyID } from '~/composables/store/useMedia'
+
 import { uploadVideo } from '~/composables/store/useVideo'
 import { usePostStore } from "~/stores/posts"
-import FsLightbox from "fslightbox-vue/v3"
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import imageCompression from 'browser-image-compression'
@@ -497,18 +585,24 @@ definePageMeta({
 
 
 const isOpen = ref(false)
-const maxLength = ref(200);
+const editPost = ref(false)
+const maxLength = ref(200)
+
 const charCount = computed(() => countChars(content.value));
 const user = computed(() => authStore.getAuthUser);
 const settings = computed(() => settingStore.getSettings);
 const posts = computed(() => postStore.getPosts);
+
+const postHasMedia = computed(() => { return (videoUrl.value || compressedFiles.value.length > 0) ? true : false })
+
+
 const content = ref('');
 const inputFileImage = ref(null)
 const inputVideoPicker = ref()
 const isLoading = ref(false)
+const selectedPostID = ref(null)
 
 const page = ref(1)
-const tags = ref([])
 const errors = ref([])
 const compressedFiles = ref([])
 const multiple = ref(false)
@@ -564,6 +658,11 @@ const removeImage = (index) => {
     if (compressedFiles.value.length === 0) {
         inputFileImage.value.value = null;
     }
+}
+
+const removeVideo = () => {
+    selectedVideo.value = null
+    videoUrl.value = null
 }
 
 const countChars = (htmlString) => {
@@ -628,7 +727,7 @@ const onVideoFileChange = async (event) => {
     formData.append('file', selectedFiles[0])
     submitBtn.value = true
     const result = await uploadVideo(formData)
-    if(result?.success){
+    if (result?.success) {
         selectedVideo.value = result?.id
         submitBtn.value = false
     }
@@ -636,10 +735,10 @@ const onVideoFileChange = async (event) => {
 
 const deletePostFun = async (post) => {
     const result = await deletePost(post?.id);
-    
+
     if (result?.success) {
         posts.value.data = posts.value.data.filter((item) => item.id !== post?.id)
-        
+
         snackbar.add({
             type: 'success',
             text: 'Post deleted successfully',
@@ -726,25 +825,32 @@ const validationData = () => {
     }
 }
 
+const extractHashTags = (content) => {
+    const textContent = content.replace(/<\/?[^>]+(>|$)/g, "")
+    const hashtags = (textContent.match(/#\w+/g) || []).map(tag => tag.substring(1))
+    return hashtags || []
+}
+
 const submitForm = async () => {
     let hashtags = []
     isLoading.value = true
     validationData()
+
+    hashtags = extractHashTags(content.value)
+
 
     if (errors.value.length > 0) {
         isLoading.value = false
         return
     }
 
-    tags.value.forEach((tag) => {
-        hashtags.push(tag.text)
-    })
-
     let formData = new FormData()
     formData.append('description', content.value)
 
     if (hashtags.length > 0) {
-        formData.append('hashtags', hashtags)
+        hashtags.forEach((tag, index) => {
+            formData.append(`hashtags[${index}]`, tag)
+        })
     }
 
     if (compressedFiles.value[0]?.file) {
@@ -755,22 +861,29 @@ const submitForm = async () => {
         formData.append('video', selectedVideo.value)
     }
 
-    const result = await create(formData)
-    if(result?.success){
+    if (!editPost.value) {
+        const result = await create(formData)
+        if (result?.success) {
+            posts.value.data.push(result?.post)
+            isOpen.value = false
 
-        posts.value.data.push(result?.post)
-        isOpen.value = false
-
-        snackbar.add({
-            type: 'success',
-            text: 'Post added successfully',
-        });
+            snackbar.add({
+                type: 'success',
+                text: 'Post added successfully',
+            });
+        }
+    } else {
+        formData.append('_method', 'PUT')
+        const result = await update(selectedPostID.value, formData)
+        clearData()
+        editPost.value = false
     }
+
     isLoading.value = false
 }
 
 const fetchMoreComments = async $state => {
-    if (postCommnets.value.links.next == null) { $state.complete(); return }
+    if (postCommnets.value?.links.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(postCommnets.value.links.next)
         postCommnets.value.data.push(...result.data)
@@ -795,6 +908,21 @@ const fetchMorePosts = async $state => {
     }
 }
 
+const clearData = () => {
+    content.value = ''
+}
+
+const closeEdit = () => {
+    clearData()
+    editPost.value = false
+}
+
+const editPostFun = async (post) => {
+    selectedPostID.value = post?.id
+    content.value = post?.description
+    editPost.value = true;
+}
+
 
 const items = [
     [
@@ -815,7 +943,7 @@ const postDropDown = [
         {
             label: 'Edit',
             icon: 'i-heroicons-pencil-square',
-            function: editPostCommnet
+            function: editPostFun
         }, {
             label: 'Delete',
             icon: 'i-heroicons-trash',
