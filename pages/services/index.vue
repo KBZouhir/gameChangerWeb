@@ -33,7 +33,7 @@
                                 <nuxt-link :to="`/profile/${service.user.id}`">
                                     <h4 class="font-bold mb-0">{{ service.user.full_name }}</h4>
                                 </nuxt-link>
-                                <span class="text-xs text-slate-400 -mt-[0.5px]">{{ $moment(service.created_at)
+                                <span class="text-xs text-slate-400 -mt-[0.5px]">{{ $dayjs(service.created_at).format("DD/MM/YYYY h:MM A")
                                     }}</span>
                             </div>
                         </div>
