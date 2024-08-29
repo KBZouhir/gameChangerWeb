@@ -168,8 +168,10 @@
                                                 {{ message.content }}
                                             </span>
                                             <div v-for="attachment in message.attachments">
+
                                                 <ImageView v-if="attachment.type == 'image'" :id="attachment.id" />
-                                                <VideoPlayer v-else :id="attachment.id" />
+                                                <VideoPlayer v-if="attachment.type == 'video'" :id="attachment.id" />
+                                                <AudioPlayer v-if="attachment.type == 'audio'" :id="attachment.id" />
                                             </div>
                                             <p class="ml-auto mt-1 text-left text-xs text-slate-400 dark:text-navy-300">
                                                 {{ firebaseTimeGo(message.created_at) }}
@@ -194,20 +196,28 @@
 
             <div class="dark:border-[#0d121d] bg-white border-t border-r dark:bg-[#111827] p-4 col-span-1 h-full fixed flex flex-col space-y-4 w-20 md:hidden">
                 <UButton @click="isOpen = true" size="lg" square
-                        class="block md:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
-                        <template #leading>
-                            <Icon name="tabler:list" size="20" class="dark:text-white text-primary" />
-                        </template>
-                    </UButton>
+                    class="block md:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
+                    <template #leading>
+                        <Icon name="tabler:list" size="20" class="dark:text-white text-primary" />
+                    </template>
+                </UButton>
                 <div v-if="UsersConversations.length > 0" v-for="userConversation in UsersConversations"
                     :key="userConversation.id" @click="getConversation(userConversation)"
-                    :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
+                    :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'border-2 border-green-500 rounded-full flex items-center justify-center p-1 dark:bg-slate-800' : ''"
                     class="cursor-pointer font-inter ">
 
                     <UAvatar
                         :src="(userConversation.conversationable) ? userConversation.conversationable.image_url : userConversation.user.image_url"
                         :alt="userConversation.user.full_name" size="md" />
                 </div>
+
+                <template v-if="loadConversations">
+                    <div v-for="i in 10"
+                        class="flex items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+                        <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
+                        
+                    </div>
+                </template>
             </div>
 
             <div v-if="!selectedUser"
@@ -253,8 +263,107 @@
                 </div>
             </USlideover>
 
-            <USlideover v-model="openSidebar">
+            <USlideover v-model="isOpen">
+                <div class="p-4">
+                    <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
+                        <template #leading>
+                            <UButton icon="i-heroicons-arrow-left" color="primary" class="p-0 dark:text-white" square
+                                variant="link" />
+                        </template>
+
+                        <template #trailing>
+                            <UIcon name="i-heroicons-magnifying-glass" />
+                        </template>
+                    </UInput>
+
+                    <div class="pt-4">
+                        <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
+                            <button @click="{ conversationType = 1; selectedUser = null }"
+                                :class="conversationType == 1 ? 'dark:bg-white text-black' : ''"
+                                class=" flex space-x-1 justify-center items-center text-center rounded-full p-2">
+                                <Icon name="tabler:message-2" />
+                                <span class="font-semibold text-sm">{{ $t('Chat') }}</span>
+                            </button>
+
+                            <button @click="{ conversationType = 2; selectedUser = null }"
+                                :class="conversationType == 2 ? 'dark:bg-white text-black' : ''"
+                                class="flex space-x-1 justify-center items-center text-center rounded-full p-2">
+                                <Icon name="tabler:briefcase" />
+                                <span class="font-semibold text-sm">{{ $t('Services') }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
+                <div v-if="UsersConversations.length > 0" v-for="userConversation in UsersConversations"
+                    :key="userConversation.id" @click="getConversation(userConversation)"
+                    :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
+                    class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-100 dark:hover:bg-slate-800 ">
+
+                    <UAvatar
+                        :src="(userConversation.conversationable) ? userConversation.conversationable.image_url : userConversation.user.image_url"
+                        :alt="userConversation.user.full_name" size="md" />
+                    <div class="flex flex-1 flex-col">
+                        <div class="flex items-baseline justify-between space-x-1.5">
+                            <p
+                                class="line-clamp-1 text-sm font-medium text-slate-700 dark:text-white dark:text-navy-100">
+                                {{ (userConversation.conversationable) ? userConversation.conversationable.title :
+                                    userConversation.user.full_name }}
+                            </p>
+                            <span class="text-xs text-slate-400 dark:text-navy-300"> {{
+                                firebaseTimeGo(userConversation.conversation.last_message.created_at) }}</span>
+                        </div>
+                        <div class="mt-1 flex items-center justify-between space-x-1">
+                            <p class="line-clamp-1 text-xs text-slate-400 dark:text-navy-300">
+                                <span
+                                    v-if="(userConversation.conversation.last_message.sender_uid == user.firebase_uuid) && userConversation.conversation.last_message.content != null">You:
+                                </span>
+                                <span v-if="userConversation.conversation.last_message.content != null"
+                                    :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : ''">
+                                    {{ userConversation.conversation.last_message.content }}
+                                </span>
+                                <span v-if="userConversation.conversation.last_message?.attachments"
+                                    :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : 'italic '">
+                                    {{ userConversation.conversation.last_message?.attachments[0].type == 'image' ?
+                                        'You sent a picture' : 'You sent a video'
+                                    }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <template v-if="loadConversations">
+                    <div v-for="i in 10"
+                        class="flex items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+                        <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
+                        <div class="flex flex-1 flex-col space-y-3">
+                            <USkeleton class="h-4" />
+                            <USkeleton class="h-4 w-2/5" />
+                        </div>
+                    </div>
+                </template>
+
+                <template v-if="!loadConversations && UsersConversations.length == 0">
+                    <div class="flex-1 justify-center flex items-center">
+                        <div>
+                            <img class="w-32 mx-auto mb-4 dark:hidden flex"
+                                src="~/assets/svg/vectors/chat-illustration.svg" alt="" srcset="">
+                            <img class="w-32 mx-auto mb-4 dark:flex hidden"
+                                src="~/assets/svg/vectors/chat-illustration-white.svg" alt="" srcset="">
+                            <div class="text-center my-3">
+                                <h2 class="text-xl font-bold">No Conversations</h2>
+                                <p class="text-gray-400">You don't have any conversations yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="flex justify-center py-4" v-if="showMoreBtn && UsersConversations.length > 0">
+                    <UButton @click="fetchMoreUsersConversations" :loading="seeMoreLoading"
+                        class="dark:bg-slate-50 capitalize hover:dark:bg-slate-200" size="xs">load more</UButton>
+                </div>
             </USlideover>
         </div>
     </div>
@@ -279,9 +388,10 @@ const user = computed(() => authStore.getAuthUser);
 const UsersConversations = computed(() => conversationStore.getUsersConversations);
 
 const inputMessage = ref();
-const openSidebar = ref(false);
-const scrollTrigger = ref(null);
-const scrollContainer = ref(null);
+const openSidebar = ref(false)
+const isOpen = ref(false)
+const scrollTrigger = ref(null)
+const scrollContainer = ref(null)
 const loadConversations = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
@@ -366,6 +476,7 @@ const fetchMoreUsersConversations = async () => {
 }
 
 const getConversation = async (conversationData) => {
+    isOpen.value = false
     let id = (conversationData.conversation.conversationable_id) ? conversationData.conversation.conversationable_id : conversationData.user.id
     selectedUser.value = conversationData.user;
     selectedService.value = conversationData.conversationable;

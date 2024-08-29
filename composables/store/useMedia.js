@@ -19,4 +19,14 @@ const getImagebyID = async (id) => {
    return data
 };
 
-export { get, getImagebyID };
+const getAudioByID = async (id) => {
+  const { data, refresh, error, pending } = await useApi(`conversations/attachments/${id}`, {
+    initialCache: false,
+    responseType: 'blob',
+    method: "GET",
+  });
+
+   return data
+};
+
+export { get, getImagebyID, getAudioByID };
