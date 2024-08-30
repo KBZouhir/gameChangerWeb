@@ -67,11 +67,16 @@ async function validationOtp() {
         loading.value = false
 
         if (result?.success) {
+            console.log(result?.success);
+            
             await navigateTo('/auth/complete-profile')
         } else {
+            error.value = true
+            const {data} = result
+            
             snackbar.add({
                 type: 'error',
-                text: result.message
+                text: data.data.message
             })
         }
     }
@@ -85,17 +90,15 @@ async function resendOtp() {
 
     const result = await ResendValidationMail()
 
-    console.log(result);
+    console.log(result)
     if (result?.success) {
         snackbar.add({
             type: 'success',
-            text: result.data.message
+            text: result.message
         })
     }else{
 
     }
-
-
 
 }
 

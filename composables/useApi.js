@@ -12,7 +12,7 @@ export const useApi = async (url, options) => {
   const cookie = useCookie("user_access_token");
   let token = cookie.value;
   const apiRoute = "https://gc-dev.informatikab.com/api/v1";
-  
+
   const DEFAULT_HEADERS = {
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest",
@@ -61,7 +61,7 @@ export const useaSyncApi = async (url, key, options) => {
   const cookie = useCookie("customer_access_token");
   let token = cookie.value;
 
-  const apiRoute = "https://cma-mpifitness.wekode.agency/api/user";
+  const apiRoute = "https://gc-dev.informatikab.com/api/v1";
   // const apiRoute = 'http://127.0.0.1:8000/api/user';
 
   const DEFAULT_HEADERS = {
@@ -71,6 +71,7 @@ export const useaSyncApi = async (url, key, options) => {
   };
 
   key = key ? key : url;
+  console.log(key);
 
   // Here we will create a default set of headers for every request
   // if present we will also spread the `headers` set by the user
@@ -83,8 +84,10 @@ export const useaSyncApi = async (url, key, options) => {
   const opts = options ? (({ headers, ...opts }) => opts)(options) : null;
 
   const baseURL = !options?.baseURL ? apiRoute : options.baseURL;
-  const { data, refresh, error, pending } = await useAsyncData(key, () =>
-    $fetch(url, {
+
+  const { data, refresh, error, pending } = await useAsyncData(
+    key,
+    () => $fetch(url, {
       baseURL: baseURL,
       onResponseError({ request, response, options }) {
         if (response.status === 401) {
@@ -94,7 +97,8 @@ export const useaSyncApi = async (url, key, options) => {
       headers,
       ...opts,
     })
-  );
+  )
+
 
   return {
     data: data.value,

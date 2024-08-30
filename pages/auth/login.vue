@@ -11,6 +11,8 @@ definePageMeta({
     middleware: 'guest'
 })
 
+const snackbar = useSnackbar()
+
 let showPassword = ref(false)
 
 const state = reactive({
@@ -96,13 +98,13 @@ async function onSubmit(event) {
     if (result.data?.success) {
         const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = result.data.user
 
-        if (role.id == 3) {
-            navigateTo('/')
-        }
+        if ((is_completed && (is_email_verified || is_phone_verified)) || role.id == 3) {
 
-        if (is_completed && (is_email_verified || is_phone_verified)) {
-            // go to dashboard
-            navigateTo('/')
+            snackbar.add({
+                type: 'success',
+                text: result.data?.message
+            })
+            await navigateTo('/')
             return
         }
 
@@ -127,6 +129,10 @@ async function onSubmit(event) {
             await sendOtp(payload);
         }
 
+    } else {
+        const { error } = result
+
+
     }
 }
 
@@ -137,7 +143,7 @@ async function onSubmit(event) {
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
             <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden z-50">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
-                        class="w-12 absolute top-0 right-0" alt="" srcset="">
+                    class="w-12 absolute top-0 right-0" alt="" srcset="">
                 <h2 class="text-3xl font-bold">{{ $t('login.welcome_back') }}</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">{{ $t('login.please_log_in') }}</p>
 
@@ -175,7 +181,7 @@ async function onSubmit(event) {
                     </div>
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="isLoading"
+                        <UButton type="submit" block :loading="isLoading" color="green"
                             class="px-6 py-3 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500">
                             {{ $t('login.login_button') }}
                         </UButton>

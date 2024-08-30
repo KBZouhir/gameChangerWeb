@@ -93,7 +93,6 @@ const login = async (payload) => {
     const userTokenCookie = useCookie("user_access_token")
     userTokenCookie.value = data.token
     authStore.syncAuthUser(data.user)
-    getSettings()
     const { role } = data.user
     
     if(role.id != 3){
@@ -152,18 +151,19 @@ const logout = async () => {
 };
 
 async function useUser() {
+  
   const authStore = useAuthStore();
   const cookie = useCookie("user_access_token");
   const token = cookie.value;
   let user = authStore.getAuthUser;
-  getSettings()
+  if(user){
+    getSettings()
+  }
   if (token && user == null) {
     const key = `me-${(Math.random() + 1).toString(36).substring(7)}`;
 
-    const { data, error } = await useApi(`/me`, {
-      initialCache: false,
-    });
-
+    const { data, error } = await useaSyncApi(`/me`, key, {initialCache: false})
+    
     if (error) {
       const authCookie  = useCookie("user_access_token")
       authCookie.value = null
