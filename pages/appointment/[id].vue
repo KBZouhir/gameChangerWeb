@@ -20,8 +20,8 @@
                     </div>
 
                     <div v-else class="flex flex-col items-center mx-auto">
-                        <UAvatar class="mb-2" :src="appointment?.requester.image_url" :alt="appointment?.requester.full_name"
-                            size="3xl" />
+                        <UAvatar class="mb-2" :src="appointment?.requester.image_url"
+                            :alt="appointment?.requester.full_name" size="3xl" />
 
                         <div class="flex flex-col">
                             <h4 class="font-bold mb-0">{{ appointment?.requester.full_name }}</h4>
@@ -63,7 +63,8 @@
                     </div>
                 </dl>
 
-                <div v-if="appointmentStatus(appointment) == 'waiting'  && !readyTojoin" class="grid grid-cols-4 gap-6 mb-4">
+                <div v-if="appointmentStatus(appointment) == 'waiting' && !readyTojoin"
+                    class="grid grid-cols-4 gap-6 mb-4">
                     <div class="flex flex-col">
                         <span
                             class="p-1 bg-green-400 text-primary text-sm text-center font-semibold rounded-md rounded-b-none">DAYS</span>
@@ -139,26 +140,37 @@
                 <UDivider label="" />
 
                 <!-- Accept or reject -->
-                <div v-if="appointmentStatus(appointment) == 'Pending' && user.id != appointment.requester.id" class="grid grid-cols-2 space-x-2">
+                <div v-if="appointmentStatus(appointment) == 'Pending' && user.id != appointment.requester.id"
+                    class="grid grid-cols-2 space-x-2">
                     <UButton @click="rejectAppointmentModal = true" block label="Reject" color="red" size="lg" />
                     <UButton @click="acceptAppointmentFun" block label="Accept" color="green" size="lg" />
                 </div>
 
                 <!-- Cancel before start -->
-                <div v-if="appointmentStatus(appointment) == 'waiting' && !readyTojoin" class="grid grid-cols-1 space-x-2">
+                <div v-if="appointmentStatus(appointment) == 'waiting' && !readyTojoin"
+                    class="grid grid-cols-1 space-x-2">
                     <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
-                </div>  
+                </div>
 
                 <!-- Start or cancel -->
-                <div v-if="appointmentStatus(appointment) == 'waiting' && !appointment.is_requested_by_me && readyTojoin" class="grid grid-cols-2 space-x-2">
+                <div v-if="appointmentStatus(appointment) == 'waiting' && !appointment.is_requested_by_me && readyTojoin && !readyTojoinLive"
+                    class="grid grid-cols-2 space-x-2">
                     <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
-                    <UButton @click="acceptAppointmentFun" block label="Start" color="green" size="lg" />
+                    <UButton @click="startAppointmentFun" :loading="joinLoading" block label="Start" color="green" size="lg" />
                 </div>
 
                 <!-- requster join or cancel -->
-                <div v-if="appointmentStatus(appointment) == 'waiting' && appointment.is_requested_by_me && readyTojoin" class="grid grid-cols-2 space-x-2">
+                <div v-if="appointmentStatus(appointment) == 'waiting' && appointment.is_requested_by_me && readyTojoin"
+                    class="grid grid-cols-2 space-x-2">
                     <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
-                    <UButton @click="acceptAppointmentFun" block label="Start" :disabled="!appointment.room_opened_at && appointment.is_requested_by_me" color="green" size="lg" />
+                    <UButton @click="acceptAppointmentFun" block label="Start" color="green"
+                        size="lg" />
+                </div>
+
+                <!-- Room Started -->
+                <div v-if="readyTojoinLive"
+                    class="grid grid-cols-1 space-x-2">
+                    <UButton @click="startAppointmentFun" :loading="joinLoading" block label="Start" color="green" size="lg" />
                 </div>
 
             </div>
@@ -224,7 +236,7 @@
 </template>
 
 <script setup>
-import { getAppointment, acceptAppointment, rejectAppointment, cancelAppointment } from '~/composables/store/useAppointment'
+import { getAppointment, acceptAppointment, rejectAppointment, cancelAppointment, startAppointment } from '~/composables/store/useAppointment'
 import { handleApiError } from '~/composables/useApiError'
 import { useAuthStore } from "~/stores/authStore"
 
@@ -241,16 +253,42 @@ const seconds = ref(0);
 const now = ref();
 const targetDate = ref()
 const readyTojoin = ref(false)
+const readyTojoinLive = ref(false)
+const joinLoading = ref(false)
 
 let interval
 
 const route = useRoute()
+const snackbar = useSnackbar();
+
 const id = route.params.id
 
 const user = computed(() => authStore.getAuthUser)
 
-const duration = ref(15)
+const duration = computed(() => {
+    const beginAt = dayjs(appointment.value?.begin_at, 'YYYY-MM-DD HH:mm:ss')
+    const endAt = dayjs(appointment.value?.end_at, 'YYYY-MM-DD HH:mm:ss')
+    return endAt.diff(beginAt, 'minute')
+})
 
+
+
+
+const appointmentLive = () => {
+    const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const endAt = dayjs.utc(appointment.value?.end_at).tz(localTimezone)
+    const currentTime = dayjs().local()
+    return currentTime.isBefore(endAt)
+}
+
+
+
+const canJoin = () => {
+    
+    if (appointment.value?.room_opened_at && appointment.value?.status == 1 && appointmentLive()){
+        readyTojoinLive.value = true
+    }
+}
 
 definePageMeta({
     layout: 'auth',
@@ -264,9 +302,9 @@ const cancel_reason = ref()
 
 const calculateTimeLeft = () => {
     if (true) {
-        const totalSeconds = targetDate.value.diff(now.value, 'second')
-        
-        if (totalSeconds < 0) {
+        const totalSeconds = targetDate.value?.diff(now.value, 'second')
+
+        if (totalSeconds < 0 && appointmentLive()) {
             roomStarted()
             readyTojoin.value = true
         } else {
@@ -309,14 +347,13 @@ const appointmentStatus = (object) => {
         const appointmentStatusEnumMap = ["Accepted", "Pending", "Refused", "Canceled_before", "Canceled"];
         let status = appointmentStatusEnumMap[jsonStatus - 1];
 
-        const duration = 15;
         const now = dayjs.utc()
 
         if (status === "Accepted") {
             const timeToBegin = beginAt.diff(now, 'minute');
             const timeToEnd = endAt.diff(now, 'minute');
 
-            if (timeToBegin < duration) {
+            if (timeToBegin < duration.value) {
                 if (timeToEnd < 0) {
                     status = roomOpenedAt ? "ended" : "expired";
                 } else {
@@ -343,12 +380,12 @@ const roomStarted = () => {
     const { begin_at, end_at } = appointment?.value;
     const beginAt = dayjs.utc(begin_at);
     const endAt = dayjs.utc(end_at);
-    
-    if(endAt.diff(beginAt, 'minute') < duration.value){
+
+    if (endAt.diff(beginAt, 'minute') < duration.value) {
         readyTojoin.value = true
-    }else{
-        readyTojoin.value = false 
-    }    
+    } else {
+        readyTojoin.value = false
+    }
 }
 
 const badgeType = (status) => {
@@ -400,11 +437,43 @@ const cancelAppointmentFun = async () => {
     }
 }
 
+
+const startAppointmentFun = async () => {
+    joinLoading.value = true
+    const result = await startAppointment(id)
+    joinLoading.value = false
+    console.log(result);
+    
+    if (result?.success) {
+        await navigateTo(
+            {
+                path: '/room',
+                query: {
+                    link: appointment.value.room_link,
+                    token: result?.data.token
+                }
+            }
+        )
+    }else{
+        const {data} = result.data
+        console.log(data.message);
+        
+        snackbar.add({
+            type: 'error',
+            text: data.message
+        })
+    }
+
+}
+
 onMounted(() => {
     interval = setInterval(() => {
         now.value = dayjs();
         calculateTimeLeft();
+        canJoin()
     }, 1000);
+
+    console.log('appointmentLive',appointmentLive());
 });
 
 watchEffect(() => {

@@ -10,10 +10,10 @@ export const useConversationStore = defineStore("ConversationStore", {
   actions: {
     setUsersConversations(conversations) {
       this.usersConversations = conversations.sort((a, b) => {
-        const aSeconds = a.conversation.last_message.created_at.seconds;
-        const aNanoseconds = a.conversation.last_message.created_at.nanoseconds;
-        const bSeconds = b.conversation.last_message.created_at.seconds;
-        const bNanoseconds = b.conversation.last_message.created_at.nanoseconds;
+        const aSeconds = a.conversation.last_message.created_at?.seconds;
+        const aNanoseconds = a.conversation.last_message.created_at?.nanoseconds;
+        const bSeconds = b.conversation.last_message.created_at?.seconds;
+        const bNanoseconds = b.conversation.last_message.created_at?.nanoseconds;
 
         if (aSeconds !== bSeconds) {
           return bSeconds - aSeconds

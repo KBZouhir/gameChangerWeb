@@ -17,14 +17,14 @@
 
                     <div class="pt-4">
                         <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
-                            <button @click="{ conversationType = 1; selectedUser = null }"
+                            <button @click="selectTab(1)"
                                 :class="conversationType == 1 ? 'dark:bg-white text-black' : ''"
                                 class=" flex space-x-1 justify-center items-center text-center rounded-full p-2">
                                 <Icon name="tabler:message-2" />
                                 <span class="font-semibold text-sm">{{ $t('Chat') }}</span>
                             </button>
 
-                            <button @click="{ conversationType = 2; selectedUser = null }"
+                            <button @click="selectTab(2)"
                                 :class="conversationType == 2 ? 'dark:bg-white text-black' : ''"
                                 class="flex space-x-1 justify-center items-center text-center rounded-full p-2">
                                 <Icon name="tabler:briefcase" />
@@ -67,7 +67,7 @@
                                     <span v-if="userConversation.conversation.last_message?.attachments"
                                         :class="userConversation.conversation.last_message.sender_uid != user.firebase_uuid ? 'font-bold' : 'italic '">
                                         {{ userConversation.conversation.last_message?.attachments[0].type == 'image' ?
-                                            'You sent a picture' : 'You sent a video'
+                                            'You sent a picture' : 'You sent a Media'
                                         }}
                                     </span>
                                 </p>
@@ -136,9 +136,43 @@
                 </div>
                 <div
                     class="relative h-[calc(100vh-13rem)] bg-repeat bg-[url('~/assets/img/profile-cover-pattern.png')] overflow-y-auto is-scrollbar-hidden">
-                    <div v-if="selectedService" class="w-full p-2 dark:bg-slate-800 sticky top-0 z-50">
-                        {{ selectedService.title }}
+
+
+                    <div v-if="selectedService" class="w-full p-2 bg-white dark:bg-slate-800 sticky top-0 z-50">
+                        <div class="relative isolate flex flex-col gap-8 lg:flex-row">
+                            <div class="relative aspect-[16/9] sm:aspect-[2/1] lg:aspect-square lg:w-64 lg:shrink-0">
+                                <img :src="selectedService.image_url" alt=""
+                                    class="absolute inset-0 h-full w-full rounded-md bg-gray-50 object-cover">
+                                <div class="absolute inset-0 rounded-md ring-1 ring-inset ring-gray-900/10"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-x-4 text-xs">
+                                    <time datetime="2020-03-16" class="text-gray-500 dark:text-white">
+                                        {{ selectedService.created_at }}
+                                    </time>
+                                </div>
+                                <div class="group relative">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600 dark:text-white group-hover:dark:text-white">
+                                            <nuxt-link :to="`/services/${selectedService?.id}`">
+                                                {{ selectedService.title }}
+                                            </nuxt-link>
+                                        </h3>
+                                        <span class="relative z-10 items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                                            <span v-if="selectedService.price">{{selectedService.price}}$</span> 
+                                            <span v-else>{{ $t('Estimate') }}</span>
+                                        </span>
+                                    </div>
+                                    <p class="mt-2 text-xs leading-6 text-gray-600 dark:text-gray-300 line-clamp-3">
+                                        {{ selectedService.description }}
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
                     </div>
+
                     <div ref="scrollContainer" class="relative min-h-full bg-white/95 dark:bg-[#111827]/95">
                         <div v-for="(listMessages, date) in messages" :key="date" class="p-4">
                             <UDivider :label="date" size="2xs" />
@@ -163,7 +197,10 @@
                                 <div v-else class="flex items-start justify-end space-x-2.5 sm:space-x-5 mb-3">
                                     <div class="flex flex-col items-end space-y-3.5">
                                         <div class="flex flex-col justify-end items-end ml-4 max-w-lg sm:ml-10">
-                                            <span v-if="message.content"
+                                            <div v-if="isURL(message.content)">
+                                                <LinkPreview :url="message.content" />
+                                            </div>
+                                            <span v-else
                                                 class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
                                                 {{ message.content }}
                                             </span>
@@ -187,14 +224,15 @@
                     class="flex items-center h-16 border-t bg-white dark:border-[#0d121d] dark:bg-[#111827] px-4 space-x-4">
                     <UInput v-model="inputMessage" class="flex-1" variant="none" placeholder="Write your message"
                         @keyup.enter="sendMessage" />
-                    <UButton icon="i-heroicons-photo" class="dark:text-white dark:hover:text-white/70" size="sm"
+                    <UButton icon="i-heroicons-photo" class="hidden dark:text-white dark:hover:text-white/70" size="sm"
                         color="primary" square variant="link" />
-                    <UButton icon="i-heroicons-paper-clip" class="dark:text-white dark:hover:text-white/70" size="sm"
-                        color="primary" square variant="link" />
+                    <UButton icon="i-heroicons-paper-clip" class="hidden dark:text-white dark:hover:text-white/70"
+                        size="sm" color="primary" square variant="link" />
                 </div>
             </div>
 
-            <div class="dark:border-[#0d121d] bg-white border-t border-r dark:bg-[#111827] p-4 col-span-1 h-full fixed flex flex-col space-y-4 w-20 md:hidden">
+            <div
+                class="dark:border-[#0d121d] bg-white border-t border-r dark:bg-[#111827] p-4 col-span-1 h-full fixed flex flex-col space-y-4 w-20 md:hidden">
                 <UButton @click="isOpen = true" size="lg" square
                     class="block md:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                     <template #leading>
@@ -215,7 +253,7 @@
                     <div v-for="i in 10"
                         class="flex items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
                         <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
-                        
+
                     </div>
                 </template>
             </div>
@@ -294,7 +332,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div v-if="UsersConversations.length > 0" v-for="userConversation in UsersConversations"
                     :key="userConversation.id" @click="getConversation(userConversation)"
                     :class="(selectedUser?.firebase_uuid == userConversation.user.firebase_uuid) ? 'bg-green-100 dark:bg-slate-800' : ''"
@@ -383,6 +421,10 @@ const conversationStore = useConversationStore();
 
 const { $db } = useNuxtApp()
 const { $moment } = useNuxtApp()
+const route = useRoute()
+const router = useRouter()
+
+const dayjs = useDayjs()
 
 const user = computed(() => authStore.getAuthUser);
 const UsersConversations = computed(() => conversationStore.getUsersConversations);
@@ -404,6 +446,7 @@ const selectedConversation = ref(null)
 const showMoreBtn = ref(false)
 const seeMoreLoading = ref(false)
 const conversationType = ref(1)
+
 
 
 definePageMeta({
@@ -454,6 +497,26 @@ const getConversationsData = async () => {
     }
 }
 
+const getOrCreateCon = async () => {
+    if (route.query.user_id) {
+        let id = (route.query.service_id) ? route.query.service_id : route.query.user_id
+        let type = (route.query.service_id) ? 2 : 1
+        const result = await getOrCreateConversation(id, type)
+        conversationType.value = type
+
+        if (result?.conversationable) {
+            selectedService.value = result?.conversationable
+        }
+        selectedConversation.value = result?.id
+        await getMessagesFirebase(result?.id)
+
+        const participant = result.participants.find((participant) => participant.id !== user.value.id);
+
+        selectedUser.value = participant
+
+    }
+}
+
 const fetchMoreUsersConversations = async () => {
     loadConversations.value = true
     seeMoreLoading.value = true
@@ -481,33 +544,35 @@ const getConversation = async (conversationData) => {
     selectedUser.value = conversationData.user;
     selectedService.value = conversationData.conversationable;
     const conversationID = await getOrCreateConversation(id, conversationType.value)
-    console.log(conversationID.conversationable);
+
 
     selectedConversation.value = conversationID?.id
     messages.value = []
 
+    getMessagesFirebase(selectedConversation.value)
+}
+
+const getMessagesFirebase = (targetConversation) => {
     try {
-        const messagesCollectionRef = collection($db, "conversations", selectedConversation.value, "messages");
+        const messagesCollectionRef = collection($db, "conversations", targetConversation, "messages");
         const messagesQuery = query(messagesCollectionRef, orderBy("created_at", "asc"));
 
         onSnapshot(messagesQuery, (snapshot) => {
             const messagesList = snapshot.docs.map((doc) => doc.data());
-            console.log(messagesList);
 
             const filteredMessages = messagesList.filter(
                 (message) => message.sender_uid === selectedUser.value.firebase_uuid
             )
 
-            const groupedMessages = messagesList.reduce((groups, message) => {
-                const date = new Date(message.created_at.seconds * 1000)
-                    .toISOString()
-                    .split("T")[0];
-                if (!groups[date]) {
-                    groups[date] = [];
+            const groupedMessages = messagesList.reduce((acc, message) => {
+                const date = dayjs.unix(message.created_at?.seconds).format('YYYY-MM-DD');
+                if (!acc[date]) {
+                    acc[date] = [];
                 }
-                groups[date].push(message);
-                return groups;
-            }, {})
+                acc[date].push(message);
+
+                return acc;
+            }, {});
 
 
             if (filteredMessages.length > 0) {
@@ -527,6 +592,8 @@ const getConversation = async (conversationData) => {
 }
 
 const sendMessage = async () => {
+    console.log(selectedConversation.value);
+    
     if (selectedConversation.value) {
         if (inputMessage.value.trim() === '') return;
         try {
@@ -556,7 +623,7 @@ const sendMessage = async () => {
 const firebaseTimeGo = (timestamp) => {
     const millisecondsFromNanoseconds = timestamp.nanoseconds / 1000000;
     const totalMilliseconds = (timestamp.seconds * 1000) + millisecondsFromNanoseconds;
-    return $moment(totalMilliseconds).fromNow();
+    return dayjs(totalMilliseconds).fromNow();
 }
 
 const receivedMessageSound = () => {
@@ -564,8 +631,31 @@ const receivedMessageSound = () => {
     audio.play();
 }
 
+
+const selectTab = (tab) => {
+    router.push({
+        path: route.path,
+        query: {}
+    })
+    conversationType.value = tab;
+    selectedUser.value = null
+}
+
+
+const isURL = (str, protocol = "") => {
+  try {
+    const url = new URL(str);
+    return protocol 
+      ? url.protocol === `${protocol}:` && url.hostname !== ""
+      : url.hostname !== ""
+  } catch (_) {
+    return false
+  }
+}
+
 watchEffect(() => {
     getConversationsData()
+    getOrCreateCon()
 })
 
 </script>

@@ -43,25 +43,7 @@ const fetchPosterAsBlob = async (posterUrl) => {
   }
 }
 
-onMounted(async () => {
-  if (!userAccessToken.value) {
-    console.error('Missing user access token for video playback.')
-    return
-  }
-
-  if (props.poster) {
-    const posterBlobUrl = await fetchPosterAsBlob(props.poster)
-    poster.value = posterBlobUrl
-  }
-
-  const player = $videojs(videoPlayer.value, {
-    autoplay: false,
-    controls: true,
-    responsive: true,
-    fluid: true
-  })
-
-
+const fetchAndPlayVideo = async () => {
   try {
       const response = await fetch(props.videoSrc, {
         method: 'GET',
@@ -82,6 +64,27 @@ onMounted(async () => {
     } catch (error) {
       console.error('Error fetching video:', error);
     }
+}
+
+onMounted(async () => {
+  if (!userAccessToken.value) {
+    console.error('Missing user access token for video playback.')
+    return
+  }
+
+  if (props.poster) {
+    const posterBlobUrl = await fetchPosterAsBlob(props.poster)
+    poster.value = posterBlobUrl
+  }
+
+  const player = $videojs(videoPlayer.value, {
+    autoplay: false,
+    controls: true,
+    responsive: true,
+    fluid: true
+  })
+
+  player.on('play', fetchAndPlayVideo)
 
   player.on('error', (e) => {
     console.error('Video.js error:', e)

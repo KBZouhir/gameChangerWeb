@@ -138,7 +138,7 @@ export const cancelAppointment = async (id, payload) => {
 };
 
 
-export const getRoomToken = async (id) => {
+export const startAppointment = async (id) => {
   
   const { data, refresh, error, pending } = await useApi(
     `appointments/${id}/stream`,
@@ -147,5 +147,16 @@ export const getRoomToken = async (id) => {
       method: "GET",
     }
   )
-  console.log(data);
+
+  if(data){
+    return {
+      success: true,
+      data: data
+    }
+  }else{
+    return {
+      success: false,
+      data: error
+    }
+  }
 };

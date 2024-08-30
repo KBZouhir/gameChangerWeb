@@ -73,3 +73,29 @@ export const updateProfilePicture = async (payload) => {
 
   return data
 };
+
+
+
+export const updateSettings = async (payload) => {
+  const { data, refresh, error, pending } = await useApi(
+    `profile/settings`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "PUT",
+    }
+  );
+  
+  if(data){
+    return{
+      success: true,
+      data: data
+    }
+  }else{
+    return{
+      success: false,
+      data: error
+    }
+  }
+  
+};

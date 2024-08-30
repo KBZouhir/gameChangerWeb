@@ -59,7 +59,7 @@ export const getOrCreateConversation = async (id, type) => {
       method: "POST",
     }
   );
-  if (data.success) {
+  if (data?.success) {
     return data.data;
   }
 };
