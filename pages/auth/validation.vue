@@ -8,7 +8,6 @@ import VOtpInput from "vue3-otp-input";
 definePageMeta({
     layout: 'auth',
     title: 'Validation',
-    middleware: ['validotp']
 })
 
 const error = ref(false)
@@ -105,7 +104,7 @@ async function resendOtp() {
 </script>
 
 <template>
-    <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
+    <div class="relative  h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
             <UCard class="md:w-3/5 w-full p-8 relative z-50">
                 <h2 class="text-3xl font-bold">Verification code</h2>

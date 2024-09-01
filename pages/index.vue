@@ -896,7 +896,7 @@ const fetchMoreComments = async $state => {
 }
 
 const fetchMorePosts = async $state => {
-    if (posts.value.links.next == null) { $state.complete(); return }
+    if (posts.value?.links.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(posts.value.links.next)
         posts.value.data.push(...result.data)

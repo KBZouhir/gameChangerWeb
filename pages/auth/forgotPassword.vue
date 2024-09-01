@@ -47,7 +47,7 @@ async function onSubmit(event) {
 </script>
 
 <template>
-    <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
+    <div class="relative  h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
             <UCard class="md:w-2/4 w-full p-8 relative z-50" v-show="!linkSend">
                 <h2 class="text-3xl font-bold">Forgotten your password?</h2>

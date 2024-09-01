@@ -94,6 +94,7 @@ async function onSubmit(event) {
         if (error.status === 422) {
             form.value.setErrors(error.errors);
         }
+        
     }
     if (result.data?.success) {
         const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = result.data.user
@@ -139,7 +140,7 @@ async function onSubmit(event) {
 </script>
 
 <template>
-    <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
+    <div class="relative  h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
             <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden z-50">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
@@ -182,7 +183,7 @@ async function onSubmit(event) {
 
                     <div class="mt-4">
                         <UButton type="submit" block :loading="isLoading" color="green"
-                            class="px-6 py-3 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500">
+                            class="px-6 py-3 ">
                             {{ $t('login.login_button') }}
                         </UButton>
                     </div>

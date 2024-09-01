@@ -174,7 +174,7 @@
                         </div>
                     </div>
                     <UButton :loading="submitLoading" type="submit" label="Submit"
-                        class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                        class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="green"
                         size="md">
                         <template #trailing>
                             <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
