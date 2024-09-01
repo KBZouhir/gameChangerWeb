@@ -4,7 +4,7 @@
             <div
                 class="bg-white hidden lg:col-span-1 col-span-2 dark:bg-[#111827] dark:border-[#0d121d] border-r border-t md:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
                 <div class="p-4">
-                    <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
+                    <!-- <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
                         <template #leading>
                             <UButton icon="i-heroicons-arrow-left" color="primary" class="p-0 dark:text-white" square
                                 variant="link" />
@@ -13,7 +13,7 @@
                         <template #trailing>
                             <UIcon name="i-heroicons-magnifying-glass" />
                         </template>
-                    </UInput>
+                    </UInput> -->
 
                     <div class="pt-4">
                         <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
@@ -153,13 +153,15 @@
                                 </div>
                                 <div class="group relative">
                                     <div class="flex items-center justify-between">
-                                        <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600 dark:text-white group-hover:dark:text-white">
+                                        <h3
+                                            class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600 dark:text-white group-hover:dark:text-white">
                                             <nuxt-link :to="`/services/${selectedService?.id}`">
                                                 {{ selectedService.title }}
                                             </nuxt-link>
                                         </h3>
-                                        <span class="relative z-10 items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
-                                            <span v-if="selectedService.price">{{selectedService.price}}$</span> 
+                                        <span
+                                            class="relative z-10 items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                                            <span v-if="selectedService.price">{{ selectedService.price }}$</span>
                                             <span v-else>{{ $t('Estimate') }}</span>
                                         </span>
                                     </div>
@@ -197,13 +199,15 @@
                                 <div v-else class="flex items-start justify-end space-x-2.5 sm:space-x-5 mb-3">
                                     <div class="flex flex-col items-end space-y-3.5">
                                         <div class="flex flex-col justify-end items-end ml-4 max-w-lg sm:ml-10">
-                                            <div v-if="isURL(message.content)">
-                                                <LinkPreview :url="message.content" />
-                                            </div>
-                                            <span v-else
-                                                class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
-                                                {{ message.content }}
-                                            </span>
+                                            <template v-if="message.content">
+                                                <div v-if="isURL(message.content)">
+                                                    <LinkPreview :url="message.content" />
+                                                </div>
+                                                <span v-else
+                                                    class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
+                                                    {{ message.content }}
+                                                </span>
+                                            </template>
                                             <div v-for="attachment in message.attachments">
 
                                                 <ImageView v-if="attachment.type == 'image'" :id="attachment.id" />
@@ -594,7 +598,7 @@ const getMessagesFirebase = (targetConversation) => {
 
 const sendMessage = async () => {
     console.log(selectedConversation.value);
-    
+
     if (selectedConversation.value) {
         if (inputMessage.value.trim() === '') return;
         try {
@@ -644,14 +648,14 @@ const selectTab = (tab) => {
 
 
 const isURL = (str, protocol = "") => {
-  try {
-    const url = new URL(str);
-    return protocol 
-      ? url.protocol === `${protocol}:` && url.hostname !== ""
-      : url.hostname !== ""
-  } catch (_) {
-    return false
-  }
+    try {
+        const url = new URL(str);
+        return protocol
+            ? url.protocol === `${protocol}:` && url.hostname !== ""
+            : url.hostname !== ""
+    } catch (_) {
+        return false
+    }
 }
 
 watchEffect(() => {

@@ -22,7 +22,7 @@
     "@vueform/multiselect": "^2.6.9",
     "@vuepic/vue-datepicker": "^9.0.1",
     "@vueup/vue-quill": "^1.2.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.7",
     "browser-image-compression": "^2.0.2",
     "cheerio": "^1.0.0",
     "compressorjs": "^1.2.1",

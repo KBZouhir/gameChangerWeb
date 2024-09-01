@@ -7,14 +7,15 @@ const user = computed(() => authStore.getAuthUser)
 
 const isOpen = ref(false)
 
-watchEffect(() => {
-    useUser();
-});
+// watchEffect(() => {
+//     useUser();
+// });
 
 const logoutUser = async () => {
-    const result = await logout()
+    const result = await logout();
+     const authCookie = useCookie("user_access_token");
+    authCookie.value = null;
     await navigateTo('/auth/login')
-
 }
 
 const items = [
@@ -72,7 +73,7 @@ const items = [
                             <Icon name="tabler:briefcase" />
                             <span>Services</span>
                         </nuxt-link>
-                        <nuxt-link to="/calendar"
+                        <nuxt-link v-if="user?.role.id != 3" to="/calendar"
                             class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
                             <Icon name="tabler:calendar" />
                             <span>Calendar</span>
@@ -188,7 +189,7 @@ const items = [
                         Services
                     </nuxt-link>
                 </li>
-                <li @click="isOpen = false">
+                <li v-if="user?.role.id != 3" @click="isOpen = false">
                     <nuxt-link to="/calendar" 
                         class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
                         <Icon name="tabler:calendar" />

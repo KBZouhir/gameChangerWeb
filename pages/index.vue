@@ -242,16 +242,16 @@
                                 <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
                                     class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
-                                <div v-if="compressedFiles.length > 0" class="my-4">
+                                <div v-if="compressedFiles?.length > 0" class="my-4">
                                     <div
                                         class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
                                         <div v-for="(file, index) in compressedFiles" :key="index"
                                             class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                                             <div class="w-full h-full overflow-hidden border-e">
-                                                <img :src="file.preview" alt="Selected Image"
+                                                <img :src="file?.preview" alt="Selected Image"
                                                     class="object-cover w-full h-full" />
                                             </div>
-                                            <div v-if="file.progress < 100"
+                                            <div v-if="file?.progress < 100"
                                                 class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
                                                 <UButton loading
                                                     :color="(colorMode.value != 'light') ? 'white' : 'primary'"
@@ -269,11 +269,26 @@
                                     </div>
                                 </div>
 
-                                <div v-if="videoUrl" class="my-4 rounded-md overflow-hidden relative">
-                                    <video :src="videoUrl" controls width="100%" />
+                                <div v-show="videoUrl" class="my-4 rounded-md overflow-hidden relative">
+                                    <video ref="videoContainer" :src="videoUrl" controls width="100%" />
                                     <UButton @click="removeVideo" icon="i-heroicons-trash"
-                                        class="absolute top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
+                                        class="absolute z-20 top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
                                         size="2xs" color="primary" square variant="soft" />
+
+                                    <!-- <div class="w-full z-10 absolute top-0 left-0 h-full flex items-center justify-center"
+                                        v-if="progress > 0 && progress < 100">
+                                        <UButton loading color="black" variant="link">
+                                            Uploding ({{ progress }}%)...
+                                        </UButton>
+                                    </div> -->
+                                    <div class="w-full" v-if="progress > 0 ">
+                                        <div
+                                            class="relative dark:bg-slate-800 bg-slate-300 h-2 rounded-md overflow-hidden">
+                                            <div class="bg-green-600 absolute top-0 left-0 h-full"
+                                                :style="`width: ${progress}%;`">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex space-x-4 items-center pt-4">
                                     <input ref="inputFileImage" type="file" id="file-input-image"
@@ -289,14 +304,15 @@
                                         class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
                                         color="primary" square variant="ghost" label="Video" />
                                 </div>
+
                             </div>
 
                         </div>
                         <template #footer>
                             <div class="flex justify-end">
-                                <UButton size="lg" @click="submitForm" :disabled="submitBtn" :loading="isLoading"
-                                    class="dark:bg-emerald-500 dark:text-white px-4 py-2" icon="i-heroicons-arrow-right"
-                                    trailing>Post</UButton>
+                                <UButton size="lg" @click="submitForm" color="green" :disabled="submitBtn"
+                                    :loading="isLoading" class=" px-4 py-2" icon="i-heroicons-arrow-right" trailing>{{
+                                        $t('Post') }}</UButton>
                             </div>
                         </template>
                     </UCard>
@@ -328,7 +344,7 @@
                                 <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
                                     class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
-                                <div v-if="compressedFiles.length > 0" class="my-4">
+                                <div v-if="compressedFiles?.length > 0" class="my-4">
                                     <div
                                         class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
                                         <div v-for="(file, index) in compressedFiles" :key="index"
@@ -559,8 +575,9 @@
 <script setup>
 import { create, index, update, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, deletePost } from '~/composables/store/usePost'
 import { get, getImagebyID } from '~/composables/store/useMedia'
+import axios from 'axios'
 
-import { uploadVideo } from '~/composables/store/useVideo'
+// import { uploadVideo } from '~/composables/store/useVideo'
 import { usePostStore } from "~/stores/posts"
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
@@ -587,6 +604,8 @@ definePageMeta({
 const isOpen = ref(false)
 const editPost = ref(false)
 const maxLength = ref(200)
+
+const videoContainer = ref()
 
 const charCount = computed(() => countChars(content.value));
 const user = computed(() => authStore.getAuthUser);
@@ -617,6 +636,8 @@ const snackbar = useSnackbar()
 const selectedVideo = ref(null)
 const videoUrl = ref('')
 const submitBtn = ref(false)
+const thumbnailVideo = ref()
+const progress = ref(0)
 
 
 const options = ref({
@@ -663,6 +684,7 @@ const removeImage = (index) => {
 const removeVideo = () => {
     selectedVideo.value = null
     videoUrl.value = null
+    inputVideoPicker.value.value = null
 }
 
 const countChars = (htmlString) => {
@@ -720,9 +742,65 @@ const onImageFileChange = async (event) => {
     }
 }
 
+
+const getVideoCover = () => {
+    return new Promise((resolve, reject) => {
+        videoContainer.value.addEventListener('loadedmetadata', () => {
+
+            setTimeout(() => {
+                videoContainer.value.currentTime = 1;
+            }, 200);
+            // extract video thumbnail once seeking is complete
+            videoContainer.value.addEventListener('seeked', () => {
+                console.log('video is now paused at %ss.', 1);
+                // define a canvas to have the same dimension as the video
+                const canvas = document.createElement("canvas");
+                canvas.width = videoContainer.value.videoWidth;
+                canvas.height = videoContainer.value.videoHeight;
+                // draw the video frame to canvas
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(videoContainer.value, 0, 0, canvas.width, canvas.height);
+                // return the canvas image as a blob
+                ctx.canvas.toBlob(
+                    blob => {
+                        resolve(blob);
+                    },
+                    "image/jpeg",
+                    0.75 /* quality */
+                );
+            });
+        });
+    });
+}
+
+const uploadVideo = async (payload) => {
+    const cookie = useCookie("user_access_token");
+    const token = cookie.value;
+
+    try {
+        const response = await axios.post('https://gc-dev.informatikab.com/api/v1/upload-file', payload, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            onUploadProgress: (progressEvent) => {
+                progress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Upload failed:", error);
+        submitBtn.value = false;
+        return null;
+    }
+}
+
 const onVideoFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files)
+
     videoUrl.value = URL.createObjectURL(selectedFiles[0])
+
+    thumbnailVideo.value = await getVideoCover()
+
     const formData = new FormData()
     formData.append('file', selectedFiles[0])
     submitBtn.value = true
@@ -853,6 +931,10 @@ const submitForm = async () => {
         })
     }
 
+    if (thumbnailVideo.value) {
+        formData.append(`thumbnail`, thumbnailVideo.value)
+    }
+
     if (compressedFiles.value[0]?.file) {
         formData.append('image', compressedFiles.value[0].file)
     }
@@ -866,7 +948,7 @@ const submitForm = async () => {
         if (result?.success) {
             posts.value.data.push(result?.post)
             isOpen.value = false
-
+            clearData()
             snackbar.add({
                 type: 'success',
                 text: 'Post added successfully',
@@ -883,7 +965,7 @@ const submitForm = async () => {
 }
 
 const fetchMoreComments = async $state => {
-    if (postCommnets.value?.links.next == null) { $state.complete(); return }
+    if (postCommnets.value?.links?.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(postCommnets.value.links.next)
         postCommnets.value.data.push(...result.data)
@@ -896,7 +978,7 @@ const fetchMoreComments = async $state => {
 }
 
 const fetchMorePosts = async $state => {
-    if (posts.value.links.next == null) { $state.complete(); return }
+    if (posts.value?.links?.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(posts.value.links.next)
         posts.value.data.push(...result.data)
@@ -910,6 +992,10 @@ const fetchMorePosts = async $state => {
 
 const clearData = () => {
     content.value = ''
+    thumbnailVideo.value = null
+    compressedFiles.value = []
+    inputVideoPicker.value.value = null
+    inputFileImage.value.value = null
 }
 
 const closeEdit = () => {

@@ -225,6 +225,9 @@
                     <UFormGroup label="Email" name="email">
                         <UInput size="lg" type="email" v-model="resendCredentialState.email" />
                     </UFormGroup>
+                    <UFormGroup  name="external">
+                        <UCheckbox v-model="external" color="green" name="external" label="Animator" />
+                    </UFormGroup>
 
 
                     <div class="flex flex-col justify-between space-y-2">
@@ -271,6 +274,9 @@
                         <UInput size="lg" type="password" v-model="externalUserJoinState.password" />
                     </UFormGroup>
 
+                    <UFormGroup  name="external">
+                        <UCheckbox v-model="external" color="green" name="external" label="Animator" />
+                    </UFormGroup>
 
                     <div class="flex flex-col justify-between space-y-2">
                         <UButton v-if="masterclassStarted && !IsPassed" block :loading="loadingSubmit" size="lg"
@@ -296,7 +302,7 @@
 </template>
 
 <script setup>
-import { showMasterClass, externalUserJoin, guestSubscribeMasterClass, resendExternalCredentials } from '~/composables/store/useMasterClass'
+import { showMasterClass, externalUserJoin, guestSubscribeMasterClass, resendExternalCredentials, resendExternalAnimatorCredentials, externalAnimatorJoin } from '~/composables/store/useMasterClass'
 import fallbackImage from '~/assets/img/profile-cover.webp'
 import { z } from "zod"
 
@@ -315,6 +321,7 @@ const resendCredentialsModal = ref(false)
 const joinMasterClassModal = ref(false)
 const paymentSuccess = route.query?.payment_successfully
 const masterclassGotStarted = ref(false)
+const external = ref(false)
 
 const snackbar = useSnackbar();
 
@@ -459,9 +466,14 @@ const submitSubscribeForm = async () => {
 
 const submitResendCredentials = async () => {
     loadingSubmit.value = true;
-
+    let result
     try {
-        const result = await resendExternalCredentials(id, resendCredentialState)
+        if(external.value){
+            result = await resendExternalAnimatorCredentials(id, resendCredentialState) 
+        }else{
+            result = await resendExternalCredentials(id, resendCredentialState) 
+        }
+        
 
         if (result?.success) {
             console.log(result.data)
@@ -481,9 +493,14 @@ const submitResendCredentials = async () => {
 
 const submitExternalUserJoin = async () => {
     loadingSubmit.value = true;
-
+    let result
     try {
-        const result = await externalUserJoin(id, externalUserJoinState)
+        if(external.value){
+            result = await externalAnimatorJoin(id, externalUserJoinState)
+        }else{
+            result = await externalUserJoin(id, externalUserJoinState)
+        }
+        
         loadingSubmit.value = false
 
         if (result?.success) {

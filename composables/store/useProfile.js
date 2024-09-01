@@ -1,6 +1,8 @@
-import { useApi } from "~/composables/useApi";
-import { successAlert, errorAlert } from "~/composables/useAlert";
-import { useAuthStore } from "~/stores/authStore";
+import { useApi } from "~/composables/useApi"
+import { successAlert, errorAlert } from "~/composables/useAlert"
+import { useAuthStore } from "~/stores/authStore"
+import { useUser } from "~/composables/store/useApiAuth";
+
 
 export const updateGeneral = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/profile`, {
@@ -77,6 +79,7 @@ export const updateProfilePicture = async (payload) => {
 
 
 export const updateSettings = async (payload) => {
+  const authStore = useAuthStore();
   const { data, refresh, error, pending } = await useApi(
     `profile/settings`,
     {
@@ -85,8 +88,10 @@ export const updateSettings = async (payload) => {
       method: "PUT",
     }
   );
+
   
   if(data){
+    await useUser()
     return{
       success: true,
       data: data
