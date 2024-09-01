@@ -94,6 +94,7 @@ async function onSubmit(event) {
         if (error.status === 422) {
             form.value.setErrors(error.errors);
         }
+        
     }
     if (result.data?.success) {
         const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = result.data.user
