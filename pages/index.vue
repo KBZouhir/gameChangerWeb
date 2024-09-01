@@ -759,7 +759,6 @@ const getVideoCover = () => {
 
 const onVideoFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files)
-    console.log(selectedFiles);
     
     videoUrl.value = URL.createObjectURL(selectedFiles[0])
 

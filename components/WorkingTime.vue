@@ -28,7 +28,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex flex-col mb-4">
                             <h4 class="font-semibold text-xl">Allow appointment</h4>
-                            <p class="text-slate-400 text-sm">Setup the meeting duration , max duration is 60 min </p>
+                            <p class="text-slate-400 text-sm">By allow will be able to recive ppointments </p>
                         </div>
                         <UToggle v-model="allowAppointment" color="green" />
                     </div>

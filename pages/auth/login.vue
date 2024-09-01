@@ -83,7 +83,7 @@ const getRecaptchaToken = async () => {
     }
 }
 
-const hendleLoginData = async (data) => {
+const hendleLoginData = async (data, result) => {
     const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = data
 
     if ((is_completed && (is_email_verified || is_phone_verified)) || role.id == 3) {
@@ -132,7 +132,7 @@ async function onSubmit(event) {
 
     }
     if (result.data?.success) {
-        hendleLoginData(result.data.user)
+        hendleLoginData(result.data.user, result)
     } else {
         const { error } = result
     }
@@ -142,7 +142,7 @@ const signInWithGoogle = async () => {
     const result = await loginWithGoogle()
 
     if (result?.success) {
-        hendleLoginData(result.user)
+        hendleLoginData(result.user, result)
     }
 }
 
