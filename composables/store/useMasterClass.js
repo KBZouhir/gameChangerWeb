@@ -45,7 +45,7 @@ export const showMasterClass = async (id) => {
   
   
   return data
-};
+}
 
 export const subscribeMasterClass = async (id) => {
   const { data, refresh, error, pending } = await useApi(
@@ -58,7 +58,7 @@ export const subscribeMasterClass = async (id) => {
 
   return data;
   
-};
+}
 
 export const guestSubscribeMasterClass = async (id, payload) => {
   const { data, refresh, error, pending } = await useApi(
@@ -82,7 +82,7 @@ export const guestSubscribeMasterClass = async (id, payload) => {
   }
   
   return data
-};
+}
 
 
 export const resendExternalCredentials = async (id, payload) => {
@@ -107,7 +107,31 @@ export const resendExternalCredentials = async (id, payload) => {
     }
   }
   
-};
+}
+
+export const resendExternalAnimatorCredentials = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(
+    `masterclasses/${id}/send-external-animator-informations`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+
+  if(data){
+    return{
+      success: true,
+      data: data
+    }
+  }else{
+    return{
+      success: false,
+      data: error
+    }
+  }
+  
+}
 
 
 export const joinMasterClass = async (id) => {
@@ -132,7 +156,7 @@ export const joinMasterClass = async (id) => {
     }
   }
   
-};
+}
 
 export const externalUserJoin = async (id, payload) => {
   const { data, refresh, error, pending } = await useApi(
@@ -156,7 +180,31 @@ export const externalUserJoin = async (id, payload) => {
     }
   }
   
-};
+}
+
+export const externalAnimatorJoin = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(
+    `masterclasses/${id}/animators/join`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+
+  if(data){
+    return{
+      success: true,
+      data: data
+    }
+  }else{
+    return{
+      success: false,
+      data: error
+    }
+  }
+  
+}
 
 export const getInformationsByEmail = async (id) => {
   const { data, refresh, error, pending } = await useApi(
@@ -166,4 +214,4 @@ export const getInformationsByEmail = async (id) => {
       method: "GET",
     }
   );
-};
+}

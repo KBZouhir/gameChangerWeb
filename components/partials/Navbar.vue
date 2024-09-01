@@ -8,7 +8,7 @@
                     </div>
                     <div class="hidden flex-shrink-0 items-center dark:flex">
                         <nuxt-link to="/">
-                            <img class="h-6  w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Game changer">
+                            <img class="h-10  w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Game changer">
                         </nuxt-link>
                     </div>
                     <div class="hidden sm:ml-16 sm:flex items-center">

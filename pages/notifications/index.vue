@@ -19,9 +19,15 @@
             <ul v-if="notifications?.data?.length > 0" role="list" class="">
                 <li v-for="(notification, index) in notifications?.data" :key="index"
                     class="flex items-start p-4 shadow mb-4 rounded-md relative bg-transparent border dark:border-slate-800/40">
+                    
                     <div class="flex-1">
                         <div class="flex items-center space-x-4 ">
-                            <UAvatar :src="notification.data.image_url" alt="" size="md" />
+                            <UAvatar v-if="notification.data.image_url" :src="notification.data.image_url" alt="" size="md" />
+                            <div v-else class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                                <img  alt="user" :src="user" className="inline-block dark:hidden" />
+                                <img  alt="user" :src="userWhite" className="hidden dark:inline-block" />
+                            </div>
+                            
 
                             <div class="flex flex-col">
                                 <h4 class="font-bold mb-0">{{ notification.data.message }}</h4>
@@ -104,6 +110,8 @@ import { getPaginationsComments } from '~/composables/store/usePost'
 import { useNotificationsStore } from "~/stores/notifications"
 import bell from '~/assets/svg/vectors/bell.svg'
 import bellWhite from '~/assets/svg/vectors/bell-white.svg'
+import user from '~/assets/svg/icons/user.svg'
+import userWhite from '~/assets/svg/icons/user-white.svg'
 import { useDayjs } from '#dayjs'
 
 const store = useNotificationsStore()

@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
 
-                                <div v-if="user.id != service?.user.id" class="py-2">
+                                <div v-if="(user.id != service?.user.id) && user?.role.id != 3" class="py-2">
                                     <nuxt-link :to="`/chat?service_id=${service?.id}&user_id=${service?.user?.id}`">
                                         <UButton block label="Send Message"
                                         class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-green-400"

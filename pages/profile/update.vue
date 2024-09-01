@@ -57,7 +57,7 @@
                                 {{ user.bio }}
                             </p>
                         </div>
-                        <ClientOnly>
+                        <!-- <ClientOnly>
                             <div class="space-x-4 items-center flex md:hidden my-4">
                                 <UButton icon="i-heroicons-plus" size="sm" class="py-2 px-4"
                                     :color="($colorMode.value == 'dark' ? 'green' : 'primary')" variant="solid"
@@ -66,7 +66,7 @@
                                     :color="($colorMode.value == 'dark' ? 'green' : 'primary')" variant="outline"
                                     label="Update profile" :trailing="false" />
                             </div>
-                        </ClientOnly>
+                        </ClientOnly> -->
 
                     </div>
                 </div>
