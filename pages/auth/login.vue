@@ -1,7 +1,7 @@
 <script setup>
 import { useNuxtApp } from '#app';
 import { z } from "zod";
-import { login, ResendValidationMail, sendOtp } from '~/composables/store/useApiAuth'
+import { login, ResendValidationMail, sendOtp, loginWithGoogle } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
 const { $auth, $RecaptchaVerifier } = useNuxtApp();
 
@@ -44,7 +44,7 @@ onMounted(() => {
     window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
         'size': 'invisible',
     });
-});
+})
 
 const schema = z.object({
     email: z.string().optional().refine((val) => val === "0" || val === undefined || emailRegex.test(val), { message: "Invalid email" }),
@@ -58,7 +58,7 @@ const schema = z.object({
             path: ["email", "phone"],
         });
     }
-});
+})
 
 
 watch(() => state.email, (newValue) => {
@@ -81,7 +81,42 @@ const getRecaptchaToken = async () => {
     } catch (error) {
         console.error('Error getting reCAPTCHA token:', error);
     }
-};
+}
+
+const hendleLoginData = async (data) => {
+    const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = data
+
+    if ((is_completed && (is_email_verified || is_phone_verified)) || role.id == 3) {
+
+        snackbar.add({
+            type: 'success',
+            text: result.data?.message
+        })
+        await navigateTo('/')
+        return
+    }
+
+    if (!is_completed && (is_email_verified || is_phone_verified)) {
+        // go to complete-profile
+        navigateTo('/auth/complete-profile')
+        return
+    }
+
+    if (!is_email_verified && email && !phone) {
+        await ResendValidationMail();
+        navigateTo('/auth/validation')
+        return
+    }
+
+    if (!is_phone_verified && phone && !email) {
+        await getRecaptchaToken()
+        let payload = {
+            phoneNumber: data.phone,
+            recaptchaToken: recaptchaToken.value
+        }
+        await sendOtp(payload);
+    }
+}
 
 async function onSubmit(event) {
     isLoading.value = true;
@@ -94,46 +129,20 @@ async function onSubmit(event) {
         if (error.status === 422) {
             form.value.setErrors(error.errors);
         }
-        
+
     }
     if (result.data?.success) {
-        const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = result.data.user
-
-        if ((is_completed && (is_email_verified || is_phone_verified)) || role.id == 3) {
-
-            snackbar.add({
-                type: 'success',
-                text: result.data?.message
-            })
-            await navigateTo('/')
-            return
-        }
-
-        if (!is_completed && (is_email_verified || is_phone_verified)) {
-            // go to complete-profile
-            navigateTo('/auth/complete-profile')
-            return
-        }
-
-        if (!is_email_verified && email && !phone) {
-            await ResendValidationMail();
-            navigateTo('/auth/validation')
-            return
-        }
-
-        if (!is_phone_verified && phone && !email) {
-            await getRecaptchaToken()
-            let payload = {
-                phoneNumber: data.phone,
-                recaptchaToken: recaptchaToken.value
-            }
-            await sendOtp(payload);
-        }
-
+        hendleLoginData(result.data.user)
     } else {
         const { error } = result
+    }
+}
 
+const signInWithGoogle = async () => {
+    const result = await loginWithGoogle()
 
+    if (result?.success) {
+        hendleLoginData(result.user)
     }
 }
 
@@ -182,8 +191,7 @@ async function onSubmit(event) {
                     </div>
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="isLoading" color="green"
-                            class="px-6 py-3 ">
+                        <UButton type="submit" block :loading="isLoading" color="green" class="px-6 py-3 ">
                             {{ $t('login.login_button') }}
                         </UButton>
                     </div>
@@ -192,7 +200,7 @@ async function onSubmit(event) {
 
                     <p class="mb-6 mt-4 text-center text-sm">{{ $t('login.or_log_in_with') }}</p>
                     <div class="flex justify-center space-x-4">
-                        <UButton size="lg" square
+                        <UButton @click="signInWithGoogle" size="lg" square
                             class="bg-[#d14938] hover:bg-[#d14938] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
                                 <Icon name="tabler:brand-google-filled" size="20" class="text-white" />
