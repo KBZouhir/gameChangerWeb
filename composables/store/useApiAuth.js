@@ -135,38 +135,37 @@ const completeProfile = async (payload) => {
 };
 
 const logout = async () => {
-  const authStore = useAuthStore();
-  const authCookie  = useCookie("user_access_token")
-  const { data, refresh, error, pending } = await useApi(`/logout`, {
-    initialCache: false,
-    method: "POST",
-  })
+  // const authStore = useAuthStore();
+  // const authCookie  = useCookie("user_access_token")
+  // const { data, refresh, error, pending } = await useApi(`/logout`, {
+  //   initialCache: false,
+  //   method: "POST",
+  // })
   
-  if (data?.success) {
+  // if (data?.success) {
     
-    authStore.syncAuthUser(null)
-    authStore.syncLoginState(false)
-    authCookie.value = null
-  }
+  //   authStore.syncAuthUser(null)
+  //   authStore.syncLoginState(false)
+  //   authCookie.value = null
+  // }
 };
 
-async function useUser() {
-  
+async function useUser(key = "me") {
   const authStore = useAuthStore();
   const cookie = useCookie("user_access_token");
   const token = cookie.value;
   let user = authStore.getAuthUser;
-  if(user){
-    getSettings()
-  }
-  if (token && user == null) {
-    const key = `me-${(Math.random() + 1).toString(36).substring(7)}`;
 
-    const { data, error } = await useaSyncApi(`/me`, key, {initialCache: false})
-    
+  if (token && user == null) {
+    const { data, error } = await useaSyncApi(`/me`, key, {
+      initialCache: false,
+    });
     if (error) {
-      const authCookie  = useCookie("user_access_token")
-      authCookie.value = null
+      console.log(error );
+      
+      // const authCookie = useCookie("user_access_token");
+      // authCookie.value = null;
+      
       authStore.syncAuthUser(null);
     }
 
@@ -174,7 +173,7 @@ async function useUser() {
       authStore.syncAuthUser(data.user);
     }
   }
-  // return user;
+  return user;
 }
 
 

@@ -7,9 +7,9 @@ const user = computed(() => authStore.getAuthUser)
 
 const isOpen = ref(false)
 
-watchEffect(() => {
-    useUser();
-});
+// watchEffect(() => {
+//     useUser();
+// });
 
 const logoutUser = async () => {
     const result = await logout()

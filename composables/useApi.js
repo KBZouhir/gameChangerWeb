@@ -58,7 +58,7 @@ export const useApi = async (url, options) => {
  */
 
 export const useaSyncApi = async (url, key, options) => {
-  const cookie = useCookie("customer_access_token");
+  const cookie = useCookie("user_access_token");
   let token = cookie.value;
 
   const apiRoute = "https://gc-dev.informatikab.com/api/v1";
@@ -71,8 +71,6 @@ export const useaSyncApi = async (url, key, options) => {
   };
 
   key = key ? key : url;
-  console.log(key);
-
   // Here we will create a default set of headers for every request
   // if present we will also spread the `headers` set by the user
   // then we will delete them to avoid collision in next spread
