@@ -6,8 +6,6 @@ export default defineNuxtPlugin(async ({ vueApp }) => {
   const store = useSettings();
   await store.syncSetting();
   const key = `me-${(Math.random() + 1).toString(36).substring(7)}`;
-  console.log(key, "tetsetset");
-
   await useUser(key);
   return {
     provide: {
