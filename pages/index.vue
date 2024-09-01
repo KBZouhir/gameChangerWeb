@@ -242,16 +242,16 @@
                                 <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
                                     class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
-                                <div v-if="compressedFiles.length > 0" class="my-4">
+                                <div v-if="compressedFiles?.length > 0" class="my-4">
                                     <div
                                         class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
                                         <div v-for="(file, index) in compressedFiles" :key="index"
                                             class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                                             <div class="w-full h-full overflow-hidden border-e">
-                                                <img :src="file.preview" alt="Selected Image"
+                                                <img :src="file?.preview" alt="Selected Image"
                                                     class="object-cover w-full h-full" />
                                             </div>
-                                            <div v-if="file.progress < 100"
+                                            <div v-if="file?.progress < 100"
                                                 class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
                                                 <UButton loading
                                                     :color="(colorMode.value != 'light') ? 'white' : 'primary'"
@@ -294,9 +294,9 @@
                         </div>
                         <template #footer>
                             <div class="flex justify-end">
-                                <UButton size="lg" @click="submitForm" :disabled="submitBtn" :loading="isLoading"
-                                    class="dark:bg-emerald-500 dark:text-white px-4 py-2" icon="i-heroicons-arrow-right"
-                                    trailing>Post</UButton>
+                                <UButton size="lg" @click="submitForm" color="green" :disabled="submitBtn" :loading="isLoading"
+                                    class=" px-4 py-2" icon="i-heroicons-arrow-right"
+                                    trailing>{{ $t('Post') }}</UButton>
                             </div>
                         </template>
                     </UCard>
@@ -328,7 +328,7 @@
                                 <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''"
                                     class="text-red-500 text-[10px] mb-2">{{ getErrorMessage('content') }}</p>
 
-                                <div v-if="compressedFiles.length > 0" class="my-4">
+                                <div v-if="compressedFiles?.length > 0" class="my-4">
                                     <div
                                         class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
                                         <div v-for="(file, index) in compressedFiles" :key="index"
@@ -666,6 +666,7 @@ const removeImage = (index) => {
 const removeVideo = () => {
     selectedVideo.value = null
     videoUrl.value = null
+    inputVideoPicker.value.value = null
 }
 
 const countChars = (htmlString) => {
@@ -758,6 +759,8 @@ const getVideoCover = () => {
 
 const onVideoFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files)
+    console.log(selectedFiles);
+    
     videoUrl.value = URL.createObjectURL(selectedFiles[0])
 
     thumbnailVideo.value = await getVideoCover()
@@ -909,7 +912,7 @@ const submitForm = async () => {
         if (result?.success) {
             posts.value.data.push(result?.post)
             isOpen.value = false
-
+            clearData()
             snackbar.add({
                 type: 'success',
                 text: 'Post added successfully',
@@ -954,6 +957,8 @@ const fetchMorePosts = async $state => {
 const clearData = () => {
     content.value = ''
     thumbnailVideo.value = null
+    compressedFiles.value[0] = null
+    inputVideoPicker.value.value = null
 }
 
 const closeEdit = () => {
