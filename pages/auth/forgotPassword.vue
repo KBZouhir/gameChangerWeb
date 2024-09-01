@@ -14,6 +14,8 @@ definePageMeta({
 const form = ref()
 const linkSend = ref(false)
 const isLoading = ref(false)
+const snackbar = useSnackbar()
+
 const state = reactive({
     email: undefined,
     phone: undefined,
@@ -34,11 +36,18 @@ async function onSubmit(event) {
 
     if(result.data?.success){
         linkSend.value = true
+        snackbar.add({
+            type: 'success',
+            text: result.data?.message
+        })
         successAlert(result.data?.status)
     }
 
     if(result.data?.success == false){
-        warningAlert(result.data?.status)
+        snackbar.add({
+            type: 'error',
+            text: result.data?.message.email
+        })
     }
 
     isLoading.value = false

@@ -1,29 +1,37 @@
 <script setup>
 
-import { validationMail, ResendValidationMail, sendOtp } from '~/composables/store/useApiAuth'
+import { validationMail, ResendValidationMail, sendOtp, verifyOtp } from '~/composables/store/useApiAuth'
 import { useAuthStore } from "~/stores/authStore";
 import VOtpInput from "vue3-otp-input";
+const { $auth, $RecaptchaVerifier } = useNuxtApp();
+
 
 
 definePageMeta({
     layout: 'auth',
     title: 'Validation',
+    middleware: ['auth']
 })
 
 const error = ref(false)
 const timeLeft = ref(2)
 const form = ref()
 const loading = ref(false)
+let recaptchaToken = ref(null)
 let intervalId = null
+let sessionInfo = ref(null)
 
 const authStore = useAuthStore();
 const snackbar = useSnackbar();
-const router = useRouter()
 
+
+const user = computed(() => authStore.getAuthUser);
 
 const state = reactive({
     code: undefined,
 })
+
+console.log(user.value);
 
 
 onMounted(() => {
@@ -50,11 +58,8 @@ const counter = () => {
     }, 1000);
 }
 
-
-async function validationOtp() {
-
-    const { is_email_verified, is_phone_verified, phone, email } = authStore.user
-
+const validationOtp = async () => {
+    const { is_email_verified, is_phone_verified, phone, email } = user.value
     if (state.code.length <= 5) {
         error.value = true
         return
@@ -66,20 +71,37 @@ async function validationOtp() {
         loading.value = false
 
         if (result?.success) {
-            console.log(result?.success);
-            
+            console.log(user.value);
             await navigateTo('/auth/complete-profile')
         } else {
             error.value = true
-            const {data} = result
-            
+            const { data } = result
+
             snackbar.add({
                 type: 'error',
                 text: data.data.message
             })
         }
+    }else{
+        loading.value = true
+        let payload = {
+            phoneNumber: user.value.full_phone,
+            code: state.code ,
+            sessionInfo: sessionInfo.value
+        }
+        const result = await verifyOtp(payload);
+        loading.value = false
     }
+}
 
+const getRecaptchaToken = async () => {
+    try {
+        await window.recaptchaVerifier.render();
+        const token = await window.recaptchaVerifier.verify();
+        recaptchaToken.value = token;
+    } catch (error) {
+        console.error('Error getting reCAPTCHA token:', error);
+    }
 }
 
 async function resendOtp() {
@@ -87,19 +109,37 @@ async function resendOtp() {
     timeLeft.value = 30
     counter()
 
-    const result = await ResendValidationMail()
-
-    console.log(result)
-    if (result?.success) {
-        snackbar.add({
-            type: 'success',
-            text: result.message
-        })
-    }else{
-
+    if (user.value.email) {
+        const result = await ResendValidationMail()
+        console.log(result)
+        if (result?.data.success) {
+            snackbar.add({
+                type: 'success',
+                text: result.data.message
+            })
+        }else{
+            snackbar.add({
+                type: 'error',
+                text: result.data.data.message
+            })
+        }
+    } else {
+        await getRecaptchaToken()
+        let payload = {
+            phoneNumber: user.value.full_phone,
+            recaptchaToken: recaptchaToken.value
+        }
+       const result = await sendOtp(payload)
+       sessionInfo.value = result?.sessionInfo 
     }
 
 }
+
+onMounted(() => {
+    window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
+        'size': 'invisible',
+    });
+})
 
 </script>
 
@@ -138,6 +178,7 @@ async function resendOtp() {
                             Re-send code
                         </span>
                     </div>
+                    <div id="recaptcha-container"></div>
                 </UForm>
             </UCard>
         </div>

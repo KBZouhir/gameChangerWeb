@@ -8,7 +8,7 @@ import { useNuxtApp } from '#app';
 definePageMeta({
     layout: 'guest',
     title: 'Login Page',
-    middleware: 'guest'
+    middleware: ['guest']
 })
 
 const { $auth, $RecaptchaVerifier } = useNuxtApp();

@@ -8,13 +8,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo("/auth/login");
   }
   var user = authStore.getAuthUser;
-  if (!user.is_email_verified && !user.is_phone_verified) {
-    if (!user.is_email_verified && user.email) {
-      return navigateTo("/auth/validation");
-    }
 
-    if (!user.is_phone_verified && user.phone) {
-      // resend phone verification
+  
+  if (!user.is_email_verified && !user.is_phone_verified) {
+    if (to.path != "/auth/validation") {
       return navigateTo("/auth/validation");
     }
   }

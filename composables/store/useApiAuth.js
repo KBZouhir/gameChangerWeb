@@ -1,8 +1,7 @@
-import { useApi } from "~/composables/useApi";
-import { successAlert, errorAlert } from "~/composables/useAlert";
-import { useAuthStore } from "~/stores/authStore";
-import { useSettings } from "~/stores/settings";
-import { excludeKeys } from "~/utils/excludeKeys";
+import { useApi } from "~/composables/useApi"
+import { useAuthStore } from "~/stores/authStore"
+import { useSettings } from "~/stores/settings"
+import { excludeKeys } from "~/utils/excludeKeys"
 
 const register = async (payload) => {
   let cleanData = { ...payload };
@@ -17,19 +16,57 @@ const register = async (payload) => {
   });
 
   if (data) {
-    // successAlert(data.message);
     const userTokenCookie = useCookie("user_access_token");
-    // const currentUserCookie = useCookie("current_user");
     userTokenCookie.value = data.token;
-    // currentUserCookie.value = data.user;
   }
   return { data, error, refresh, pending };
-};
+}
 
 const validationMail = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/email/verify`, {
     initialCache: false,
     body: payload,
+    method: "POST",
+  });
+  await useUser()
+  if (data) {
+    return {
+      success: true,
+      data: data,
+    };
+  } else {
+    return {
+      success: false,
+      data: error,
+    };
+  }
+}
+
+const sendOtp = async (payload) => {
+  return await useApi(
+    "https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=AIzaSyCvYsqLUIloaOmJtmqNPf0-R8FltxRsBsk",
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+}
+
+const verifyOtp = async (payload) => {
+  return await useApi(
+    "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber?key=AIzaSyDT5goQg7ja2wF5VIyMR5ywgzEc_qUtacg",
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+}
+
+const ResendValidationMail = async () => {
+  const { data, refresh, error, pending } = await useApi(`/email/resend`, {
+    initialCache: false,
     method: "POST",
   });
 
@@ -44,27 +81,7 @@ const validationMail = async (payload) => {
       data: error,
     };
   }
-};
-
-const sendOtp = async (payload) => {
-  return await useApi(
-    "https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=AIzaSyDT5goQg7ja2wF5VIyMR5ywgzEc_qUtacg",
-    {
-      initialCache: false,
-      body: payload,
-      method: "POST",
-    }
-  );
-};
-
-const ResendValidationMail = async () => {
-  const { data, refresh, error, pending } = await useApi(`/email/resend`, {
-    initialCache: false,
-    method: "POST",
-  });
-
-  return data;
-};
+}
 
 const socialAuth = async (payload) => {
   const authStore = useAuthStore();
@@ -109,7 +126,7 @@ const login = async (payload) => {
     authStore.syncAuthUser(data.user);
     const { role } = data.user;
 
-    if (role.id != 3) {
+    if (role.id != 3 && payload.email != "0") {
       const { user } = await $signInWithEmailAndPassword(
         $auth,
         payload.email,
@@ -118,7 +135,7 @@ const login = async (payload) => {
     }
   }
   return { data, error, refresh, pending };
-};
+}
 
 const loginWithGoogle = async () => {
   const { $auth, $GoogleAuthProvider, $signInWithPopup } = useNuxtApp();
@@ -141,7 +158,7 @@ const loginWithGoogle = async () => {
   } catch (error) {
     console.log(error);
   }
-};
+}
 
 const forgotPassword = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/forgot-password`, {
@@ -151,7 +168,7 @@ const forgotPassword = async (payload) => {
   });
 
   return { data, error, refresh, pending };
-};
+}
 
 const resetPassword = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/password/reset`, {
@@ -161,7 +178,7 @@ const resetPassword = async (payload) => {
   });
 
   return { data, error, refresh, pending };
-};
+}
 
 const completeProfile = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/complete-profile`, {
@@ -171,7 +188,7 @@ const completeProfile = async (payload) => {
   });
 
   return { data, error, refresh, pending };
-};
+}
 
 const logout = async () => {
   const authStore = useAuthStore();
@@ -187,7 +204,7 @@ const logout = async () => {
     authStore.syncLoginState(false);
    
   }
-};
+}
 
 async function useUser(key = "me") {
   const authStore = useAuthStore();
@@ -239,6 +256,7 @@ export {
   register,
   validationMail,
   sendOtp,
+  verifyOtp,
   ResendValidationMail,
   login,
   loginWithGoogle,

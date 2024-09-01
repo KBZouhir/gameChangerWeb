@@ -7,10 +7,11 @@ import schema from '~/schemas/auth/resetPassword'
 definePageMeta({
     layout: 'guest',
     title: 'Login Page',
-
+    middleware: ['guest']
 })
 
 const route = useRoute()
+const snackbar = useSnackbar()
 
 
 let showPassword = ref(false)
@@ -35,10 +36,11 @@ const toggleConfirmationPassword = () => {
     showConfirmationPassword.value = !showConfirmationPassword.value
 }
 
-async function onSubmit(event) {
-    const { data } = event;
-    const result = await resetPassword(state);
 
+async function onSubmit() {
+    isLoading.value = true
+    const result = await resetPassword(state);
+    isLoading.value = false
     if (!result.data) {
         const error = handleApiError(result.error);
         if (error.status === 422) {
@@ -51,7 +53,10 @@ async function onSubmit(event) {
     }
 
     if (!result.data?.success) {
-        warningAlert(result.data?.status);
+        snackbar.add({
+            type: 'error',
+            text: result.data?.message.email
+        })
     }
 }
 
@@ -99,14 +104,6 @@ async function onSubmit(event) {
                                 </template>
                             </UInput>
                         </UFormGroup>
-                    </div>
-
-                    <div class="flex justify-between items-center mt-4">
-                        <UCheckbox class="text-sm" name="notifications" label="Remember me" />
-                        <NuxtLink to="forgotpassword"
-                            class="text-[#001D6C] dark:text-slate-300 hover:underline cursor-pointer text-sm">
-                            Forgot Password?
-                        </NuxtLink>
                     </div>
 
                     <div class="mt-4">

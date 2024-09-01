@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   await useUser();
   const authStore = useAuthStore();
   var user = authStore.getAuthUser;
-
+  
   if(user.is_completed){
     return navigateTo("/");
   }
