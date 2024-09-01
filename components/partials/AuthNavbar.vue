@@ -7,14 +7,15 @@ const user = computed(() => authStore.getAuthUser)
 
 const isOpen = ref(false)
 
-watchEffect(() => {
-    useUser();
-});
+// watchEffect(() => {
+//     useUser();
+// });
 
 const logoutUser = async () => {
-    const result = await logout()
+    const result = await logout();
+     const authCookie = useCookie("user_access_token");
+    authCookie.value = null;
     await navigateTo('/auth/login')
-
 }
 
 const items = [

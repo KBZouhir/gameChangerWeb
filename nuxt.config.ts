@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  ssr: true,
 
   colorMode: {
     preference: "system", // default value of $colorMode.preference
@@ -44,7 +45,11 @@ export default defineNuxtConfig({
   },
 
   build: {
-    transpile: ["@vuepic/vue-datepicker", '@fawmi/vue-google-maps', '@googlemaps/markerclusterer'],
+    transpile: [
+      "@vuepic/vue-datepicker",
+      "@fawmi/vue-google-maps",
+      "@googlemaps/markerclusterer",
+    ],
   },
 
   snackbar: {
