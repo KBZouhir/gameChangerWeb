@@ -272,8 +272,23 @@
                                 <div v-show="videoUrl" class="my-4 rounded-md overflow-hidden relative">
                                     <video ref="videoContainer" :src="videoUrl" controls width="100%" />
                                     <UButton @click="removeVideo" icon="i-heroicons-trash"
-                                        class="absolute top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
+                                        class="absolute z-20 top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
                                         size="2xs" color="primary" square variant="soft" />
+
+                                    <!-- <div class="w-full z-10 absolute top-0 left-0 h-full flex items-center justify-center"
+                                        v-if="progress > 0 && progress < 100">
+                                        <UButton loading color="black" variant="link">
+                                            Uploding ({{ progress }}%)...
+                                        </UButton>
+                                    </div> -->
+                                    <div class="w-full" v-if="progress > 0 ">
+                                        <div
+                                            class="relative dark:bg-slate-800 bg-slate-300 h-2 rounded-md overflow-hidden">
+                                            <div class="bg-green-600 absolute top-0 left-0 h-full"
+                                                :style="`width: ${progress}%;`">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex space-x-4 items-center pt-4">
                                     <input ref="inputFileImage" type="file" id="file-input-image"
@@ -289,14 +304,15 @@
                                         class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
                                         color="primary" square variant="ghost" label="Video" />
                                 </div>
+
                             </div>
 
                         </div>
                         <template #footer>
                             <div class="flex justify-end">
-                                <UButton size="lg" @click="submitForm" color="green" :disabled="submitBtn" :loading="isLoading"
-                                    class=" px-4 py-2" icon="i-heroicons-arrow-right"
-                                    trailing>{{ $t('Post') }}</UButton>
+                                <UButton size="lg" @click="submitForm" color="green" :disabled="submitBtn"
+                                    :loading="isLoading" class=" px-4 py-2" icon="i-heroicons-arrow-right" trailing>{{
+                                        $t('Post') }}</UButton>
                             </div>
                         </template>
                     </UCard>
@@ -559,8 +575,9 @@
 <script setup>
 import { create, index, update, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, deletePost } from '~/composables/store/usePost'
 import { get, getImagebyID } from '~/composables/store/useMedia'
+import axios from 'axios'
 
-import { uploadVideo } from '~/composables/store/useVideo'
+// import { uploadVideo } from '~/composables/store/useVideo'
 import { usePostStore } from "~/stores/posts"
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
@@ -620,6 +637,7 @@ const selectedVideo = ref(null)
 const videoUrl = ref('')
 const submitBtn = ref(false)
 const thumbnailVideo = ref()
+const progress = ref(0)
 
 
 const options = ref({
@@ -755,15 +773,34 @@ const getVideoCover = () => {
     });
 }
 
+const uploadVideo = async (payload) => {
+    const cookie = useCookie("user_access_token");
+    const token = cookie.value;
 
+    try {
+        const response = await axios.post('https://gc-dev.informatikab.com/api/v1/upload-file', payload, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            onUploadProgress: (progressEvent) => {
+                progress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Upload failed:", error);
+        submitBtn.value = false;
+        return null;
+    }
+}
 
 const onVideoFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files)
-    
+
     videoUrl.value = URL.createObjectURL(selectedFiles[0])
 
     thumbnailVideo.value = await getVideoCover()
-    
+
     const formData = new FormData()
     formData.append('file', selectedFiles[0])
     submitBtn.value = true
@@ -894,7 +931,7 @@ const submitForm = async () => {
         })
     }
 
-    if(thumbnailVideo.value){
+    if (thumbnailVideo.value) {
         formData.append(`thumbnail`, thumbnailVideo.value)
     }
 
@@ -956,8 +993,9 @@ const fetchMorePosts = async $state => {
 const clearData = () => {
     content.value = ''
     thumbnailVideo.value = null
-    compressedFiles.value[0] = null
+    compressedFiles.value = []
     inputVideoPicker.value.value = null
+    inputFileImage.value.value = null
 }
 
 const closeEdit = () => {
