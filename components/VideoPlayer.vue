@@ -97,6 +97,10 @@ onMounted(async () => {
   })
 })
 
+watchEffect(() => {
+  fetchPosterAsBlob(props.poster)
+});
+
 </script>
 
 <style scoped>
