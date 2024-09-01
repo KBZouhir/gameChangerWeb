@@ -136,17 +136,17 @@ const completeProfile = async (payload) => {
 
 const logout = async () => {
   const authStore = useAuthStore();
-  const authCookie  = useCookie("user_access_token")
   const { data, refresh, error, pending } = await useApi(`/logout`, {
     initialCache: false,
     method: "POST",
   })
   
-  if (data?.success) {
-    
-    authStore.syncAuthUser(null)
-    authStore.syncLoginState(false)
-    authCookie.value = null
+  
+  if (data) {
+    console.log(data);
+    authStore.syncAuthUser(null);
+    authStore.syncLoginState(false);
+   
   }
 };
 

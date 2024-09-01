@@ -12,9 +12,10 @@ const isOpen = ref(false)
 // });
 
 const logoutUser = async () => {
-    const result = await logout()
+    const result = await logout();
+     const authCookie = useCookie("user_access_token");
+    authCookie.value = null;
     await navigateTo('/auth/login')
-
 }
 
 const items = [
