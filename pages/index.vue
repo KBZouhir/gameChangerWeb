@@ -269,8 +269,8 @@
                                     </div>
                                 </div>
 
-                                <div v-if="videoUrl" class="my-4 rounded-md overflow-hidden relative">
-                                    <video :src="videoUrl" controls width="100%" />
+                                <div v-show="videoUrl" class="my-4 rounded-md overflow-hidden relative">
+                                    <video ref="videoContainer" :src="videoUrl" controls width="100%" />
                                     <UButton @click="removeVideo" icon="i-heroicons-trash"
                                         class="absolute top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
                                         size="2xs" color="primary" square variant="soft" />
@@ -588,6 +588,8 @@ const isOpen = ref(false)
 const editPost = ref(false)
 const maxLength = ref(200)
 
+const videoContainer = ref()
+
 const charCount = computed(() => countChars(content.value));
 const user = computed(() => authStore.getAuthUser);
 const settings = computed(() => settingStore.getSettings);
@@ -617,6 +619,7 @@ const snackbar = useSnackbar()
 const selectedVideo = ref(null)
 const videoUrl = ref('')
 const submitBtn = ref(false)
+const thumbnailVideo = ref()
 
 
 const options = ref({
@@ -720,9 +723,45 @@ const onImageFileChange = async (event) => {
     }
 }
 
+
+const getVideoCover = () => {
+    return new Promise((resolve, reject) => {
+        videoContainer.value.addEventListener('loadedmetadata', () => {
+
+            setTimeout(() => {
+                videoContainer.value.currentTime = 1;
+            }, 200);
+            // extract video thumbnail once seeking is complete
+            videoContainer.value.addEventListener('seeked', () => {
+                console.log('video is now paused at %ss.', 1);
+                // define a canvas to have the same dimension as the video
+                const canvas = document.createElement("canvas");
+                canvas.width = videoContainer.value.videoWidth;
+                canvas.height = videoContainer.value.videoHeight;
+                // draw the video frame to canvas
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(videoContainer.value, 0, 0, canvas.width, canvas.height);
+                // return the canvas image as a blob
+                ctx.canvas.toBlob(
+                    blob => {
+                        resolve(blob);
+                    },
+                    "image/jpeg",
+                    0.75 /* quality */
+                );
+            });
+        });
+    });
+}
+
+
+
 const onVideoFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files)
     videoUrl.value = URL.createObjectURL(selectedFiles[0])
+
+    thumbnailVideo.value = await getVideoCover()
+    
     const formData = new FormData()
     formData.append('file', selectedFiles[0])
     submitBtn.value = true
@@ -853,6 +892,10 @@ const submitForm = async () => {
         })
     }
 
+    if(thumbnailVideo.value){
+        formData.append(`thumbnail`, thumbnailVideo.value)
+    }
+
     if (compressedFiles.value[0]?.file) {
         formData.append('image', compressedFiles.value[0].file)
     }
@@ -910,6 +953,7 @@ const fetchMorePosts = async $state => {
 
 const clearData = () => {
     content.value = ''
+    thumbnailVideo.value = null
 }
 
 const closeEdit = () => {
