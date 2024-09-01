@@ -95,7 +95,7 @@
                 </UCard>
             </div>
 
-            <InfiniteLoading @infinite="fetchMoreServices">
+            <InfiniteLoading v-if="services" @infinite="fetchMoreServices">
                 <template #spinner>
                     <div class="flex justify-center w-full">
                         <LoadingIcon />
@@ -133,7 +133,6 @@ const user = computed(() => authStore.getAuthUser);
 
 const fetchMoreServices = async $state => {
 
-    if (services.value?.links?.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(services.value.links.next)
         services.value.data.push(...result.data)

@@ -303,7 +303,7 @@
 
             <USlideover v-model="isOpen">
                 <div class="p-4">
-                    <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
+                    <!-- <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
                         <template #leading>
                             <UButton icon="i-heroicons-arrow-left" color="primary" class="p-0 dark:text-white" square
                                 variant="link" />
@@ -312,7 +312,8 @@
                         <template #trailing>
                             <UIcon name="i-heroicons-magnifying-glass" />
                         </template>
-                    </UInput>
+                    </UInput> -->
+                    <UButton @click="isOpen = false" icon="i-heroicons-arrow-left" color="green" class="p-0 dark:text-white" square variant="link" />
 
                     <div class="pt-4">
                         <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
