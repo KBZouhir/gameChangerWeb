@@ -103,7 +103,7 @@ const socialAuth = async (payload) => {
 const login = async (payload) => {
   const authStore = useAuthStore();
   const { $auth, $signInWithEmailAndPassword } = useNuxtApp();
-
+  
   let cleanData = { ...payload };
   if (!payload.email || payload.email === "0") {
     const { email, ...rest } = payload;

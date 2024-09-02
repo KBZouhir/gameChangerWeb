@@ -3,7 +3,7 @@ import { useNuxtApp } from '#app';
 import { z } from "zod";
 import { login, ResendValidationMail, sendOtp, loginWithGoogle } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
-const { $auth, $RecaptchaVerifier } = useNuxtApp();
+const { $auth, $RecaptchaVerifier, $messaging, $getToken, $onMessage } = useNuxtApp(); 
 
 definePageMeta({
     layout: 'guest',
@@ -118,9 +118,24 @@ const hendleLoginData = async (data, result) => {
     }
 }
 
+const getDeviceToken = async () => {
+    try {
+        const token = await $getToken($messaging, { vapidKey: 'BJXJpMYEoxBnfQRx74LugwKT6Bs29NW39m6Wh8exW1bb8nrMElyc4c8VfuCj-ZnhZSOuiEiiKsuq9djzsLVSqgU' })
+        return token
+    } catch (error) {
+        console.error('Error getting reCAPTCHA token:', error);
+    }
+}
+
 async function onSubmit(event) {
     isLoading.value = true;
     const { data } = event
+    let token = await getDeviceToken()
+    
+    if (token) {
+        data.device_token = token
+    }
+    
     const result = await login(data);
     isLoading.value = false;
 

@@ -46,7 +46,7 @@
                     </ol>
                 </nav>
             </div>
-            <div class="relative overflow-hidden rounded-lg  px-6 h-[450px] sm:py-32 lg:px-8">
+            <div class="relative overflow-hidden rounded-lg  px-6 md:h-[550px] h-[450px] sm:py-32 lg:px-8">
                 <USkeleton class="absolute inset-0 z-10 h-full w-full object-cover" />
                 <img v-if="service?.image_url" draggable="false" :src="service?.image_url" alt=""
                     class="absolute inset-0 z-10 h-full w-full object-cover" />

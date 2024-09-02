@@ -5,15 +5,12 @@
     <NuxtLoadingIndicator />
     <NuxtSnackbar />
     <PartialsAuthNavbar />
-
     <div class="relative flex-1 z-20">
-
       <div class="relative">
-
         <NuxtPage />
       </div>
     </div>
-    <UNotifications class="z-10"/>
+    <!-- <UNotifications class="z-20"/> -->
     <!-- <img class="absolute top-0 right-0 z-10" :src="yellowBlurEffect" alt="" srcset=""> -->
 
   </div>
@@ -62,10 +59,9 @@ const RegisterFCMToken = async (token) => {
 
 onMounted(() => {
   requestPermission()
-    
+
   $onMessage($messaging, (payload) => {
     console.log("Message on Clinet ", payload);
-
     toast.add({
       id: payload.notification.messageId,
       description: payload.notification.body,

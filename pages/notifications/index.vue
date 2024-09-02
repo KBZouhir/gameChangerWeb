@@ -19,19 +19,21 @@
             <ul v-if="notifications?.data?.length > 0" role="list" class="">
                 <li v-for="(notification, index) in notifications?.data" :key="index"
                     class="flex items-start p-4 shadow mb-4 rounded-md relative bg-transparent border dark:border-slate-800/40">
-                    
+
                     <div class="flex-1">
                         <div class="flex items-center space-x-4 ">
-                            <UAvatar v-if="notification.data.image_url" :src="notification.data.image_url" alt="" size="md" />
-                            <div v-else class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                                <img  alt="user" :src="user" className="inline-block dark:hidden" />
-                                <img  alt="user" :src="userWhite" className="hidden dark:inline-block" />
+                            <UAvatar v-if="notification.data.image_url" :src="notification.data.image_url" alt=""
+                                size="md" />
+                            <div v-else
+                                class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                                <img alt="user" :src="user" className="inline-block dark:hidden" />
+                                <img alt="user" :src="userWhite" className="hidden dark:inline-block" />
                             </div>
-                            
+
 
                             <div class="flex flex-col">
                                 <h4 class="font-bold mb-0">{{ notification.data.message }}</h4>
-                                
+
                                 <span class="text-xs -mt-[0.5px]">
                                     {{ timego(notification.created_at) }}
                                 </span>
@@ -64,20 +66,21 @@
                         </UDropdown>
                     </div>
                 </li>
-                <InfiniteLoading @infinite="fetchMoreNotifications">
-                    <template #spinner>
-                        <div class="flex justify-center w-full">
-                            <LoadingIcon />
-                        </div>
-                    </template>
-                    <template v-if="services?.data?.length > 0" #complete>
-                        <div class="flex justify-center my-4">
-                            <span>No more data found!</span>
-                        </div>
-                    </template>
-                </InfiniteLoading>
             </ul>
-            
+
+            <InfiniteLoading @infinite="fetchMoreNotifications">
+                <template #spinner>
+                    <div class="flex justify-center w-full">
+                        <LoadingIcon />
+                    </div>
+                </template>
+                <template v-if="services?.data?.length > 0" #complete>
+                    <div class="flex justify-center my-4">
+                        <span>No more data found!</span>
+                    </div>
+                </template>
+            </InfiniteLoading>
+
 
             <ul v-if="loadingNotification" role="list" class="">
                 <li v-for="(notification, index) in 4" :key="index" class="py-4">
@@ -90,7 +93,7 @@
                     </div>
                 </li>
             </ul>
-            
+
             <div v-if="notifications?.data?.length == 0 && !loadingNotification"
                 class="flex flex-col justify-center items-center space-y-2">
                 <ClientOnly>
@@ -170,7 +173,6 @@ const getDataFromApi = async () => {
 const fetchMoreNotifications = async $state => {
     console.log("fetch more data");
 
-    if (notifications.value?.links?.next == null) { $state.complete(); return }
     try {
         const result = await getPaginationsComments(notifications.value.links.next)
         notifications.value.data.push(...result.data)
