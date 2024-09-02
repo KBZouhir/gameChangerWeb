@@ -2,7 +2,7 @@
     <div class="max-w-screen-xl mx-auto py-4">
         <div class="grid grid-cols-1 md:grid-cols-6 gap-6 p-6">
             <div class="md:col-span-4">
-                <div class="rounded-lg overflow-hidden mb-6 h-80">
+                <div class="rounded-lg overflow-hidden mb-6 h-96">
                     <img v-if="masterclass?.image_url" :src="masterclass?.image_url" draggable="false"
                         class="w-full h-full object-cover" alt="" srcset="">
                     <USkeleton class="w-full h-full" />
@@ -25,7 +25,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="mb-8">
+                                    <div class="mb-2">
                                         <h1 class="text-2xl font-bold">{{ masterclass?.title }}</h1>
                                     </div>
                                 </div>
@@ -36,7 +36,7 @@
                                 </div>
                             </div>
                             <div class="mb-6">
-                                <h2 class="text-xl font-bold mb-2">{{ $t('Short description') }}</h2>
+
                                 <p>{{ masterclass?.short_description }}</p>
                             </div>
 
@@ -68,7 +68,7 @@
                                     </div>
                                 </div>
                                 <span v-if="animator?.external_user_name"
-                                    class="inline-flex items-center top-2 left-2 absolute  rounded-md bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20">
+                                    class="inline-flex items-center top-2 left-2 absolute  rounded-md bg-[#ffbb0c]/10 px-2 py-1 text-xs font-medium text-[#ffbb0c] ring-1 ring-inset ring-[#ffbb0c]/20">
                                     {{ $t('External user') }}
                                 </span>
                                 <span v-if="animator?.user"
@@ -93,11 +93,11 @@
 
             <div class="md:col-span-2 sticky top-4">
                 <div v-if="masterclass"
-                    class="rounded-2xl overflow-hidden relative bg-white dark:bg-white/5 p-8 ring-2 ring-green-500 xl:p-10">
+                    class="rounded-2xl h-96 overflow-hidden relative bg-white dark:bg-white/5 p-8 ring-2 ring-green-500 xl:p-10">
                     <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                         class="w-12 absolute top-0 right-0" alt="" srcset="">
                     <div class="flex items-center justify-between">
-                        <p class="mt-6 flex items-baseline gap-x-1">
+                        <p class="flex items-baseline gap-x-1">
                             <span v-if="masterclass?.is_subscribed"
                                 class="text-4xl font-bold tracking-tight dark:text-white"><sup>$</sup>
                                 {{ masterclass?.price }}
@@ -109,8 +109,8 @@
                         </p>
 
                     </div>
-                    <UDivider class="my-4" />
-                    <ul role="list" class="mt-4 space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-6">
+                    <UDivider class="my-2" />
+                    <ul role="list" class="space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-2">
                         <li class="flex items-center gap-x-3">
                             <Icon name="tabler:calendar-event" />
                             <span>{{ $t('Date') }} :</span>
@@ -157,7 +157,7 @@
                         <UDivider label="Masterclass end" />
                     </div>
 
-                    <div v-if="!IsPassed && !masterclass?.is_subscribed && masterclassStarted" class="flex justify-center mt-4">
+                    <div v-if="!IsPassed && !masterclass?.is_subscribed && masterclassStarted" class="flex justify-center mt-6">
                         <UDivider label="Masterclass Started" />
                     </div>
                 </div>

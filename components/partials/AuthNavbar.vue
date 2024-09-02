@@ -68,19 +68,28 @@ const items = [
 
                 <div class="hidden sm:ml-16 sm:flex items-center">
                     <div class="flex space-x-4">
+                        <nuxt-link to="/"
+                            :class="$route.path === '/' ? 'text-[#34d399]' : 'text-gray-400'"
+                            class="flex space-x-2 items-center px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:smart-home" size="18" />
+                            <span>Home</span>
+                        </nuxt-link>
                         <nuxt-link to="/services"
-                            class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
-                            <Icon name="tabler:briefcase" />
+                            :class="$route.path === '/services' ? 'text-[#34d399]' : 'text-gray-400'"
+                            class="flex space-x-2 items-center px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:briefcase" size="18" />
                             <span>Services</span>
                         </nuxt-link>
                         <nuxt-link v-if="user?.role.id != 3" to="/calendar"
-                            class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
-                            <Icon name="tabler:calendar" />
+                            :class="$route.path === '/calendar' ? 'text-[#34d399]' : 'text-gray-400'"
+                            class="flex space-x-2 items-center px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:calendar" size="18"/>
                             <span>Calendar</span>
                         </nuxt-link>
                         <nuxt-link to="/masterclass"
-                            class="flex space-x-2 items-center text-blueGray-900 dark:text-white px-3 py-2 text-xs font-medium">
-                            <Icon name="tabler:device-tv" />
+                            :class="$route.path === '/masterclass' ? 'text-[#34d399]' : 'text-gray-400'"
+                            class="flex space-x-2 items-center px-3 py-2 text-xs font-medium">
+                            <Icon name="tabler:device-tv" size="18"/>
                             <span>Masterclass</span>
                         </nuxt-link>
                     </div>
@@ -108,13 +117,15 @@ const items = [
                         <UButton size="sm" square
                             class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
-                                <Icon name="tabler:message" size="20" class="dark:text-white text-primary" />
+                                <Icon name="tabler:message" size="20" :class="$route.path === '/chat' ? 'text-[#34d399]' : 'text-[#0f1454] dark:text-white'" />
                             </template>
                         </UButton>
                     </nuxt-link>
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                         :popper="{ placement: 'bottom-start' }">
-                        <UAvatar :src="user.image_url" :alt="user.full_name" size="md" />
+                        <div class="p-[2px] bg-gray-100 dark:bg-gray-800 dark:border-slate-700 border-slate-200  border rounded-full flex items-center justify-center">
+                            <UAvatar :src="user.image_url" :alt="user.full_name" size="md" />
+                        </div>
                         <template #account="{ item }">
                             <div class="text-left">
                                 <p>
@@ -177,29 +188,33 @@ const items = [
             <ul role="list" class="-mx-2 space-y-1 my-4">
                 <li @click="isOpen = false">
                     <nuxt-link to="/"
+                        :class="{'bg-green-500 text-white': $route.path === '/'}"
                         class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:home" />
+                        <Icon name="tabler:smart-home" size="18" />
                         Home
                     </nuxt-link>
                 </li>
                 <li @click="isOpen = false">
                     <nuxt-link to="/services"
+                        :class="{'bg-[#34d399] text-white': $route.path === '/services'}"
                         class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:briefcase" />
+                        <Icon name="tabler:briefcase" size="18"/>
                         Services
                     </nuxt-link>
                 </li>
                 <li v-if="user?.role.id != 3" @click="isOpen = false">
                     <nuxt-link to="/calendar" 
+                        :class="{'bg-[#34d399] text-white': $route.path === '/calendar'}"
                         class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:calendar" />
+                        <Icon name="tabler:calendar" size="18"/>
                         Calendar
                     </nuxt-link>
                 </li>
                 <li @click="isOpen = false">
                     <nuxt-link to="/masterclass"
+                        :class="{'bg-[#34d399] text-white': $route.path === '/masterclass'}"
                         class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:device-tv" />
+                        <Icon name="tabler:device-tv" size="18"/>
                         Masterclass
                     </nuxt-link>
                 </li>

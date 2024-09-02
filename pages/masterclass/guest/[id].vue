@@ -2,7 +2,7 @@
     <div class="max-w-screen-xl mx-auto py-4">
         <div class="grid grid-cols-1 md:grid-cols-6 gap-6 p-6">
             <div class="md:col-span-4">
-                <div class="rounded-lg overflow-hidden mb-6 h-80">
+                <div class="rounded-lg overflow-hidden mb-6 h-96">
                     <img v-if="masterclass?.image_url" :src="masterclass?.image_url" draggable="false"
                         class="w-full h-full object-cover" alt="" srcset="">
                     <USkeleton class="w-full h-full" />
@@ -91,22 +91,22 @@
                 </div>
             </div>
 
-            <div class="md:col-span-2 sticky top-4">
+            <div class="md:col-span-2 sticky top-4 ">
                 <div v-if="masterclass">
                     <div
-                        class="rounded-2xl overflow-hidden relative bg-white dark:bg-white/5 p-8 ring-2 ring-green-500 xl:p-10 mb-4">
+                        class="rounded-2xl h-96 overflow-hidden relative bg-white dark:bg-white/5 p-8 ring-2 ring-green-500 xl:p-10 mb-4">
                         <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                             class="w-12 absolute top-0 right-0" alt="" srcset="">
                         <div class="flex items-center justify-between">
-                            <p class="mt-6 flex items-baseline gap-x-1">
+                            <p class="flex items-baseline gap-x-1">
                                 <span class="text-4xl font-bold tracking-tight dark:text-white"><sup>$</sup>
                                     {{ masterclass?.price }}
                                 </span>
                             </p>
 
                         </div>
-                        <UDivider class="my-4" />
-                        <ul role="list" class="mt-4 space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-6">
+                        <UDivider class="my-2" />
+                        <ul role="list" class="space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-2">
                             <li class="flex items-center gap-x-3">
                                 <Icon name="tabler:calendar-event" />
                                 <span>{{ $t('Date') }} :</span>
@@ -135,27 +135,29 @@
 
                         </ul>
 
-                        <UButton block :loading="submitLoading" size="lg"
-                            class="dark:bg-green-500 hidden disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                            v-if="!IsPassed && !masterclassGotStarted" @click="subscribeUser" label="Subscribe" />
+                        <div class="py-4">
+                            <UButton block :loading="submitLoading" size="lg"
+                                class="dark:bg-green-500 hidden disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
+                                v-if="!IsPassed && !masterclassGotStarted" @click="subscribeUser" label="Subscribe" />
 
 
-                        <UButton block @click="joinMasterClassModal = true" size="lg"
-                            class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                            v-if="!IsPassed" label="Join" />
+                            <UButton block @click="joinMasterClassModal = true" size="lg"
+                                class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
+                                v-if="!IsPassed" label="Join" />
 
-                        <UButton v-if="!IsPassed && (!paymentSuccess || paymentSuccess != 1) && !masterclassStarted"
-                            block variant="outline" color="green" :loading="submitLoading" size="lg" class="my-4"
-                            @click="subscribeUser" label="Subscribe" />
+                            <UButton v-if="!IsPassed && (!paymentSuccess || paymentSuccess != 1) && !masterclassStarted"
+                                block variant="outline" color="green" :loading="submitLoading" size="lg" class="my-4"
+                                @click="subscribeUser" label="Subscribe" />
 
-                        <div v-if="IsPassed" class="flex justify-center mt-4">
-                            <UDivider label="Masterclass end" />
-                        </div>
+                            <div v-if="IsPassed" class="flex justify-center mt-4">
+                                <UDivider label="Masterclass end" />
+                            </div>
 
-                        <div v-if="!IsPassed">
-                            <UDivider label="" class="mb-2" />
-                            <UButton block @click="resendCredentialsModal = true" variant="link" color="green"
-                                label="Resend Credentials" />
+                            <div v-if="!IsPassed">
+                                <UDivider label="" class="mb-2" />
+                                <UButton block @click="resendCredentialsModal = true" variant="link" color="green"
+                                    label="Resend Credentials" />
+                            </div>
                         </div>
 
                     </div>
@@ -178,9 +180,8 @@
                     <img class="w-1/3 hidden dark:flex" src="~/assets/svg/vectors/masterclass-white.svg" alt="">
                     <h2 class="text-xl md:text-3xl font-bold">{{ $t('Subscribe to masterclass') }}</h2>
                     <p class="text-gray-600 dark:text-slate-300 text-sm text-center">{{
-                        $t(
-                            'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry')
-                        }}</p>
+                        $t( 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry') }}
+                    </p>
                 </div>
 
                 <UForm ref="form" :schema="schema" :state="subscribeState" @submit="submitSubscribeForm"
@@ -225,7 +226,7 @@
                     <UFormGroup label="Email" name="email">
                         <UInput size="lg" type="email" v-model="resendCredentialState.email" />
                     </UFormGroup>
-                    <UFormGroup  name="external">
+                    <UFormGroup name="external">
                         <UCheckbox v-model="external" color="green" name="external" label="Animator" />
                     </UFormGroup>
 
@@ -274,7 +275,7 @@
                         <UInput size="lg" type="password" v-model="externalUserJoinState.password" />
                     </UFormGroup>
 
-                    <UFormGroup  name="external">
+                    <UFormGroup name="external">
                         <UCheckbox v-model="external" color="green" name="external" label="Animator" />
                     </UFormGroup>
 
@@ -451,7 +452,7 @@ const submitSubscribeForm = async () => {
             form.value.clear()
             window.location.replace(result.data)
         } else {
-            const { data } = result.data            
+            const { data } = result.data
             snackbar.add({
                 type: 'error',
                 text: data.message
@@ -468,12 +469,12 @@ const submitResendCredentials = async () => {
     loadingSubmit.value = true;
     let result
     try {
-        if(external.value){
-            result = await resendExternalAnimatorCredentials(id, resendCredentialState) 
-        }else{
-            result = await resendExternalCredentials(id, resendCredentialState) 
+        if (external.value) {
+            result = await resendExternalAnimatorCredentials(id, resendCredentialState)
+        } else {
+            result = await resendExternalCredentials(id, resendCredentialState)
         }
-        
+
 
         if (result?.success) {
             console.log(result.data)
@@ -495,12 +496,12 @@ const submitExternalUserJoin = async () => {
     loadingSubmit.value = true;
     let result
     try {
-        if(external.value){
+        if (external.value) {
             result = await externalAnimatorJoin(id, externalUserJoinState)
-        }else{
+        } else {
             result = await externalUserJoin(id, externalUserJoinState)
         }
-        
+
         loadingSubmit.value = false
 
         if (result?.success) {

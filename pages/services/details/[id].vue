@@ -63,11 +63,11 @@
                             <div class="flex flex-col divide-y dark:divide-slate-800 space-y-4">
                                 <div class="flex flex-col space-y-2 " v-if="user?.id == service?.user?.id">
                                     <b>Actions</b>
-                                    <div class="flex space-x-2">
+                                    <div class="flex items-center justify-between space-x-2">
                                         <nuxt-link :to="`/services/edit/${service?.id}`">
                                             <UButton icon="i-heroicons-pencil-square" size="lg" label="Edit" color="green" />
                                         </nuxt-link>
-                                        <UButton icon="i-heroicons-trash" label="Delete" @click="isOpen = true" color="red" />
+                                        <UButton icon="i-heroicons-trash" label="Delete" size="lg" @click="isOpen = true" color="red" />
                                     </div>
                                 </div>
                                 <div class="flex flex-col space-y-2 ">

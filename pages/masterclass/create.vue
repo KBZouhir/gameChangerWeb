@@ -134,8 +134,8 @@
                                             {{ external_animator.external_user_email }}
                                         </p>
                                     </div>
-                                    <UButton @click="removeExternalUser(index)" icon="i-heroicons-trash" size="xs"
-                                        color="red" variant="solid" :trailing="false" />
+                                    <UButton icon="i-heroicons-x-mark" size="2xs" color="red" @click="removeExternalUser(index)" square
+                                    variant="ghost" />
                                 </div>
                             </div>
                         </div>

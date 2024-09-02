@@ -95,7 +95,8 @@
 
                         </div>
                         <div class="flex justify-between items-center">
-                            <p>Duration: 15 min</p>
+
+                            <p> {{ $t('Duration') }}:  {{ $dayjs.duration($dayjs(selectedAppointment?.end_at).diff($dayjs(selectedAppointment?.begin_at))).asMinutes() }} minutes</p>
                             <p>{{ $dayjs(selectedAppointment?.begin_at).format('dddd, MMMM D') }}</p>
                         </div>
                     </div>

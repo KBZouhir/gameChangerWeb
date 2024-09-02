@@ -84,7 +84,8 @@ onMounted(async () => {
     fluid: true
   })
 
-  player.on('play', fetchAndPlayVideo)
+  fetchAndPlayVideo()
+  // player.on('play', fetchAndPlayVideo)
 
   player.on('error', (e) => {
     console.error('Video.js error:', e)
