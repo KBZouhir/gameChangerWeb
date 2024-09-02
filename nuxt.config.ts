@@ -55,6 +55,9 @@ export default defineNuxtConfig({
   snackbar: {
     bottom: true,
     duration: 5000,
+    success: '#34d198',
+    error: '#FF5252',
+    warning: '#FFC107',
   },
 
   tailwindcss: {

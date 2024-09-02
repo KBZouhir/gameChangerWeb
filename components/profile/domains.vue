@@ -3,6 +3,8 @@ import { useBusinessSectorsStore } from "~/stores/business-sectors"
 import { useDomainsStore } from "~/stores/domains"
 import { apiGetDomainBySector } from "~/composables/store/useDomains"
 import { apiGetBusinessSectors } from "~/composables/store/useBusinessSectors"
+import { updateDomains } from "~/composables/store/useProfile"
+
 import { useAuthStore } from '~/stores/authStore'
 
 
@@ -25,7 +27,9 @@ const selectedSector = ref(null)
 const showDomains = ref(false)
 const selectedViewDomains = ref([])
 const errors = ref([])
+const loading = ref(false)
 
+const snackbar = useSnackbar()
 
 selectedViewDomains.value = userDomains.value
 selectedDomains.value = userDomains.value
@@ -86,11 +90,25 @@ const getErrorMessage = (key) => {
     return error ? error.value : ''
 }
 
-const submitForm = () =>{    
-    formData.forEach((element) => {
-        let profile = element.can_disscuss
-        console.log(profile)
-    })
+const submitForm = async () =>{    
+    const data = {
+        domains: selectedDomains.value.map((domain) => domain.id)
+    }
+    loading.value = true;
+    const result = await updateDomains(data);
+    loading.value = false;
+
+    if(result.success){
+        snackbar.add({
+            type: 'success',
+            text: 'Domains updated successfully',
+        }) 
+    }else{
+        snackbar.add({
+            type: 'error',
+            text: 'Failed to update domains',
+        }) 
+    }
 }
 
 </script>
@@ -121,7 +139,7 @@ const submitForm = () =>{
         </div>
 
         <div class="flex justify-end">
-            <UButton type="submit" class="px-4 py-2 dark:bg-[#34d399] dark:hover:bg-green-400" @click="submitForm">
+            <UButton type="submit" :loading="loading" color="green" class="px-4 py-2 " @click="submitForm">
                 Save changes
             </UButton>
         </div>

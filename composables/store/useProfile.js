@@ -1,8 +1,7 @@
-import { useApi } from "~/composables/useApi"
-import { successAlert, errorAlert } from "~/composables/useAlert"
-import { useAuthStore } from "~/stores/authStore"
+import { useApi } from "~/composables/useApi";
+import { successAlert, errorAlert } from "~/composables/useAlert";
+import { useAuthStore } from "~/stores/authStore";
 import { useUser } from "~/composables/store/useApiAuth";
-
 
 export const updateGeneral = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/profile`, {
@@ -12,9 +11,7 @@ export const updateGeneral = async (payload) => {
   });
 
   console.log(data);
-  
 };
-
 
 export const updatePassword = async (payload) => {
   const authStore = useAuthStore();
@@ -24,14 +21,53 @@ export const updatePassword = async (payload) => {
     method: "POST",
   });
 
-  if(data?.success){
+  if (data?.success) {
     successAlert(data.message);
     authStore.syncAuthUser(data.user);
   }
-  
+
   return { data, error, refresh, pending };
 };
 
+export const updateInterests = async (payload) => {
+  const { data, refresh, error, pending } = await useApi(`/profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  if (data?.success) {
+    return {
+      success: true,
+      data: data,
+    };
+  } else {
+    return {
+      success: false,
+      data: error,
+    };
+  }
+};
+
+export const updateDomains = async (payload) => {
+  const { data, refresh, error, pending } = await useApi(`/profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  if (data?.success) {
+    return {
+      success: true,
+      data: data,
+    };
+  } else {
+    return {
+      success: false,
+      data: error,
+    };
+  }
+};
 
 export const getProfile = async (id) => {
   const authStore = useAuthStore();
@@ -40,67 +76,60 @@ export const getProfile = async (id) => {
     method: "GET",
   });
 
-  return data
+  return data;
 };
-
 
 export const toggleFollow = async (id) => {
   const authStore = useAuthStore();
-  const { data, refresh, error, pending } = await useApi(`profile/${id}/follow`, {
-    initialCache: false,
-    method: "POST",
-  });
-
-  return data
-};
-
-export const updateCoverPage = async (payload) => {
-
-  const { data, refresh, error, pending } = await useApi(`profile`, {
-    initialCache: false,
-    body: payload,
-    method: "POST",
-  });
-
-  return data
-};
-
-export const updateProfilePicture = async (payload) => {
-
-  const { data, refresh, error, pending } = await useApi(`profile`, {
-    initialCache: false,
-    body: payload,
-    method: "POST",
-  });
-
-  return data
-};
-
-
-
-export const updateSettings = async (payload) => {
-  const authStore = useAuthStore();
   const { data, refresh, error, pending } = await useApi(
-    `profile/settings`,
+    `profile/${id}/follow`,
     {
       initialCache: false,
-      body: payload,
-      method: "PUT",
+      method: "POST",
     }
   );
 
-  
-  if(data){
-    await useUser()
-    return{
+  return data;
+};
+
+export const updateCoverPage = async (payload) => {
+  const { data, refresh, error, pending } = await useApi(`profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data;
+};
+
+export const updateProfilePicture = async (payload) => {
+  const { data, refresh, error, pending } = await useApi(`profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data;
+};
+
+export const updateSettings = async (payload) => {
+  const authStore = useAuthStore();
+  const { data, refresh, error, pending } = await useApi(`profile/settings`, {
+    initialCache: false,
+    body: payload,
+    method: "PUT",
+  });
+
+  if (data) {
+    await useUser();
+    return {
       success: true,
-      data: data
-    }
-  }else{
-    return{
+      data: data,
+    };
+  } else {
+    return {
       success: false,
-      data: error
-    }
+      data: error,
+    };
   }
-  
 };
