@@ -1,37 +1,46 @@
 <template>
-    <div>
-        <div class="w-full px-4 py-4 max-w-screen-md mx-auto">
-            
-            <WorkingTime />
-
-            <ClientOnly>
-                <VCalendar ref="calendarRef" expanded color="green" @dayclick="selectDay" @did-move="calendarSwipePage"
-                    :attributes="attributes" :is-dark="$colorMode.value == 'dark' ? true : false"></VCalendar>
-                <template #fallback>
-                    <p>{{ $t('Loading calendar...') }}</p>
-                </template>
-            </ClientOnly>
-
-            <div class="my-4">
-                <h2 class="mb-4">{{ $t('Appointments for ') }}<span class="font-semibold">{{
-                    $dayjs(selectedDay).format("YYYY-MM-DD") }}</span> </h2>
+    <div class="w-full px-4 py-4 max-w-screen-xl mx-auto">
+        <WorkingTime />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <ClientOnly>
+                    <VCalendar ref="calendarRef" expanded color="green" @dayclick="selectDay"
+                        @did-move="calendarSwipePage" :attributes="attributes"
+                        :is-dark="$colorMode.value == 'dark' ? true : false"></VCalendar>
+                    <template #fallback>
+                        <p>{{ $t('Loading calendar...') }}</p>
+                    </template>
+                </ClientOnly>
+            </div>
+            <div class="flex flex-col justify-start">
+                <div class="flex items-center justify-between space-x-4 mb-6">
+                    <h1 class="font-bold text-2xl">Appointments</h1>
+                    <h2 class="text-green-400">{{ $t('Appointments for ') }}
+                        <span class="font-semibold">
+                            {{ $dayjs(selectedDay).format("YYYY-MM-DD") }}
+                        </span>
+                    </h2>
+                </div>
                 <div v-if="appointments?.data?.length > 0 && !loadingAppointments"
                     class="grid md:grid-cols-2 grid-cols-1 gap-4">
                     <NuxtLink v-for="appointment in appointments?.data" :to="`/appointment/${appointment.id}`">
 
                         <div
                             class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
-                            <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false" class="w-12 absolute top-0 right-0"
-                                alt="" srcset="">
+                            <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                                class="w-12 absolute top-0 right-0" alt="" srcset="">
                             <div class="flex items-start justify-between mt-1">
                                 <div class="flex items-center space-x-4">
                                     <nuxt-link :to="`profile/${appointment.user.id}`">
-                                        <UAvatar :src="(appointment.user.id == user.id) ? appointment.requester.image_url  : appointment.user.image_url" :alt="(appointment.user.id == user.id)  ? appointment.requester.full_name : appointment.user.full_name"
+                                        <UAvatar
+                                            :src="(appointment.user.id == user.id) ? appointment.requester.image_url : appointment.user.image_url"
+                                            :alt="(appointment.user.id == user.id) ? appointment.requester.full_name : appointment.user.full_name"
                                             size="md" />
                                     </nuxt-link>
 
                                     <div class="flex flex-col">
-                                        <h4 class="font-bold mb-0">{{ (appointment.user.id == user.id) ? appointment.requester.full_name : appointment.user.full_name}}</h4>
+                                        <h4 class="font-bold mb-0">{{ (appointment.user.id == user.id) ?
+                                            appointment.requester.full_name : appointment.user.full_name }}</h4>
                                         <span class="text-xs -mt-[0.5px]">
                                             {{ convertTo12HourFormat(appointment.begin_at) }} - {{
                                                 convertTo12HourFormat(appointment.end_at) }}
@@ -72,34 +81,35 @@
                         alt="" srcset="">
                     <h2 class="font-semibold text-2xl">{{ $t('No Appointments for this date') }}</h2>
                 </div>
-            </div>
 
-            <div v-if="loadingAppointments" class="my-4">
-                <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
-                    <div v-for="i in 4"
-                        class="p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
-                        <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false" class="w-12 absolute top-0 right-0" alt=""
-                            srcset="">
-                        <div class="flex items-start justify-between mt-1">
-                            <div class="flex items-center space-x-4">
-                                <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
+                <div v-if="loadingAppointments" class="my-4">
+                    <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
+                        <div v-for="i in 4"
+                            class="p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
+                            <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                                class="w-12 absolute top-0 right-0" alt="" srcset="">
+                            <div class="flex items-start justify-between mt-1">
+                                <div class="flex items-center space-x-4">
+                                    <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
 
-                                <div class="flex flex-col">
-                                    <USkeleton class="h-4 w-[100px] mb-4" />
-                                    <span class="flex space-x-2 text-xs -mt-[0.5px]">
-                                        <USkeleton class="h-2 w-[80px]" />
-                                    </span>
+                                    <div class="flex flex-col">
+                                        <USkeleton class="h-4 w-[100px] mb-4" />
+                                        <span class="flex space-x-2 text-xs -mt-[0.5px]">
+                                            <USkeleton class="h-2 w-[80px]" />
+                                        </span>
+                                    </div>
                                 </div>
+                                <USkeleton class="h-6 w-[70px]" />
                             </div>
-                            <USkeleton class="h-6 w-[70px]" />
-                        </div>
 
-                        <div class="">
-                            <USkeleton class="h-4 w-full mb-2" />
-                            <USkeleton class="h-4 w-2/3" />
+                            <div class="">
+                                <USkeleton class="h-4 w-full mb-2" />
+                                <USkeleton class="h-4 w-2/3" />
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

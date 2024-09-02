@@ -51,7 +51,7 @@ const items = [
                             <Icon name="tabler:list" size="20" class="dark:text-white text-primary" />
                         </template>
                     </UButton>
-                    <div class="flex-shrink-0 items-center dark:hidden hidden md:flex">
+                    <div class="flex-shrink-0 items-center dark:hidden md:flex">
                         <nuxt-link to="/">
                             <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-logo.svg" alt="Game changer">
                         </nuxt-link>

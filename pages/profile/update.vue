@@ -1,6 +1,6 @@
 <template>
     <div class="bg-[#F1F5F9] dark:bg-slate-900">
-        <div class="mx-auto w-full max-w-screen-xl py-4">
+        <div class="mx-auto w-full max-w-screen-xl py-4 px-4 lg:px-0">
             <div class="flex flex-col">
                 <div class="rounded-tr-md rounded-tl-md h-96 w-full overflow-hidden relative">
                     <div class="h-full w-full ">
@@ -12,9 +12,9 @@
                     </div>
                     <div class="flex space-x-2 items-center absolute  bottom-4 right-4">
 
-                        <UButton :loading="uploadCoverLoading" size="md" color="green" class="px-4"
+                        <UButton label="Submit" :loading="uploadCoverLoading" size="md" color="green" class="px-4"
                             v-if="selectedCoverImage" @click="uploadCoverImageFun" :ui="{ rounded: 'rounded-full' }">
-                            Submit</UButton>
+                        </UButton>
 
                         <button @click="triggerFileUpload"
                             class="flex space-x-3  rounded-full hover:bg-primary text-xs cursor-pointer transition-all duration-150 hover:shadow-md px-4 py-2 backdrop-blur-md bg-white/30">
@@ -27,14 +27,16 @@
                     <input ref="uploadCoverInput" accept="image/*" type="file" hidden @change="updateCoverpage">
                 </div>
 
-                <div class="pb-4 w-full shadow-sm bg-white dark:bg-slate-800">
+                <UCard class="pb-4 w-full shadow-sm ">
                     <div
                         class="flex md:flex-row flex-col items-center md:items-start space-x-4 space-y-2 w-3/4 mx-auto ">
                         <div
                             class="w-32 h-32 bg-white dark:bg-slate-900 shadow-sm p-1 rounded-2xl relative -mt-12 md:mx-0 mx-auto md:block">
                             <img v-if="!selectedProfileImage && user?.image_url" :src="user?.image_url"
                                 class="w-full h-full object-cover rounded-2xl" :alt="user.full_name">
-                                <div v-if="!user?.image_url && !selectedProfileImage" class="w-full h-full flex items-center justify-center text-2xl font-bold">{{ getInitials(user.full_name) }}</div>
+                            <div v-if="!user?.image_url && !selectedProfileImage"
+                                class="w-full h-full flex items-center justify-center text-2xl font-bold">{{
+                                getInitials(user.full_name) }}</div>
                             <img v-if="selectedProfileImage" :src="selectedProfileImage"
                                 class="w-full h-full object-cover rounded-2xl" :alt="user.full_name">
                             <UButton @click="triggerProfileUpload" :ui="{ rounded: 'rounded-full' }"
@@ -57,68 +59,64 @@
                                 {{ user.bio }}
                             </p>
                         </div>
-                        <!-- <ClientOnly>
-                            <div class="space-x-4 items-center flex md:hidden my-4">
-                                <UButton icon="i-heroicons-plus" size="sm" class="py-2 px-4"
-                                    :color="($colorMode.value == 'dark' ? 'green' : 'primary')" variant="solid"
-                                    label="Create" :trailing="false" />
-                                <UButton icon="i-heroicons-pencil-square" class="hover:bg-primary/5 py-2 px-4" size="sm"
-                                    :color="($colorMode.value == 'dark' ? 'green' : 'primary')" variant="outline"
-                                    label="Update profile" :trailing="false" />
-                            </div>
-                        </ClientOnly> -->
-
                     </div>
-                </div>
+                </UCard>
 
             </div>
 
-            <div class="flex flex-col md:flex-row items-start space-y-4 md:space-x-4 md:space-y-0 my-4">
-                <div
-                    class="top-0 md:top-4 bg-white dark:bg-slate-800 sticky md:w-3/12 w-full p-2 rounded-md shadow-sm z-50">
-                    <div class="px-3 py-4 overflow-y-auto">
-                        <ul class=" font-medium text-sm flex flex-row md:flex-col items-center">
+            <div class="flex flex-col md:flex-row items-start space-y-4 md:space-x-4 md:space-y-0 my-4  lg:px-0">
+
+                <UCard class="top-0 md:top-4 sticky md:w-3/12 w-full rounded-md shadow-sm z-50">
+                    <div class="px-3 overflow-y-auto">
+                        <ul class="font-medium text-sm flex flex-row md:flex-col items-center lg:space-y-2 lg:space-x-0 space-x-2">
                             <li class="w-full">
-                                <button @click="currentStep = 0"
-                                    :class="currentStep == 0 ? 'text-gray-900' : 'text-[#666666]'"
-                                    class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    General
-                                </button>
+                                <UButton label="General" variant="link" class="hover:no-underline"
+                                    :color="currentStep == 0 ? 'green' : 'white'" @click="currentStep = 0">
+                                    <!-- <template #leading>
+                                        <Icon name="tabler:info-circle" />
+                                    </template> -->
+                                </UButton>
                             </li>
                             <li class="w-full">
-                                <button @click="currentStep = 1"
-                                    :class="currentStep == 1 ? 'text-gray-900' : 'text-[#666666]'"
-                                    class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    Password
-                                </button>
+                                <UButton label="Password" variant="link" class="hover:no-underline"
+                                    :color="currentStep == 1 ? 'green' : 'white'" @click="currentStep = 1">
+                                    <!-- <template #leading>
+                                        <Icon name="tabler:shield-lock" />
+                                    </template> -->
+                                </UButton>
                             </li>
                             <li class="w-full">
-                                <button @click="currentStep = 2"
-                                    :class="currentStep == 2 ? 'text-gray-900' : 'text-[#666666]'"
-                                    class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    Interests
-                                </button>
+                                <UButton label="Interests" variant="link" class="hover:no-underline"
+                                    :color="currentStep == 2 ? 'green' : 'white'" @click="currentStep = 2">
+                                    <!-- <template #leading>
+                                        <Icon name="tabler:shield-lock" />
+                                    </template> -->
+                                </UButton>
                             </li>
                             <li class="w-full">
-                                <button @click="currentStep = 3"
-                                    :class="currentStep == 3 ? 'text-gray-900' : 'text-[#666666]'"
-                                    class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    Domains
-                                </button>
+
+                                <UButton label="Domains" variant="link" class="hover:no-underline"
+                                    :color="currentStep == 3 ? 'green' : 'white'" @click="currentStep = 3">
+                                    <!-- <template #leading>
+                                        <Icon name="tabler:shield-lock" />
+                                    </template> -->
+                                </UButton>
+
                             </li>
                             <li class="w-full">
-                                <button @click="currentStep = 4"
-                                    :class="currentStep == 4 ? 'text-gray-900' : 'text-[#666666]'"
-                                    class="flex w-full items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    Address
-                                </button>
+                                <UButton label="Address" variant="link" class="hover:no-underline"
+                                    :color="currentStep == 4 ? 'green' : 'white'" @click="currentStep = 4">
+                                    <!-- <template #leading>
+                                        <Icon name="tabler:map-2" />
+                                    </template> -->
+                                </UButton>
                             </li>
 
                         </ul>
                     </div>
-                </div>
+                </UCard>
 
-                <div class="bg-white dark:bg-slate-800 md:w-9/12 w-full p-4 rounded-md shadow-sm">
+                <UCard class=" md:w-9/12 w-full p-4 rounded-md shadow-sm">
                     <div v-if="currentStep == 0" class="py-4">
                         <h1 class="text-xl font-bold mb-2">Update your Informations</h1>
                         <p class="text-xs text-[#989394]">
@@ -158,7 +156,7 @@
                         </p>
                         <Map />
                     </div>
-                </div>
+                </UCard>
             </div>
         </div>
     </div>
@@ -188,14 +186,34 @@ const uploadProfileLoading = ref(false)
 const filePicture = ref()
 
 const currentStep = ref(0)
+
+const items = [{
+    label: 'Tab1',
+    icon: 'i-heroicons-information-circle'
+},
+{
+    label: 'Tab2',
+    icon: 'i-heroicons-arrow-down-tray'
+},
+{
+    label: 'Tab3',
+    icon: 'i-heroicons-eye-dropper',
+},
+{
+    label: 'Tab2',
+    icon: 'i-heroicons-arrow-down-tray'
+},
+{
+    label: 'Tab2',
+    icon: 'i-heroicons-arrow-down-tray'
+}
+]
+
 definePageMeta({
     layout: "auth",
     title: "Login Page",
     middleware: ['auth']
-});
-
-
-
+})
 
 const triggerFileUpload = () => {
     uploadCoverInput.value.click();
@@ -255,7 +273,7 @@ const uploadProfilePictureFun = async () => {
     const result = await updateProfilePicture(formData)
 
     if (result?.success) {
-        
+
         snackbar.add({
             type: 'success',
             text: 'Cover image updated successfuly'
@@ -267,9 +285,9 @@ const uploadProfilePictureFun = async () => {
 
 const getInitials = (fullName) => {
     return fullName
-        .split(' ')           
-        .map(name => name[0]) 
-        .join('');            
+        .split(' ')
+        .map(name => name[0])
+        .join('');
 }
 
 </script>

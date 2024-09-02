@@ -27,7 +27,7 @@ const onSubmit = async () => {
 <template>
     <div>
         <UForm ref="form" :schema="schema" :state="generalForm" @submit="onSubmit" class="mt-8 space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <UFormGroup label="First name" name="first_name">
                     <UInput v-model="generalForm.first_name" size="lg" autofocus></UInput>
                 </UFormGroup>
