@@ -5,7 +5,9 @@
                 <div class="rounded-lg overflow-hidden mb-6 h-96">
                     <img v-if="masterclass?.image_url" :src="masterclass?.image_url" draggable="false"
                         class="w-full h-full object-cover" alt="" srcset="">
-                    <USkeleton class="w-full h-full" />
+
+                    <video ref="videoPlayer" class="video-js vjs-default-skin w-full h-full"></video>
+
                 </div>
 
                 <UTabs :items="items" class="mb-8">
@@ -323,9 +325,10 @@ const joinMasterClassModal = ref(false)
 const paymentSuccess = route.query?.payment_successfully
 const masterclassGotStarted = ref(false)
 const external = ref(false)
+const videoPlayer = ref(null)
 
 const snackbar = useSnackbar();
-
+const { $videojs } = useNuxtApp()
 
 definePageMeta({
     layout: 'guest',
@@ -540,6 +543,27 @@ async function onError(event) {
 const subscribeUser = async () => {
     isOpen.value = true
 }
+
+watchEffect((onCleanup) => {
+    if (videoPlayer.value && masterclass.value?.video) {
+        const player = $videojs(videoPlayer.value, {
+            sources: [{
+                src: masterclass.value?.video,
+                type: 'video/mp4'
+            }],
+            poster: masterclass.value?.video_thumbnail,
+            controls: true,
+            preload: 'auto'
+        });
+
+        onCleanup(() => {
+            player.dispose();
+        })
+
+        return;
+    }
+})
+
 
 onMounted(() => {
     setInterval(() => {

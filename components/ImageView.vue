@@ -34,6 +34,8 @@ const props = defineProps({
     },
 });
 
+
+
 const imageSrc = ref(null);
 
 const openLightboxOnSlide = () => {
@@ -44,6 +46,8 @@ const fetchImage = async () => {
     let blob;
     try {
         if (props.url) {
+            console.log('fetching image:', props.url);
+            
             blob = await get(props.url);
         } else {
             blob = await getImagebyID(props.id);
@@ -60,6 +64,6 @@ const fetchImage = async () => {
 
 onMounted(fetchImage);
 
-watch(() => props.url, fetchImage)
-watch(() => props.id, fetchImage)
+// watch(() => props.url, fetchImage)
+// watch(() => props.id, fetchImage)
 </script>

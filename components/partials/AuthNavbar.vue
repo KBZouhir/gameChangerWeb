@@ -124,7 +124,7 @@ const items = [
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                         :popper="{ placement: 'bottom-start' }">
                         <div class="p-[2px] bg-gray-100 dark:bg-gray-800 dark:border-slate-700 border-slate-200  border rounded-full flex items-center justify-center">
-                            <UAvatar :src="user.image_url" :alt="user.full_name" size="md" />
+                            <UAvatar :src="user?.image_url" :alt="user?.full_name" size="md" />
                         </div>
                         <template #account="{ item }">
                             <div class="text-left">
