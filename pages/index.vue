@@ -129,6 +129,8 @@
                     </div>
 
                     <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
+                        <!-- `https://gc-dev.informatikab.com/api/v1${post?.video?.path}` -->
+                        <!-- <VideoPlayerJS :videoSrc="`${post?.video?.url}`" /> -->
                         <VideoPlayer :videoSrc="`${post?.video?.url}`" :poster="post.video.thumbnail_url" />
                     </ClientOnly>
                     <div>

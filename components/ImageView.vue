@@ -64,6 +64,6 @@ const fetchImage = async () => {
 
 onMounted(fetchImage);
 
-// watch(() => props.url, fetchImage)
-// watch(() => props.id, fetchImage)
+watch(() => props.url, fetchImage)
+watch(() => props.id, fetchImage)
 </script>
