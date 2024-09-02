@@ -22,11 +22,12 @@
                                     <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
                                 </svg>
                                 <nuxt-link to="/services">
-                                    <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700">
+                                    <div
+                                        class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700">
                                         {{ $t('Services') }}
                                     </div>
                                 </nuxt-link>
-                                
+
                             </div>
                         </li>
                         <li class="flex">
@@ -36,7 +37,8 @@
                                     aria-hidden="true">
                                     <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
                                 </svg>
-                                <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700" aria-current="page">
+                                <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700"
+                                    aria-current="page">
                                     {{ $t('Create Service') }}
                                 </div>
                             </div>
@@ -108,13 +110,14 @@
                             </div>
                         </div>
 
-                        <UButton :loading="submitLoading" type="submit" label="Submit"
-                            class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
-                            size="md">
-                            <template #trailing>
-                                <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
-                            </template>
-                        </UButton>
+                        <div class="my-4">
+                            <UButton :loading="submitLoading" type="submit" label="Submit" color="green" size="md">
+                                <template #trailing>
+                                    <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
+                                </template>
+                            </UButton>
+                        </div>
+
                     </UForm>
 
                 </div>

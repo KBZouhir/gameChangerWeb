@@ -22,11 +22,12 @@
                                     <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
                                 </svg>
                                 <nuxt-link to="/services">
-                                    <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700">
+                                    <div
+                                        class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700">
                                         {{ $t('Services') }}
                                     </div>
                                 </nuxt-link>
-                                
+
                             </div>
                         </li>
                         <li class="flex">
@@ -36,8 +37,9 @@
                                     aria-hidden="true">
                                     <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
                                 </svg>
-                                <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700" aria-current="page">
-                                    {{ service?.title}}
+                                <div class="ml-4 text-sm font-medium dark:text-white text-gray-500 hover:text-gray-700"
+                                    aria-current="page">
+                                    {{ service?.title }}
                                 </div>
                             </div>
                         </li>
@@ -52,12 +54,14 @@
 
             <div class="py-6">
                 <div class="grid md:grid-cols-3 grid-cols-1 gap-4">
-                    <div class="col-span-2">
-                        <h1 class="text-3xl dark:text-white font-semibold mb-4">{{ service?.title }}</h1>
+                    <UCard class="col-span-2">
                         <div>
-                            {{ service?.description }}
+                            <h1 class="text-3xl dark:text-white font-semibold mb-4">{{ service?.title }}</h1>
+                            <div>
+                                {{ service?.description }}
+                            </div>
                         </div>
-                    </div>
+                    </UCard>
                     <div class="col-span-1">
                         <UCard>
                             <div class="flex flex-col divide-y dark:divide-slate-800 space-y-4">
@@ -65,9 +69,11 @@
                                     <b>Actions</b>
                                     <div class="flex items-center justify-between space-x-2">
                                         <nuxt-link :to="`/services/edit/${service?.id}`">
-                                            <UButton icon="i-heroicons-pencil-square" size="lg" label="Edit" color="green" />
+                                            <UButton icon="i-heroicons-pencil-square" variant="outline" size="lg"
+                                                label="Edit" color="green" />
                                         </nuxt-link>
-                                        <UButton icon="i-heroicons-trash" label="Delete" size="lg" @click="isOpen = true" color="red" />
+                                        <UButton icon="i-heroicons-trash" label="Delete" variant="link" size="lg"
+                                            @click="isOpen = true" color="red" />
                                     </div>
                                 </div>
                                 <div class="flex flex-col space-y-2 ">
@@ -105,8 +111,8 @@
                                 <div v-if="(user.id != service?.user.id) && user?.role.id != 3" class="py-2">
                                     <nuxt-link :to="`/chat?service_id=${service?.id}&user_id=${service?.user?.id}`">
                                         <UButton block label="Send Message"
-                                        class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-green-400"
-                                        color="primary" size="lg" />
+                                            class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-green-400"
+                                            color="primary" size="lg" />
                                     </nuxt-link>
                                 </div>
 
@@ -133,12 +139,16 @@
                 <div class="flex flex-col items-center justify-center ">
                     <img class="w-1/3 flex dark:hidden" src="~/assets/svg/vectors/danger.svg" alt="">
                     <img class="w-1/3 hidden dark:flex" src="~/assets/svg/vectors/danger-white.svg" alt="">
-                    <h2 class="text-xl md:text-3xl font-bold text-center">{{ $t('Are you sure you want to delete this service?') }}</h2>
+                    <h2 class="text-xl md:text-3xl font-bold text-center">
+                        {{ $t('Are you sure you want to delete this service?') }}
+                    </h2>
                 </div>
 
                 <div class="grid grid-cols-2 gap-6 my-6">
-                    <UButton @click="deleteServiceFun" :loading="loadingData" label="Confirm" class="flex items-center justify-center" size="lg" color="green" />
-                    <UButton @click="isOpen = false" label="Cancel" class="flex items-center justify-center" size="lg" color="red" />
+                    <UButton @click="deleteServiceFun" :loading="loadingData" label="Confirm"
+                        class="flex items-center justify-center" size="lg" color="green" />
+                    <UButton @click="isOpen = false" label="Cancel" class="flex items-center justify-center" size="lg"
+                        color="red" />
                 </div>
 
             </UCard>

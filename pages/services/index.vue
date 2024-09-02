@@ -6,8 +6,7 @@
                     Total services: <span class="font-bold">{{ services?.meta?.total }}</span>
                 </span>
                 <nuxt-link v-if="user?.role.id != 3" :to="`/services/create`">
-                    <UButton label="Create" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white"
-                        color="primary" size="md"></UButton>
+                    <UButton label="Create" color="green" size="md"></UButton>
                 </nuxt-link>
             </div>
             <div class="grid md:grid-cols-3 grid-cols-1 gap-4">

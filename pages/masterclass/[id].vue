@@ -13,6 +13,9 @@
                         <div v-if="item.key === 'general'">
                             <div class="flex justify-between pt-6">
                                 <div>
+                                    <div class="mb-2">
+                                        <h1 class="text-2xl font-bold">{{ masterclass?.title }}</h1>
+                                    </div>
                                     <div class="flex items-center space-x-2 text-xs mb-4">
                                         <span>By:</span>
                                         <div class="flex items-center space-x-1">
@@ -24,10 +27,6 @@
 
                                         </div>
                                     </div>
-
-                                    <div class="mb-2">
-                                        <h1 class="text-2xl font-bold">{{ masterclass?.title }}</h1>
-                                    </div>
                                 </div>
                                 <div
                                     class="p-4 w-16 h-16 bg-green-400 text-black rounded-md flex flex-col justify-center items-center">
@@ -35,8 +34,8 @@
                                     <p class="text-md font-semibold ">{{ $dayjs(masterclass?.date).format('MMM') }}</p>
                                 </div>
                             </div>
+                            <UDivider label="" class="my-4"/>
                             <div class="mb-6">
-
                                 <p>{{ masterclass?.short_description }}</p>
                             </div>
 
@@ -93,7 +92,7 @@
 
             <div class="md:col-span-2 sticky top-4">
                 <div v-if="masterclass"
-                    class="rounded-2xl h-96 overflow-hidden relative bg-white dark:bg-white/5 p-8 ring-2 ring-green-500 xl:p-10">
+                    class="rounded-2xl flex flex-col h-96 overflow-hidden relative bg-white dark:bg-white/5 p-8 ring-2 ring-green-500 xl:p-10">
                     <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                         class="w-12 absolute top-0 right-0" alt="" srcset="">
                     <div class="flex items-center justify-between">
@@ -110,7 +109,7 @@
 
                     </div>
                     <UDivider class="my-2" />
-                    <ul role="list" class="space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-2">
+                    <ul role="list" class="space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-2 flex-1">
                         <li class="flex items-center gap-x-3">
                             <Icon name="tabler:calendar-event" />
                             <span>{{ $t('Date') }} :</span>
@@ -230,7 +229,7 @@ const items = [{
 }, {
     key: 'animator',
     label: 'Animators',
-    icon: 'i-heroicons-eye-dropper',
+    icon: 'i-heroicons-users',
 }]
 
 

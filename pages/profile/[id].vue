@@ -51,17 +51,17 @@
                                 <li class="pb-2">Podcast</li>
                             </ul>
                             <!-- Unfollow -->
-                            <UButton v-if="profile?.is_followed_by_me" :loading="toggleFollowLoading" @click="toggleFollowBtn(1)" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white">
+                            <UButton color="green" v-if="profile?.is_followed_by_me" :loading="toggleFollowLoading" @click="toggleFollowBtn(1)" >
                                 <Icon name="tabler:user-check" />
                                 {{ $t('Following') }}
                             </UButton>
                             <!-- Follow back -->
-                            <UButton v-if="!profile?.is_followed_by_me && profile?.is_following_me" :loading="toggleFollowLoading" @click="toggleFollowBtn(2)" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white">
+                            <UButton color="green" v-if="!profile?.is_followed_by_me && profile?.is_following_me" :loading="toggleFollowLoading" @click="toggleFollowBtn(2)" >
                                 <Icon name="tabler:user-up" />
                                 {{ $t('Follow Back') }}
                             </UButton>
                             <!-- Follow -->
-                            <UButton v-if="!profile?.is_following_me && !profile?.is_followed_by_me" :loading="toggleFollowLoading" @click="toggleFollowBtn(3)" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white">
+                            <UButton color="green" v-if="!profile?.is_following_me && !profile?.is_followed_by_me" :loading="toggleFollowLoading" @click="toggleFollowBtn(3)" >
                                 <Icon name="tabler:user-plus" />
                                 {{ $t('Follow') }}
                             </UButton>
