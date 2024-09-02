@@ -13,9 +13,8 @@
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
             <div v-for="(masterclass, index) in masterClassList?.data"
-                :key="masterclass.id" :style="`background-image: url(${masterclass.image_url});`"
+                :key="masterclass.id" :style="`background-image: url(${(masterclass.image_url) ? masterclass.image_url : masterclass.video_thumbnail});`"
                 class="text-white bg-cover rounded-lg overflow-hidden">
-
                 <div class="p-8 w-full h-full flex flex-col space-y-4 bg-gradient-to-r from-primary to-transparent">
                     <div>
                         <div class="flex items-center space-x-2 text-xs">

@@ -5,7 +5,9 @@
                 <div class="rounded-lg overflow-hidden mb-6 h-96">
                     <img v-if="masterclass?.image_url" :src="masterclass?.image_url" draggable="false"
                         class="w-full h-full object-cover" alt="" srcset="">
-                    <USkeleton class="w-full h-full" />
+
+                    <video ref="videoPlayer" class="video-js vjs-default-skin w-full h-full"></video>
+
                 </div>
 
                 <UTabs :items="items" class="mb-8">
@@ -34,7 +36,7 @@
                                     <p class="text-md font-semibold ">{{ $dayjs(masterclass?.date).format('MMM') }}</p>
                                 </div>
                             </div>
-                            <UDivider label="" class="my-4"/>
+                            <UDivider label="" class="my-4" />
                             <div class="mb-6">
                                 <p>{{ masterclass?.short_description }}</p>
                             </div>
@@ -139,16 +141,16 @@
 
                     <UButton block :loading="submitLoading" size="lg"
                         class="dark:bg-green-500  disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                        v-if="!IsPassed && !masterclass.is_subscribed && !masterclassStarted && user.role.id != 3" @click="subscribeUser"
-                        label="Subscribe" />
+                        v-if="!IsPassed && !masterclass.is_subscribed && !masterclassStarted && user.role.id != 3"
+                        @click="subscribeUser" label="Subscribe" />
 
                     <UButton block :loading="joinRoomLoading" size="lg"
                         class="dark:bg-green-500  disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                        v-if="!IsPassed && masterclassStarted && (masterclass?.is_subscribed || masterclass?.is_animator || user.role.id === 3)" 
+                        v-if="!IsPassed && masterclassStarted && (masterclass?.is_subscribed || masterclass?.is_animator || user.role.id === 3)"
                         @click="joinRoom" label="Join" />
 
 
-                    <UButton block :disabled="true"  size="lg"
+                    <UButton block :disabled="true" size="lg"
                         class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
                         v-if="!IsPassed && !masterclassStarted" :label="countdownLabel" />
 
@@ -156,7 +158,8 @@
                         <UDivider label="Masterclass end" />
                     </div>
 
-                    <div v-if="!IsPassed && !masterclass?.is_subscribed && masterclassStarted" class="flex justify-center mt-6">
+                    <div v-if="!IsPassed && !masterclass?.is_subscribed && masterclassStarted"
+                        class="flex justify-center mt-6">
                         <UDivider label="Masterclass Started" />
                     </div>
                 </div>
@@ -182,7 +185,10 @@ const joinRoomLoading = ref(false)
 const countdownLabel = ref('')
 const dayjs = useDayjs()
 const now = ref()
+const videoPlayer = ref(null)
 const user = computed(() => authStore.getAuthUser)
+
+const { $videojs } = useNuxtApp()
 
 definePageMeta({
     layout: 'auth',
@@ -268,7 +274,7 @@ const joinRoom = async () => {
     joinRoomLoading.value = true
     const result = await joinMasterClass(masterclass.value.id)
     console.log(result);
-    
+
     if (result?.success) {
 
         await navigateTo(
@@ -292,12 +298,37 @@ const joinRoom = async () => {
     joinRoomLoading.value = false
 }
 
+
 onMounted(() => {
-    setInterval(() => {
+    countdownInterval = setInterval(() => {
         now.value = dayjs();
         calculateCountdown();
     }, 1000);
 })
+
+
+
+watchEffect((onCleanup) => {
+    if (videoPlayer.value && masterclass.value?.video) {
+        const player = $videojs(videoPlayer.value, {
+            sources: [{
+                src: masterclass.value?.video,
+                type: 'video/mp4'
+            }],
+            poster: masterclass.value?.video_thumbnail,
+            controls: true,
+            preload: 'auto'
+        });
+
+        onCleanup(() => {
+            player.dispose();
+        })
+
+        return;
+    }
+})
+
+
 
 onUnmounted(() => {
     clearInterval(countdownInterval);
