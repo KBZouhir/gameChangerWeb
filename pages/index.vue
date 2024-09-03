@@ -669,11 +669,12 @@
             <template #footer>
               <div class="flex justify-end">
                 <UButton
+                  color="green"
                   size="lg"
                   @click="submitForm"
                   :disabled="submitBtn"
                   :loading="isLoading"
-                  class="dark:bg-emerald-500 dark:text-white px-4 py-2"
+                  class=" px-4 py-2"
                   icon="i-heroicons-arrow-right"
                   trailing
                   >{{ $t("Submit") }}</UButton

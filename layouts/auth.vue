@@ -3,7 +3,7 @@
     <!-- <img class="absolute top-0 left-0 z-10" :src="greenBlurEffect" alt="" srcset=""> -->
     <NuxtLoadingIndicator />
     <NuxtSnackbar />
-    <PartialsAuthNavbar />
+    <PartialsAuthNavbar :notificationCount="notificationCount"/>
     <div
       
       class="fixed top-0 left-0 z-[99] pt-[--m-top] overflow-hidden transition-transform xl:duration-500 max-xl:w-full max-xl:-translate-x-full"
@@ -209,62 +209,66 @@
       </div>
       
     </div>
+
     <div class="2xl:ml-[--w-side] xl:ml-[--w-side-sm] p-2.5 mt-[--m-top]">
       <div class="lg:flex 2xl:gap-16 gap-12 max-w-[1065px] mx-auto">
         <NuxtPage />
       </div>
     </div>
 
-    <!-- <UNotifications class="z-20"/> -->
+    <UNotifications v-if="showNotification" class="z-20"/>
     <!-- <img class="absolute top-0 right-0 z-10" :src="yellowBlurEffect" alt="" srcset=""> -->
   </div>
 </template>
 
+
 <script setup>
-import greenBlurEffect from "~/assets/img/green-blur-effect.png";
-import yellowBlurEffect from "~/assets/img/yellow-blur-effect.png";
+import greenBlurEffect from '~/assets/img/green-blur-effect.png'
+import yellowBlurEffect from '~/assets/img/yellow-blur-effect.png'
 
-import { registerToken } from "~/composables/store/useApiAuth";
-import { useAuthStore } from "~/stores/authStore";
-const authStore = useAuthStore();
-const user = computed(() => authStore.getAuthUser);
+import { registerToken } from '~/composables/store/useApiAuth'
+import { unreadNotificationsCount } from '~/composables/store/useNotifications'
 
-const toast = useToast();
+import { useNotificationsStore } from "~/stores/notifications"
 
-const { $messaging, $getToken, $onMessage } = useNuxtApp();
+
+const showNotification = ref(false)
+const toast = useToast()
+
+const store = useNotificationsStore()
+
+const notificationCount = computed(() => store.unreadNotificationsCount)
+
+const { $messaging, $getToken, $onMessage } = useNuxtApp()
+
 
 const requestPermission = async () => {
   try {
-    const permission = await Notification.requestPermission();
+    const permission = await Notification.requestPermission()
 
-    if (permission === "granted") {
-      $getToken($messaging, {
-        vapidKey:
-          "BJXJpMYEoxBnfQRx74LugwKT6Bs29NW39m6Wh8exW1bb8nrMElyc4c8VfuCj-ZnhZSOuiEiiKsuq9djzsLVSqgU",
+    if (permission === 'granted') {
+
+      $getToken($messaging, { vapidKey: 'BJXJpMYEoxBnfQRx74LugwKT6Bs29NW39m6Wh8exW1bb8nrMElyc4c8VfuCj-ZnhZSOuiEiiKsuq9djzsLVSqgU' }).then((currentToken) => {
+        if (currentToken) {
+          RegisterFCMToken(currentToken)
+        } else {
+          console.log('No registration token available. Request permission to generate one.')
+        }
+      }).catch((err) => {
+        console.log('An error occurred while retrieving token. ', err)
       })
-        .then((currentToken) => {
-          if (currentToken) {
-            RegisterFCMToken(currentToken);
-          } else {
-            console.log(
-              "No registration token available. Request permission to generate one."
-            );
-          }
-        })
-        .catch((err) => {
-          console.log("An error occurred while retrieving token. ", err);
-        });
+
     } else {
-      console.error("Permission denied");
+      console.error('Permission denied')
     }
   } catch (error) {
-    console.error("Error requesting permission:", error);
+    console.error('Error requesting permission:', error)
   }
-};
+}
 
 const RegisterFCMToken = async (token) => {
-  await registerToken({ device_token: token });
-};
+  await registerToken({ device_token: token })
+}
 
 const receivedMessageSound = () => {
     const audio = new Audio('/sounds/MessageNotification.mp3');
@@ -277,7 +281,7 @@ const updateUnreadNotificationCount = async () => {
 }
 
 onMounted(() => {
-  requestPermission();
+  requestPermission()
 
   updateUnreadNotificationCount()
 
@@ -289,12 +293,15 @@ onMounted(() => {
       id: payload.notification.messageId,
       description: payload.notification.body,
       avatar: { src: payload.data.image_url },
-      icon: "i-octicon-desktop-download-24",
-      color: "primary",
-      timeout: "3000",
-    });
-  });
-});
+      color: "green",
+      timeout:"3000",
+      callback: () => {
+        showNotification.value = false;
+      }
+    })
+  })
+})
+
 </script>
 
 <style></style>
