@@ -4,13 +4,14 @@
     <!-- <img class="absolute top-0 left-0 z-10" :src="greenBlurEffect" alt="" srcset=""> -->
     <NuxtLoadingIndicator />
     <NuxtSnackbar />
-    <PartialsAuthNavbar />
+    <PartialsAuthNavbar :notificationCount="notificationCount"/>
     <div class="relative flex-1 z-20">
       <div class="relative">
         <NuxtPage />
       </div>
     </div>
-    <!-- <UNotifications class="z-20"/> -->
+    <UNotifications v-if="showNotification" class="z-20"/>
+    
     <!-- <img class="absolute top-0 right-0 z-10" :src="yellowBlurEffect" alt="" srcset=""> -->
 
   </div>
@@ -21,10 +22,17 @@ import greenBlurEffect from '~/assets/img/green-blur-effect.png'
 import yellowBlurEffect from '~/assets/img/yellow-blur-effect.png'
 
 import { registerToken } from '~/composables/store/useApiAuth'
+import { unreadNotificationsCount } from '~/composables/store/useNotifications'
+
+import { useNotificationsStore } from "~/stores/notifications"
 
 
+const showNotification = ref(false)
 const toast = useToast()
 
+const store = useNotificationsStore()
+
+const notificationCount = computed(() => store.unreadNotificationsCount)
 
 const { $messaging, $getToken, $onMessage } = useNuxtApp()
 
@@ -57,18 +65,34 @@ const RegisterFCMToken = async (token) => {
   await registerToken({ device_token: token })
 }
 
+const receivedMessageSound = () => {
+    const audio = new Audio('/sounds/MessageNotification.mp3');
+    audio.play();
+}
+
+const updateUnreadNotificationCount = async () => {
+    const result = await unreadNotificationsCount()
+    
+}
+
 onMounted(() => {
   requestPermission()
 
+  updateUnreadNotificationCount()
+
   $onMessage($messaging, (payload) => {
-    console.log("Message on Clinet ", payload);
+    showNotification.value = true
+    receivedMessageSound()
+    updateUnreadNotificationCount()
     toast.add({
       id: payload.notification.messageId,
       description: payload.notification.body,
       avatar: { src: payload.data.image_url },
-      icon: 'i-octicon-desktop-download-24',
-      color: "primary",
-      timeout:"3000"
+      color: "green",
+      timeout:"3000",
+      callback: () => {
+        showNotification.value = false;
+      }
     })
   })
 })

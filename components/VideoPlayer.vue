@@ -87,6 +87,15 @@ onMounted(async () => {
   fetchAndPlayVideo()
   // player.on('play', fetchAndPlayVideo)
 
+  player.on('play', () => {
+    const allPlayers = $videojs.getPlayers()
+    for (const playerId in allPlayers) {
+      if (playerId !== player.id()) {
+        allPlayers[playerId].pause()
+      }
+    }
+  })
+
   player.on('error', (e) => {
     console.error('Video.js error:', e)
   })

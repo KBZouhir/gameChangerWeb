@@ -9,7 +9,7 @@ export const useUserStore = defineStore("UsersStore", {
   },
   actions: {
     setUsers(users) {
-      this.users = users
+      this.users = users;
     },
   },
 });

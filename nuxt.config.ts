@@ -102,6 +102,7 @@ export default defineNuxtConfig({
       messagingSenderId: process.env.FIRE_MESSAGINGSENDERID,
       appId: process.env.FIRE_APPID,
       measurementId: process.env.FIRE_MEASUREMENTID,
+      apiBaseUrl: process.env.API_BASE_URL,
     },
   },
 

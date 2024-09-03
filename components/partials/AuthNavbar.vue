@@ -11,9 +11,16 @@ const isOpen = ref(false)
 //     useUser();
 // });
 
+defineProps({
+  notificationCount: {
+    type: Number,
+    default: 0
+  }
+});
+
 const logoutUser = async () => {
     const result = await logout();
-     const authCookie = useCookie("user_access_token");
+    const authCookie = useCookie("user_access_token");
     authCookie.value = null;
     await navigateTo('/auth/login')
 }
@@ -68,8 +75,7 @@ const items = [
 
                 <div class="hidden sm:ml-16 sm:flex items-center">
                     <div class="flex space-x-4">
-                        <nuxt-link to="/"
-                            :class="$route.path === '/' ? 'text-[#34d399]' : 'text-gray-400'"
+                        <nuxt-link to="/" :class="$route.path === '/' ? 'text-[#34d399]' : 'text-gray-400'"
                             class="flex space-x-2 items-center px-3 py-2 text-xs font-medium">
                             <Icon name="tabler:smart-home" size="18" />
                             <span>Home</span>
@@ -83,13 +89,13 @@ const items = [
                         <nuxt-link v-if="user?.role.id != 3" to="/calendar"
                             :class="$route.path === '/calendar' ? 'text-[#34d399]' : 'text-gray-400'"
                             class="flex space-x-2 items-center px-3 py-2 text-xs font-medium">
-                            <Icon name="tabler:calendar" size="18"/>
+                            <Icon name="tabler:calendar" size="18" />
                             <span>Calendar</span>
                         </nuxt-link>
                         <nuxt-link to="/masterclass"
                             :class="$route.path === '/masterclass' ? 'text-[#34d399]' : 'text-gray-400'"
                             class="flex space-x-2 items-center px-3 py-2 text-xs font-medium">
-                            <Icon name="tabler:device-tv" size="18"/>
+                            <Icon name="tabler:device-tv" size="18" />
                             <span>Masterclass</span>
                         </nuxt-link>
                     </div>
@@ -104,12 +110,15 @@ const items = [
                         </template>
                     </UButton> -->
                     <nuxt-link to="/notifications">
-                        <UButton size="sm" square
-                            class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
-                            <template #leading>
-                                <Icon name="tabler:bell" size="20" class="dark:text-white text-primary" />
-                            </template>
-                        </UButton>
+                        <UChip :text="notificationCount" color="red" size="xl">
+                            <UButton size="sm" square
+                                class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
+                                <template #leading>
+                                    <Icon name="tabler:bell" size="20" class="dark:text-white text-primary" />
+                                </template>
+                            </UButton>
+                        </UChip>
+
                     </nuxt-link>
 
                     <SwitchMode />
@@ -117,13 +126,15 @@ const items = [
                         <UButton size="sm" square
                             class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
-                                <Icon name="tabler:message" size="20" :class="$route.path === '/chat' ? 'text-[#34d399]' : 'text-[#0f1454] dark:text-white'" />
+                                <Icon name="tabler:message" size="20"
+                                    :class="$route.path === '/chat' ? 'text-[#34d399]' : 'text-[#0f1454] dark:text-white'" />
                             </template>
                         </UButton>
                     </nuxt-link>
                     <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
                         :popper="{ placement: 'bottom-start' }">
-                        <div class="p-[2px] bg-gray-100 dark:bg-gray-800 dark:border-slate-700 border-slate-200  border rounded-full flex items-center justify-center">
+                        <div
+                            class="p-[2px] bg-gray-100 dark:bg-gray-800 dark:border-slate-700 border-slate-200  border rounded-full flex items-center justify-center">
                             <UAvatar :src="user?.image_url" :alt="user?.full_name" size="md" />
                         </div>
                         <template #account="{ item }">
@@ -179,47 +190,45 @@ const items = [
 
                 <div @click="isOpen = false" class="hidden flex-shrink-0 items-center dark:flex">
                     <nuxt-link to="/">
-                        <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg" alt="Game changer">
+                        <img class="h-10 w-auto" src="~/assets/svg/logos/game-changer-white-logo.svg"
+                            alt="Game changer">
                     </nuxt-link>
                 </div>
             </div>
 
-           <div class="p-4">
-            <ul role="list" class="-mx-2 space-y-1 my-4">
-                <li @click="isOpen = false">
-                    <nuxt-link to="/"
-                        :class="{'bg-green-500 text-white': $route.path === '/'}"
-                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:smart-home" size="18" />
-                        Home
-                    </nuxt-link>
-                </li>
-                <li @click="isOpen = false">
-                    <nuxt-link to="/services"
-                        :class="{'bg-[#34d399] text-white': $route.path === '/services'}"
-                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:briefcase" size="18"/>
-                        Services
-                    </nuxt-link>
-                </li>
-                <li v-if="user?.role.id != 3" @click="isOpen = false">
-                    <nuxt-link to="/calendar" 
-                        :class="{'bg-[#34d399] text-white': $route.path === '/calendar'}"
-                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:calendar" size="18"/>
-                        Calendar
-                    </nuxt-link>
-                </li>
-                <li @click="isOpen = false">
-                    <nuxt-link to="/masterclass"
-                        :class="{'bg-[#34d399] text-white': $route.path === '/masterclass'}"
-                        class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
-                        <Icon name="tabler:device-tv" size="18"/>
-                        Masterclass
-                    </nuxt-link>
-                </li>
-            </ul>
-           </div>
+            <div class="p-4">
+                <ul role="list" class="-mx-2 space-y-1 my-4">
+                    <li @click="isOpen = false">
+                        <nuxt-link to="/" :class="{ 'bg-green-500 text-white': $route.path === '/' }"
+                            class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                            <Icon name="tabler:smart-home" size="18" />
+                            Home
+                        </nuxt-link>
+                    </li>
+                    <li @click="isOpen = false">
+                        <nuxt-link to="/services" :class="{ 'bg-[#34d399] text-white': $route.path === '/services' }"
+                            class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                            <Icon name="tabler:briefcase" size="18" />
+                            Services
+                        </nuxt-link>
+                    </li>
+                    <li v-if="user?.role.id != 3" @click="isOpen = false">
+                        <nuxt-link to="/calendar" :class="{ 'bg-[#34d399] text-white': $route.path === '/calendar' }"
+                            class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                            <Icon name="tabler:calendar" size="18" />
+                            Calendar
+                        </nuxt-link>
+                    </li>
+                    <li @click="isOpen = false">
+                        <nuxt-link to="/masterclass"
+                            :class="{ 'bg-[#34d399] text-white': $route.path === '/masterclass' }"
+                            class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
+                            <Icon name="tabler:device-tv" size="18" />
+                            Masterclass
+                        </nuxt-link>
+                    </li>
+                </ul>
+            </div>
         </USlideover>
     </nav>
 </template>

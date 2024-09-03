@@ -1,8 +1,10 @@
 <script setup>
 import schema from '~/schemas/auth/forgotpassword';
-import { forgotPassword } from '~/composables/store/useApiAuth'
+import { forgotPassword, VerifyExistencePhone, sendOtp } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
-import { warningAlert, successAlert } from '~/composables/useAlert'
+
+const { $auth, $RecaptchaVerifier } = useNuxtApp();
+
 
 
 definePageMeta({
@@ -13,66 +15,142 @@ definePageMeta({
 
 const form = ref()
 const linkSend = ref(false)
+const isPhoneInput = ref(false)
 const isLoading = ref(false)
+const recaptchaToken = ref()
 const snackbar = useSnackbar()
 
 const state = reactive({
     email: undefined,
     phone: undefined,
-    password: undefined
+})
+
+
+const hidePhoneComp = () => {
+    isPhoneInput.value = false
+    state.email = ""
+}
+
+
+watch(() => state.email, (newValue) => {
+    const regex = /^[+0-9]/;
+    if (regex.test(newValue)) {
+        isPhoneInput.value = true
+        state.phone = state.email
+    } else {
+        if (isPhoneInput.value) {
+            hidePhoneComp()
+        }
+    }
+})
+
+
+const getRecaptchaToken = async () => {
+    try {
+        await window.recaptchaVerifier.render();
+        const token = await window.recaptchaVerifier.verify();
+        recaptchaToken.value = token;
+    } catch (error) {
+        console.error('Error getting reCAPTCHA token:', error);
+    }
+}
+
+onMounted(() => {
+    window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
+        'size': 'invisible',
+    });
 })
 
 
 async function onSubmit(event) {
-    let {data} = event;
+    let { data } = event;
     isLoading.value = true
-    const result = await forgotPassword(data);
-    if (!result.data) {
-        const error = handleApiError(result.error);
-        if (error.status === 422) {
-            form.value.setErrors(error.errors);
+
+    if (isPhoneInput.value) {
+        data = { phone: state.phone }
+
+        const result = await VerifyExistencePhone(data);
+        if (result?.data?.success) {
+            await getRecaptchaToken()
+            let payload = {
+                phoneNumber: data.phone,
+                recaptchaToken: recaptchaToken.value
+            }
+            await sendOtp(payload);
+
+            await navigateTo({
+                path: '/auth/validation',
+                query: {
+                    forgot_password: 1
+                }
+            })
+            return
+        }
+
+        if (!result.data) {
+            const error = handleApiError(result.error);
+            if (error.status === 422) {
+                form.value.setErrors(error.errors);
+            }
+        }
+
+
+    } else {
+        const result = await forgotPassword(data);
+        if (!result.data) {
+            const error = handleApiError(result.error);
+            if (error.status === 422) {
+                form.value.setErrors(error.errors);
+            }
+        }
+
+        if (result.data?.success) {
+            linkSend.value = true
+            snackbar.add({
+                type: 'success',
+                text: result.data?.message
+            })
+            successAlert(result.data?.status)
+        }
+
+        if (result.data?.success == false) {
+            snackbar.add({
+                type: 'error',
+                text: result.data?.message.email
+            })
         }
     }
-
-    if(result.data?.success){
-        linkSend.value = true
-        snackbar.add({
-            type: 'success',
-            text: result.data?.message
-        })
-        successAlert(result.data?.status)
-    }
-
-    if(result.data?.success == false){
-        snackbar.add({
-            type: 'error',
-            text: result.data?.message.email
-        })
-    }
-
     isLoading.value = false
+
 }
 
 </script>
 
 <template>
-    <div class="relative  h-full py-12">
+    <div class="relative h-screen px-4 md:px-0 py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-2/4 w-full p-8 relative z-50" v-show="!linkSend">
-                <h2 class="text-3xl font-bold">Forgotten your password?</h2>
-                <p class="text-blueGray-900 dark:text-slate-300">There is nothing to worry about, we'll send you a
+            <UCard class="md:w-2/4 w-full p-8 relative overflow-hidden" v-show="!linkSend">
+                <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                    class="w-12 absolute top-0 right-0" alt="" srcset="">
+                <h2 class="text-3xl font-bold mb-2">Forgotten your password?</h2>
+                <p class="text-sm text-blueGray-900 dark:text-slate-300">There is nothing to worry about, we'll send you a
                     message to help you reset your password.</p>
 
                 <UForm ref="form" :state="state" :schema="schema" @submit="onSubmit" class="mt-8">
+
                     <div class="mt-8">
-                        <UFormGroup label="Email Address" name="email">
-                            <UInput v-model="state.email" size="lg" autofocus placeholder="exmple@mail.com" />
+                        <UFormGroup :label="$t('login.email_address')" name="email" v-if="!isPhoneInput">
+                            <UInput v-model="state.email" size="lg" autofocus placeholder="example@mail.com" />
+                        </UFormGroup>
+                        <UFormGroup name="phone" v-else>
+                            <IntlTelInput v-model="state.phone" @hidePhone="hidePhoneComp" />
                         </UFormGroup>
                     </div>
 
 
                     <div class="mt-4">
-                        <UButton type="submit" block :loading="isLoading" class="px-6 py-3 bg-emerald-400 bg-emerald-400 dark:text-white dark:bg-green-400 dark:hover:bg-emerald-500">Send Reset Link</UButton>
+                        <UButton color="green" type="submit" block :loading="isLoading" class="px-6 py-3 ">
+                            Send Reset Link</UButton>
                     </div>
 
                     <UDivider label="" class="my-6" />
@@ -82,6 +160,7 @@ async function onSubmit(event) {
                             Wait! i Remember my password
                         </NuxtLink>
                     </div>
+                    <div id="recaptcha-container"></div>
                 </UForm>
             </UCard>
 
@@ -90,7 +169,8 @@ async function onSubmit(event) {
                     <img class="w-auto h-52" src="~/assets/svg/vectors/check.svg" alt="Game changer">
 
                     <h3 class="text-2xl font-bold mb-3">Reset password</h3>
-                    <p class="text-blueGray-900 dark:text-slate-300 text-center">Reset password link sent on your email.</p>
+                    <p class="text-blueGray-900 dark:text-slate-300 text-center">Reset password link sent on your email.
+                    </p>
                 </div>
 
 

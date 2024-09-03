@@ -43,8 +43,9 @@ const validationMail = async (payload) => {
 }
 
 const sendOtp = async (payload) => {
+  const { apiKey } = useRuntimeConfig().public
   return await useApi(
-    "https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=AIzaSyCvYsqLUIloaOmJtmqNPf0-R8FltxRsBsk",
+    `https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=${apiKey}`,
     {
       initialCache: false,
       body: payload,
@@ -54,8 +55,9 @@ const sendOtp = async (payload) => {
 }
 
 const verifyOtp = async (payload) => {
+  const { apiKey } = useRuntimeConfig().public
   return await useApi(
-    "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber?key=AIzaSyDT5goQg7ja2wF5VIyMR5ywgzEc_qUtacg",
+    `https://identitytoolkit.googleapis.com/v1/accounts:verifyVerificationCode?key=${apiKey}`,
     {
       initialCache: false,
       body: payload,
@@ -180,6 +182,16 @@ const resetPassword = async (payload) => {
   return { data, error, refresh, pending };
 }
 
+const VerifyExistencePhone = async (payload) => {
+  const { data, refresh, error, pending } = await useApi(`/forgot-password/phone/verify`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return { data, error, refresh, pending };
+}
+
 const completeProfile = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/complete-profile`, {
     initialCache: false,
@@ -264,5 +276,6 @@ export {
   completeProfile,
   forgotPassword,
   resetPassword,
+  VerifyExistencePhone,
   registerToken,
 };
