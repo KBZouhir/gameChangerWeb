@@ -1,7 +1,7 @@
 <script setup>
 import { useNuxtApp } from '#app';
 import { z } from "zod";
-import { login, ResendValidationMail, sendOtp, loginWithGoogle } from '~/composables/store/useApiAuth'
+import { login, ResendValidationMail, sendOtp, loginWithGoogle, loginWithFacebook } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
 const { $auth, $RecaptchaVerifier, $messaging, $getToken, $onMessage } = useNuxtApp();
 
@@ -168,6 +168,15 @@ const signInWithGoogle = async () => {
     }
 }
 
+
+const signInWithFacebook = async () => {
+    const result = await loginWithFacebook()
+
+    if (result?.success) {
+        //hendleLoginData(result.user, result)
+    }
+}
+
 </script>
 
 <template>
@@ -228,7 +237,7 @@ const signInWithGoogle = async () => {
                             </template>
                         </UButton>
 
-                        <UButton size="lg" square
+                        <UButton @click="signInWithFacebook" size="lg" square
                             class="bg-[#1877f2] hover:bg-[#1877f2] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
                                 <Icon name="tabler:brand-facebook-filled" size="20"

@@ -2,7 +2,7 @@
 import { defineNuxtPlugin } from '#app'
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from "firebase/firestore"
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider   } from 'firebase/auth'
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider    } from 'firebase/auth'
 import { getMessaging, getToken, onMessage } from '@firebase/messaging'
 
 
@@ -31,6 +31,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.provide('signInWithEmailAndPassword', signInWithEmailAndPassword)
   nuxtApp.provide('signInWithPopup', signInWithPopup)
   nuxtApp.provide('GoogleAuthProvider', GoogleAuthProvider)
+  nuxtApp.provide('FacebookAuthProvider', FacebookAuthProvider)
   nuxtApp.provide('getToken', getToken)
   nuxtApp.provide('messaging', messaging)
   nuxtApp.provide('onMessage', onMessage)

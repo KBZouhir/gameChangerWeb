@@ -1,7 +1,7 @@
-import { useApi } from "~/composables/useApi"
-import { useAuthStore } from "~/stores/authStore"
-import { useSettings } from "~/stores/settings"
-import { excludeKeys } from "~/utils/excludeKeys"
+import { useApi } from "~/composables/useApi";
+import { useAuthStore } from "~/stores/authStore";
+import { useSettings } from "~/stores/settings";
+import { excludeKeys } from "~/utils/excludeKeys";
 
 const register = async (payload) => {
   let cleanData = { ...payload };
@@ -20,7 +20,7 @@ const register = async (payload) => {
     userTokenCookie.value = data.token;
   }
   return { data, error, refresh, pending };
-}
+};
 
 const validationMail = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/email/verify`, {
@@ -28,7 +28,7 @@ const validationMail = async (payload) => {
     body: payload,
     method: "POST",
   });
-  await useUser()
+  await useUser();
   if (data) {
     return {
       success: true,
@@ -40,10 +40,10 @@ const validationMail = async (payload) => {
       data: error,
     };
   }
-}
+};
 
 const sendOtp = async (payload) => {
-  const { apiKey } = useRuntimeConfig().public
+  const { apiKey } = useRuntimeConfig().public;
   return await useApi(
     `https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=${apiKey}`,
     {
@@ -52,10 +52,10 @@ const sendOtp = async (payload) => {
       method: "POST",
     }
   );
-}
+};
 
 const verifyOtp = async (payload) => {
-  const { apiKey } = useRuntimeConfig().public
+  const { apiKey } = useRuntimeConfig().public;
   return await useApi(
     `https://identitytoolkit.googleapis.com/v1/accounts:verifyVerificationCode?key=${apiKey}`,
     {
@@ -64,7 +64,7 @@ const verifyOtp = async (payload) => {
       method: "POST",
     }
   );
-}
+};
 
 const ResendValidationMail = async () => {
   const { data, refresh, error, pending } = await useApi(`/email/resend`, {
@@ -83,7 +83,7 @@ const ResendValidationMail = async () => {
       data: error,
     };
   }
-}
+};
 
 const socialAuth = async (payload) => {
   const authStore = useAuthStore();
@@ -93,19 +93,19 @@ const socialAuth = async (payload) => {
     method: "POST",
   });
 
-  if(data.success){
-    const userTokenCookie = useCookie("user_access_token")
-    userTokenCookie.value = data.token
-    authStore.syncAuthUser(data.user)
+  if (data.success) {
+    const userTokenCookie = useCookie("user_access_token");
+    userTokenCookie.value = data.token;
+    authStore.syncAuthUser(data.user);
 
-    return data
+    return data;
   }
-}
+};
 
 const login = async (payload) => {
   const authStore = useAuthStore();
   const { $auth, $signInWithEmailAndPassword } = useNuxtApp();
-  
+
   let cleanData = { ...payload };
   if (!payload.email || payload.email === "0") {
     const { email, ...rest } = payload;
@@ -137,7 +137,7 @@ const login = async (payload) => {
     }
   }
   return { data, error, refresh, pending };
-}
+};
 
 const loginWithGoogle = async () => {
   const { $auth, $GoogleAuthProvider, $signInWithPopup } = useNuxtApp();
@@ -147,20 +147,49 @@ const loginWithGoogle = async () => {
 
     if (result.user) {
       const [firstName, lastName] = result.user.displayName.split(" ");
-      
+
       const payload = {
         idToken: result.user.accessToken,
         first_name: firstName,
         last_name: lastName,
       };
 
-      const response = await socialAuth(payload)
-      return response
+      const response = await socialAuth(payload);
+      return response;
     }
   } catch (error) {
     console.log(error);
   }
-}
+};
+
+const loginWithFacebook = async () => {
+  const { $auth, $FacebookAuthProvider, $signInWithPopup } = useNuxtApp();
+  try {
+    const provider = new $FacebookAuthProvider();
+
+    $signInWithPopup($auth, provider)
+      .then((result) => {
+        const user = result.user;
+        const credential = FacebookAuthProvider.credentialFromResult(result);
+        const accessToken = credential.accessToken;
+
+        console.log(user, accessToken);
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = FacebookAuthProvider.credentialFromError(error);
+
+        console.log(errorCode, errorMessage, email, credential);
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const forgotPassword = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/forgot-password`, {
@@ -170,7 +199,7 @@ const forgotPassword = async (payload) => {
   });
 
   return { data, error, refresh, pending };
-}
+};
 
 const resetPassword = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/password/reset`, {
@@ -180,17 +209,20 @@ const resetPassword = async (payload) => {
   });
 
   return { data, error, refresh, pending };
-}
+};
 
 const VerifyExistencePhone = async (payload) => {
-  const { data, refresh, error, pending } = await useApi(`/forgot-password/phone/verify`, {
-    initialCache: false,
-    body: payload,
-    method: "POST",
-  });
+  const { data, refresh, error, pending } = await useApi(
+    `/forgot-password/phone/verify`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
 
   return { data, error, refresh, pending };
-}
+};
 
 const completeProfile = async (payload) => {
   const { data, refresh, error, pending } = await useApi(`/complete-profile`, {
@@ -200,23 +232,21 @@ const completeProfile = async (payload) => {
   });
 
   return { data, error, refresh, pending };
-}
+};
 
 const logout = async () => {
   const authStore = useAuthStore();
   const { data, refresh, error, pending } = await useApi(`/logout`, {
     initialCache: false,
     method: "POST",
-  })
-  
-  
+  });
+
   if (data) {
     console.log(data);
     authStore.syncAuthUser(null);
     authStore.syncLoginState(false);
-   
   }
-}
+};
 
 async function useUser(key = "me") {
   const authStore = useAuthStore();
@@ -229,8 +259,8 @@ async function useUser(key = "me") {
       initialCache: false,
     });
     if (error) {
-      console.log(error );
-      
+      console.log(error);
+
       // const authCookie = useCookie("user_access_token");
       // authCookie.value = null;
 
@@ -272,6 +302,7 @@ export {
   ResendValidationMail,
   login,
   loginWithGoogle,
+  loginWithFacebook,
   logout,
   completeProfile,
   forgotPassword,
