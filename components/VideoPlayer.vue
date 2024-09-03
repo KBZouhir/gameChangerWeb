@@ -1,5 +1,5 @@
 <template>
-  <div :class="id ? 'w-72 h-auto' : ''">
+  <div class="rounded-md overflow-hidden" :class="id ? 'w-72 h-auto' : ''">
     <video ref="videoPlayer" class="video-js vjs-default-skin w-full h-full" controls preload="auto" :poster="poster">
       <source :src="videoSrc" type="video/mp4" />
     </video>
