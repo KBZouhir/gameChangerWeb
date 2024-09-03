@@ -117,7 +117,7 @@ async function onSubmit(event) {
 
                 <UForm ref="form" :schema="schema" :state="state" @submit="onSubmit" class="mt-8">
 
-                    <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <UFormGroup label="First name" name="first_name">
                             <UInput v-model="state.first_name" size="lg" autofocus placeholder="First name" />
                         </UFormGroup>
@@ -179,35 +179,6 @@ async function onSubmit(event) {
                         </UButton>
                     </div>
 
-                    <UDivider label="" class="my-6 border-blueGray-700" />
-
-                    <p class="mb-6 mt-4 text-center text-sm">Or sign up with:</p>
-                    <div class="flex justify-center space-x-4">
-                        <UButton size="lg" square
-                            class="bg-[#d14938] hover:bg-[#d14938] dark:bg-transparent dark:hover:bg-white/5">
-                            <template #leading>
-                                <Icon name="tabler:brand-google-filled" size="20" class="text-white" />
-                            </template>
-                        </UButton>
-
-                        <UButton size="lg" square
-                            class="bg-[#1877f2] hover:bg-[#1877f2] dark:bg-transparent dark:hover:bg-white/5">
-                            <template #leading>
-                                <Icon name="tabler:brand-facebook-filled" size="20"
-                                    class="dark:text-white text-white" />
-                            </template>
-                        </UButton>
-
-                        <UButton size="lg" square
-                            class="bg-[#0f6ac5] hover:bg-[#0f6ac5] dark:bg-transparent dark:hover:bg-white/5">
-                            <template #leading>
-                                <Icon name="tabler:brand-linkedin" size="20" class="text-white" />
-                            </template>
-                        </UButton>
-
-                        <!-- <MediaButton type="google" @click="googleLogin()" />
-                        <MediaButton type="twitter" /> -->
-                    </div>
 
                     <UDivider label="" class="my-6" />
                     <div class="text-center">

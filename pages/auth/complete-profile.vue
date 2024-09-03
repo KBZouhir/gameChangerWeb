@@ -1,10 +1,8 @@
-
-
 <template>
-  <div class="relative bg-slate-50 dark:bg-slate-800">
+  <div class="relative bg-slate-50 dark:bg-slate-900">
     <div class="mx-auto max-w-s w-full max-w-screen-xl  h-full   grid grid-cols-5 gap-0 "
       :class="activeStep != 2 ? 'h-screen' : ''">
-      <div class="flex bg-slate-50 dark:bg-slate-800 justify-center items-center col-span-5 lg:col-span-3 ">
+      <div class="flex  justify-center items-center col-span-5 lg:col-span-3 ">
         <div class="h-full flex flex-col w-full px-4 sm:px-6 lg:px-2 py-8">
           <h1 class="text-3xl font-bold">Complete profile</h1>
 
@@ -32,7 +30,7 @@
               things in common.
             </p>
 
-            <SelectDomain v-model="formData.domains"/>
+            <SelectDomain v-model="formData.domains" />
           </div>
 
           <div v-show="activeStep == 2" class="flex-1 overflow-auto">
@@ -85,7 +83,8 @@
               Next
             </UButton>
 
-            <UButton @click="submitForm" v-if="activeStep >= steps - 1" class="px-6 py-3 bg-emerald-400 dark:bg-emerald-400 dark:hover:bg-emerald-500">
+            <UButton @click="submitForm" v-if="activeStep >= steps - 1"
+              class="px-6 py-3 bg-emerald-400 dark:bg-emerald-400 dark:hover:bg-emerald-500">
               Finish
             </UButton>
           </div>
@@ -93,11 +92,18 @@
         <Loading v-model="isLoading" />
 
       </div>
-      <div class=" col-span-2 bg-slate-50 dark:bg-slate-800 h-full flex-1 hidden lg:flex justify-center items-center ">
+      <div class=" col-span-2  h-full flex-1 hidden lg:flex justify-center items-center ">
         <img class="absolute hidden right-0 top-0" width="80%" :src="greenBlurEffect" alt="">
-        <img :src="$colorMode.value == 'dark' ? completeProfileImageWhite  : completeProfileImage" v-if="activeStep == 0" draggable="false" width="50%">
-        <img :src="$colorMode.value == 'dark' ? intelligenceImageWhite : intelligenceImage"  v-if="activeStep == 1" draggable="false" width="50%">
-        <img :src="$colorMode.value == 'dark' ? mapImageWhite : mapImage" v-if="activeStep == 2" draggable="false" width="50%">
+
+        <ClientOnly>
+          <img :src="$colorMode.value == 'dark' ? completeProfileImageWhite : completeProfileImage"
+            v-if="activeStep == 0" draggable="false" width="50%">
+          <img :src="$colorMode.value == 'dark' ? intelligenceImageWhite : intelligenceImage" v-if="activeStep == 1"
+            draggable="false" width="50%">
+          <img :src="$colorMode.value == 'dark' ? mapImageWhite : mapImage" v-if="activeStep == 2" draggable="false"
+            width="50%">
+        </ClientOnly>
+
       </div>
     </div>
   </div>
@@ -211,7 +217,7 @@ const formValidation = () => {
 
 const submitForm = async () => {
   formValidation();
-  
+
   let payload = {
     address: null,
     interests: [],
@@ -231,10 +237,10 @@ const submitForm = async () => {
   payload.address.lat = payload.address.lat.toString();
   payload.address.lon = payload.address.lon.toString();
 
-  
+
   const result = await completeProfile(payload);
   console.log(result);
-  
+
   if (!result.data) {
     const error = handleApiError(result.error);
     if (error.status === 422) {

@@ -31,7 +31,6 @@ const state = reactive({
     code: undefined,
 })
 
-console.log(user.value);
 
 
 onMounted(() => {
@@ -69,10 +68,17 @@ const validationOtp = async () => {
         loading.value = true
         const result = await validationMail(state);
         loading.value = false
-
+        console.log(result);
+        
         if (result?.success) {
-            console.log(user.value);
-            await navigateTo('/auth/complete-profile')
+            snackbar.add({
+                type: 'success',
+                text: result?.data.message
+            })
+            setTimeout(() => {
+                location.reload();
+            }, 500);
+            // await navigateTo('/auth/complete-profile')
         } else {
             error.value = true
             const { data } = result
@@ -144,9 +150,11 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="relative  h-full py-12">
+    <div class="relative min-h-screen py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-3/5 w-full p-8 relative z-50">
+            <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden">
+                <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                    class="w-12 absolute top-0 right-0" alt="" srcset="">
                 <h2 class="text-3xl font-bold">Verification code</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">
                     We just send you a verify code. Check your inbox to get them.

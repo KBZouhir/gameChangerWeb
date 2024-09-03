@@ -8,6 +8,7 @@
                 <UButton loading variant="link" :color="(colorMode.value != 'light') ? 'white' : 'primary'"
                     class="text-white" disabled></UButton>
             </div>
+
         </div>
         <FsLightbox :toggler="toggler" :slide="slide" :showThumbsOnMount="true" :sources="[imageSrc]" />
     </div>
@@ -15,9 +16,12 @@
 
 <script setup>
 import FsLightbox from "fslightbox-vue/v3"
-import { get, getImagebyID } from '~/composables/store/useMedia';
+import axios from 'axios'
+
+const { apiBaseUrl } = useRuntimeConfig().public
 
 const colorMode = useColorMode();
+const userAccessToken = useCookie('user_access_token')
 
 const toggler = ref(false);
 const slide = ref(1);
@@ -32,38 +36,39 @@ const props = defineProps({
         required: false,
         default: null
     },
-});
+})
 
-
-
-const imageSrc = ref(null);
+const imageSrc = ref(null)
 
 const openLightboxOnSlide = () => {
-    toggler.value = !toggler.value;
+    toggler.value = !toggler.value
 };
 
 const fetchImage = async () => {
-    let blob;
+    let response;
+    let url = (props.url) ? props.url : `${apiBaseUrl}conversations/attachments/${props.id}`
+
     try {
-        if (props.url) {
-            console.log('fetching image:', props.url);
-            
-            blob = await get(props.url);
+        response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${userAccessToken.value}`
+            },
+            responseType: 'blob'
+        })
+
+        if (response && response.data) {
+            imageSrc.value = URL.createObjectURL(response.data)
         } else {
-            blob = await getImagebyID(props.id);
-        }
-        if (blob) {
-            imageSrc.value = URL.createObjectURL(blob);
-        } else {
-            console.error('Failed to fetch image blob.')
+            console.error('Received response is not a Blob.')
         }
     } catch (error) {
         console.error('Error fetching image:', error)
     }
 };
 
-onMounted(fetchImage);
+watchEffect(() => {
+    fetchImage()
+})
 
-watch(() => props.url, fetchImage)
-watch(() => props.id, fetchImage)
+
 </script>

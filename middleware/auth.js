@@ -9,6 +9,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
   var user = authStore.getAuthUser;
 
+  console.log('auth middleware', user);
   
   if (!user.is_email_verified && !user.is_phone_verified && user.role.id != 3) {
     if (to.path != "/auth/validation") {

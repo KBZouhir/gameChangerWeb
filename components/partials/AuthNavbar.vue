@@ -11,6 +11,13 @@ const isOpen = ref(false);
 //     useUser();
 // });
 
+defineProps({
+  notificationCount: {
+    type: Number,
+    default: 0
+  }
+});
+
 const logoutUser = async () => {
   const result = await logout();
   const authCookie = useCookie("user_access_token");

@@ -266,11 +266,25 @@ const RegisterFCMToken = async (token) => {
   await registerToken({ device_token: token });
 };
 
+const receivedMessageSound = () => {
+    const audio = new Audio('/sounds/MessageNotification.mp3');
+    audio.play();
+}
+
+const updateUnreadNotificationCount = async () => {
+    const result = await unreadNotificationsCount()
+    
+}
+
 onMounted(() => {
   requestPermission();
 
+  updateUnreadNotificationCount()
+
   $onMessage($messaging, (payload) => {
-    console.log("Message on Clinet ", payload);
+    showNotification.value = true
+    receivedMessageSound()
+    updateUnreadNotificationCount()
     toast.add({
       id: payload.notification.messageId,
       description: payload.notification.body,

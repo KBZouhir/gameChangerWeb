@@ -1,9 +1,9 @@
 <script setup>
 import { useNuxtApp } from '#app';
 import { z } from "zod";
-import { login, ResendValidationMail, sendOtp, loginWithGoogle } from '~/composables/store/useApiAuth'
+import { login, ResendValidationMail, sendOtp, loginWithGoogle, loginWithFacebook } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
-const { $auth, $RecaptchaVerifier, $messaging, $getToken, $onMessage } = useNuxtApp(); 
+const { $auth, $RecaptchaVerifier, $messaging, $getToken, $onMessage } = useNuxtApp();
 
 definePageMeta({
     layout: 'guest',
@@ -131,11 +131,11 @@ async function onSubmit(event) {
     isLoading.value = true;
     const { data } = event
     let token = await getDeviceToken()
-    
+
     if (token) {
         data.device_token = token
     }
-    
+
     const result = await login(data);
     isLoading.value = false;
 
@@ -150,14 +150,30 @@ async function onSubmit(event) {
         hendleLoginData(result.data.user, result)
     } else {
         const { error } = result
+        console.log(error.data?.message);
+
+        snackbar.add({
+            type: 'error',
+            text: error.data?.message
+        })
     }
 }
+
 
 const signInWithGoogle = async () => {
     const result = await loginWithGoogle()
 
     if (result?.success) {
         hendleLoginData(result.user, result)
+    }
+}
+
+
+const signInWithFacebook = async () => {
+    const result = await loginWithFacebook()
+
+    if (result?.success) {
+        //hendleLoginData(result.user, result)
     }
 }
 
@@ -211,9 +227,8 @@ const signInWithGoogle = async () => {
                         </UButton>
                     </div>
 
-                    <UDivider label="" class="my-6 border-blueGray-700" />
+                    <UDivider :label="$t('login.or_log_in_with')" class="my-6 border-blueGray-700" />
 
-                    <p class="mb-6 mt-4 text-center text-sm">{{ $t('login.or_log_in_with') }}</p>
                     <div class="flex justify-center space-x-4">
                         <UButton @click="signInWithGoogle" size="lg" square
                             class="bg-[#d14938] hover:bg-[#d14938] dark:bg-transparent dark:hover:bg-white/5">
@@ -222,7 +237,7 @@ const signInWithGoogle = async () => {
                             </template>
                         </UButton>
 
-                        <UButton size="lg" square
+                        <UButton @click="signInWithFacebook" size="lg" square
                             class="bg-[#1877f2] hover:bg-[#1877f2] dark:bg-transparent dark:hover:bg-white/5">
                             <template #leading>
                                 <Icon name="tabler:brand-facebook-filled" size="20"
