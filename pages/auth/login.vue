@@ -164,8 +164,8 @@ const signInWithGoogle = async () => {
 </script>
 
 <template>
-    <div class="relative  h-full py-12">
-        <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
+    <div class="relative h-full py-12 pb-6">
+        <div class="mx-3 md:mx-auto  max-w-4xl flex justify-center items-center h-full">
             <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden z-50">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                     class="w-12 absolute top-0 right-0" alt="" srcset="">
@@ -253,7 +253,6 @@ const signInWithGoogle = async () => {
                 </UForm>
             </UCard>
         </div>
-
         <div class="absolute top-0 dark:hidden">
             <img src="~/assets/svg/particules/gradient.svg" draggable="false" />
         </div>

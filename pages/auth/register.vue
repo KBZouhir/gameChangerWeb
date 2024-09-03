@@ -109,8 +109,8 @@ async function onSubmit(event) {
 </script>
 
 <template>
-    <div class="relative h-full py-12">
-        <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
+    <div class="relative h-full py-12 pb-6">
+        <div class="mx-3 md:mx-auto max-w-4xl flex justify-center items-center h-full">
             <UCard class="md:w-3/5 w-full p-8 relative z-50">
                 <h2 class="text-3xl font-bold">Sign Up Free</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">14 day free access to unlimited resources </p>
