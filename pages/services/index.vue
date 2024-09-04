@@ -9,7 +9,7 @@
                     <UButton label="Create" color="green" size="md"></UButton>
                 </nuxt-link>
             </div>
-            <div class="grid md:grid-cols-3 grid-cols-1 gap-4">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4">
                 <UCard :ui="{ body: 'p-0' }" class="overflow-hidden" v-for="(service, index) in services?.data">
                     <nuxt-link :to="`/services/details/${service?.id}`">
                         <div :class="`relative h-64 rounded-tr-lg rounded-tl-lg bg-cover`"

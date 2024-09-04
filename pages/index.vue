@@ -5,12 +5,8 @@
     <!-- <div class="gridlines absolute inset-x-0 z-10 -mt-8 py-20"></div> -->
     <div class="flex flex-col col-span-6 lg:col-span-4 mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-6 text-white">
-        <div
-          class="md:col-span-3 bg-[url('~/assets/img/announcent.webp')] bg-cover rounded-lg overflow-hidden"
-        >
-          <div
-            class="p-8 w-full h-full flex flex-col space-y-4 bg-gradient-to-r from-primary to-transparent"
-          >
+        <div class="md:col-span-3  bg-[url('~/assets/img/announcent.webp')] bg-cover rounded-lg overflow-hidden">
+          <div class="p-8 w-full h-full flex flex-col space-y-4 bg-gradient-to-r from-primary to-transparent">
             <div>
               <span class="text-xs">Game changer media </span>
               <h2 class="text-2xl font-bold">Service banner</h2>
@@ -19,13 +15,8 @@
               In publishing and graphic design, Lorem ipsum is a placeholder text
             </p>
             <div>
-              <UButton
-                label="Discover"
-                :ui="{ rounded: 'rounded-full' }"
-                color="white"
-                variant="solid"
-                class="px-4 py-2"
-              >
+              <UButton label="Discover" :ui="{ rounded: 'rounded-full' }" color="white" variant="solid"
+                class="px-4 py-2">
                 <template #trailing>
                   <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
                 </template>
@@ -34,21 +25,14 @@
           </div>
         </div>
 
-        <div
-          class="md:col-span-2 p-8 bg-[#FFBB0C] rounded-lg flex flex-col justify-center space-y-6"
-        >
+        <div class="md:col-span-2 p-8 bg-[#FFBB0C] rounded-lg flex flex-col justify-center space-y-6">
           <div>
             <h2 class="text-2xl font-semibold">Offer</h2>
             <p class="text-4xl font-bold">Get 15%</p>
           </div>
           <div>
-            <UButton
-              label="Grab Offer"
-              :ui="{ rounded: 'rounded-full' }"
-              color="white"
-              variant="solid"
-              class="px-4 py-2"
-            >
+            <UButton label="Grab Offer" :ui="{ rounded: 'rounded-full' }" color="white" variant="solid"
+              class="px-4 py-2">
               <template #trailing>
                 <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
               </template>
@@ -58,14 +42,8 @@
       </div>
 
       <div
-        class="p-4 px-6 ring-1 relative overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-slate-800 rounded-xl flex flex-col space-y-6 mb-4 mt-8"
-      >
-        <img
-          src="~/assets/svg/vectors/pattern-rectangle.svg"
-          class="w-12 absolute top-0 right-0"
-          alt=""
-          srcset=""
-        />
+        class="p-4 px-6 ring-1 relative overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-slate-800 rounded-xl flex flex-col space-y-6 mb-4 mt-8">
+        <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt="" srcset="" />
         <div>
           <h2>Hello {{ user.first_name }} 👋</h2>
           <h1 class="text-2xl font-bold text-dark dark:text-white">
@@ -75,57 +53,33 @@
 
         <div class="flex items-center space-x-4">
           <div
-            class="p-[2px] bg-gray-100 dark:bg-gray-800 border dark:border-slate-700 border-slate-200 rounded-full flex items-center justify-center"
-          >
+            class="p-[2px] bg-gray-100 dark:bg-gray-800 border dark:border-slate-700 border-slate-200 rounded-full flex items-center justify-center">
             <UAvatar :src="user?.image_url" :alt="user.full_name" size="md" />
           </div>
 
-          <button
-            class="flex-1 text-start bg-slate-100 dark:bg-white/5 py-3 px-4 rounded-lg"
-            @click="isOpen = true"
-          >
-            <span class="pt-2 select-none text-sm text-dark dark:text-white"
-              >Write something ...</span
-            >
+          <button class="flex-1 text-start bg-slate-100 dark:bg-white/5 py-3 px-4 rounded-lg" @click="isOpen = true">
+            <span class="pt-2 select-none text-sm text-dark dark:text-white">Write something ...</span>
           </button>
-          <button
-            @click="isOpen = true"
-            type="button"
-            class="rounded-full bg-primary dark:bg-emerald-500 p-2 text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            <svg
-              class="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
+          <button @click="isOpen = true" type="button"
+            class="rounded-full bg-primary dark:bg-emerald-500 p-2 text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path
-                d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
-              />
+                d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
             </svg>
           </button>
         </div>
       </div>
 
-      <UCard
-        v-for="post in posts?.data"
-        class="my-2 py-0 bg-white rounded-xl shadow-sm text-sm font-medium bg-white dark:bg-slate-800"
-      >
+      <UCard v-for="post in posts?.data"
+        class="my-2 py-0 bg-white rounded-xl shadow-sm text-sm font-medium   dark:bg-slate-800">
         <div>
           <div class="flex justify-between items-center flex-wrap">
             <div class="flex items-center space-x-4">
-              <nuxt-link
-                :to="
-                  post.author.id == user.id
-                    ? `profile/update`
-                    : `profile/${post.author.id}`
-                "
-              >
-                <UAvatar
-                  :src="post.author.image_url"
-                  :alt="post.author.full_name"
-                  size="md"
-                />
+              <nuxt-link :to="post.author.id == user.id
+                  ? `profile/update`
+                  : `profile/${post.author.id}`
+                ">
+                <UAvatar :src="post.author.image_url" :alt="post.author.full_name" size="md" />
               </nuxt-link>
 
               <div class="flex flex-col">
@@ -136,29 +90,15 @@
               </div>
             </div>
             <div class="flex space-x-4" v-if="post.author.id == user.id">
-              <UDropdown
-                :items="postDropDown"
-                :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                :popper="{ placement: 'bottom-start' }"
-              >
-                <UButton
-                  icon="i-heroicons-ellipsis-vertical"
-                  size="sm"
-                  :color="colorMode.value == 'dark' ? 'white' : 'black'"
-                  variant="link"
-                  :trailing="false"
-                />
+              <UDropdown :items="postDropDown" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                :popper="{ placement: 'bottom-start' }">
+                <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
+                  :color="colorMode.value == 'dark' ? 'white' : 'black'" variant="link" :trailing="false" />
 
                 <template #item="{ item }">
-                  <button
-                    class="w-full flex items-center justify-between"
-                    @click="item.function(post)"
-                  >
+                  <button class="w-full flex items-center justify-between" @click="item.function(post)">
                     <span class="truncate">{{ item.label }}</span>
-                    <UIcon
-                      :name="item.icon"
-                      class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
-                    />
+                    <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
                   </button>
                 </template>
               </UDropdown>
@@ -171,10 +111,7 @@
           <ClientOnly fallback-tag="div" fallback="" v-if="post.video">
             <!-- `https://gc-dev.informatikab.com/api/v1${post?.video?.path}` -->
             <!-- <VideoPlayerJS :videoSrc="`${post?.video?.url}`" /> -->
-            <VideoPlayer
-              :videoSrc="`${post?.video?.url}`"
-              :poster="post.video.thumbnail_url"
-            />
+            <VideoPlayer :videoSrc="`${post?.video?.url}`" :poster="post.video.thumbnail_url" />
           </ClientOnly>
           <div>
             <ImageView v-if="post.image" :url="`${post.image.url}`" />
@@ -184,58 +121,22 @@
                 <UPopover mode="hover" :popper="{ placement: 'top-start' }">
                   <div class="flex items-center space-x-0 font-semibold">
                     <div v-if="post.reaction">
-                      <UButton
-                        v-if="post.reaction == '1'"
-                        @click="togglePostReaction(post.id, 1)"
-                        size="sm"
-                        color="primary"
-                        square
-                        variant="link"
-                      >
-                        <Icon
-                          name="tabler:thumb-up-filled"
-                          class="text-green-600"
-                          size="22"
-                        />
+                      <UButton v-if="post.reaction == '1'" @click="togglePostReaction(post.id, 1)" size="sm"
+                        color="primary" square variant="link">
+                        <Icon name="tabler:thumb-up-filled" class="text-green-600" size="22" />
                       </UButton>
-                      <UButton
-                        v-if="post.reaction == '2'"
-                        @click="togglePostReaction(post.id, 2)"
-                        size="sm"
-                        color="primary"
-                        square
-                        variant="link"
-                      >
+                      <UButton v-if="post.reaction == '2'" @click="togglePostReaction(post.id, 2)" size="sm"
+                        color="primary" square variant="link">
                         <Icon name="tabler:heart-filled" class="text-red-600" size="22" />
                       </UButton>
-                      <UButton
-                        v-if="post.reaction == '3'"
-                        @click="togglePostReaction(post.id, 3)"
-                        size="sm"
-                        color="primary"
-                        square
-                        variant="link"
-                      >
-                        <Icon
-                          name="tabler:mood-smile-filled"
-                          class="text-orange-500"
-                          size="22"
-                        />
+                      <UButton v-if="post.reaction == '3'" @click="togglePostReaction(post.id, 3)" size="sm"
+                        color="primary" square variant="link">
+                        <Icon name="tabler:mood-smile-filled" class="text-orange-500" size="22" />
                       </UButton>
                     </div>
-                    <UButton
-                      v-else
-                      size="sm"
-                      @click="togglePostReaction(post.id, 2)"
-                      color="primary"
-                      square
-                      variant="link"
-                    >
-                      <Icon
-                        name="tabler:heart"
-                        size="22"
-                        class="dark:text-white text-primary"
-                      />
+                    <UButton v-else size="sm" @click="togglePostReaction(post.id, 2)" color="primary" square
+                      variant="link">
+                      <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
                     </UButton>
                     <span @click="getPostReactions(post.id)">{{
                       post.reactions_count
@@ -244,33 +145,15 @@
 
                   <template #panel>
                     <div class="p-2 flex space-x-2">
-                      <div
-                        class="flex flex-col items-center"
-                        v-for="reaction in settings.reaction.type"
-                      >
+                      <div class="flex flex-col items-center" v-for="reaction in settings.reaction.type">
                         <UTooltip :text="reaction.label">
                           <UButton size="sm" color="primary" square variant="link">
-                            <Icon
-                              v-if="reaction.case == 'LIKE'"
-                              @click="togglePostReaction(post.id, 1)"
-                              name="tabler:thumb-up-filled"
-                              class="text-green-600"
-                              size="22"
-                            />
-                            <Icon
-                              v-if="reaction.case == 'LOVE'"
-                              @click="togglePostReaction(post.id, 2)"
-                              name="tabler:heart-filled"
-                              class="text-red-600"
-                              size="22"
-                            />
-                            <Icon
-                              v-if="reaction.case == 'HAHA'"
-                              @click="togglePostReaction(post.id, 3)"
-                              name="tabler:mood-smile-filled"
-                              class="text-orange-500"
-                              size="22"
-                            />
+                            <Icon v-if="reaction.case == 'LIKE'" @click="togglePostReaction(post.id, 1)"
+                              name="tabler:thumb-up-filled" class="text-green-600" size="22" />
+                            <Icon v-if="reaction.case == 'LOVE'" @click="togglePostReaction(post.id, 2)"
+                              name="tabler:heart-filled" class="text-red-600" size="22" />
+                            <Icon v-if="reaction.case == 'HAHA'" @click="togglePostReaction(post.id, 3)"
+                              name="tabler:mood-smile-filled" class="text-orange-500" size="22" />
                           </UButton>
                         </UTooltip>
                       </div>
@@ -279,19 +162,9 @@
                 </UPopover>
               </div>
 
-              <UButton
-                @click="getPostComments(post.id)"
-                size="sm"
-                color="primary"
-                square
-                variant="link"
-                class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline"
-              >
-                <Icon
-                  name="tabler:message-dots"
-                  class="dark:text-white text-primary"
-                  size="22"
-                />
+              <UButton @click="getPostComments(post.id)" size="sm" color="primary" square variant="link"
+                class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
+                <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
                 <span class="dark:text-white text-black hover:no-underline">{{
                   post.comments_count
                 }}</span>
@@ -313,118 +186,63 @@
       </InfiniteLoading>
 
       <div v-if="!posts" class="flex flex-1 flex-col items-center justify-center py-4">
-        <img
-          class="flex dark:hidden mx-auto"
-          src="~/assets/svg/vectors/empty.svg"
-          draggable="false"
-          alt=""
-          srcset=""
-        />
-        <img
-          class="hidden dark:flex mx-auto"
-          src="~/assets/svg/vectors/empty-white.svg"
-          draggable="false"
-          alt=""
-          srcset=""
-        />
+        <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt="" srcset="" />
+        <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false" alt=""
+          srcset="" />
         <h2 class="font-semibold text-2xl">No data founds !</h2>
         <p>You don't have any notification yet.</p>
       </div>
 
       <ClientOnly fallback-tag="div" fallback="">
         <UModal v-model="isOpen" :ui="{ width: 'w-full sm:w-full' }" prevent-close>
-          <UCard
-            :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }"
-          >
+          <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
             <template #header>
               <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
                   {{ $t("Create publication") }}
                 </h3>
-                <UButton
-                  color="gray"
-                  variant="ghost"
-                  icon="i-heroicons-x-mark-20-solid"
-                  class="-my-1"
-                  @click="isOpen = false"
-                />
+                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                  @click="isOpen = false" />
               </div>
             </template>
             <div class="flex flex-col space-y-4 relative">
               <div class="flex flex-col">
-                <div
-                  class="relative"
-                  :class="
-                    keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
-                      ? 'border-[1px] border-red-400 rounded-md'
-                      : ''
-                  "
-                >
-                  <QuillEditor
-                    :class="colorMode.value == 'dark' ? 'dark-theme' : ''"
-                    :options="options"
-                    theme="bubble"
-                    @text-change="onTextChange"
-                    v-model:content="content"
-                    contentType="html"
-                  />
-                  <p
-                    class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
-                    :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'"
-                  >
+                <div class="relative" :class="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
+                    ? 'border-[1px] border-red-400 rounded-md'
+                    : ''
+                  ">
+                  <QuillEditor :class="colorMode.value == 'dark' ? 'dark-theme' : ''" :options="options" theme="bubble"
+                    @text-change="onTextChange" v-model:content="content" contentType="html" />
+                  <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
+                    :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'">
                     {{ charCount }} / {{ maxLength }}
                   </p>
                 </div>
-                <p
-                  v-show="
-                    keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
-                  "
-                  class="text-red-500 text-[10px] mb-2"
-                >
+                <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
+                  " class="text-red-500 text-[10px] mb-2">
                   {{ getErrorMessage("content") }}
                 </p>
 
                 <div v-if="compressedFiles?.length > 0" class="my-4">
                   <div
-                    class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100"
-                  >
-                    <div
-                      v-for="(file, index) in compressedFiles"
-                      :key="index"
-                      class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out"
-                    >
+                    class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
+                    <div v-for="(file, index) in compressedFiles" :key="index"
+                      class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                       <div class="w-full h-full overflow-hidden border-e">
-                        <img
-                          :src="file?.preview"
-                          alt="Selected Image"
-                          class="object-cover w-full h-full"
-                        />
+                        <img :src="file?.preview" alt="Selected Image" class="object-cover w-full h-full" />
                       </div>
-                      <div
-                        v-if="file?.progress < 100"
-                        class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center"
-                      >
-                        <UButton
-                          loading
-                          :color="colorMode.value != 'light' ? 'white' : 'primary'"
-                          variant="link"
-                          disabled
-                        >
+                      <div v-if="file?.progress < 100"
+                        class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
+                        <UButton loading :color="colorMode.value != 'light' ? 'white' : 'primary'" variant="link"
+                          disabled>
                           Compressing...
                         </UButton>
                       </div>
                       <div
-                        class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden"
-                      >
-                        <UButton
-                          @click="removeImage(index)"
-                          icon="i-heroicons-trash"
+                        class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
+                        <UButton @click="removeImage(index)" icon="i-heroicons-trash"
                           class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
-                          size="2xs"
-                          color="primary"
-                          square
-                          variant="soft"
-                        />
+                          size="2xs" color="primary" square variant="soft" />
                       </div>
                     </div>
                   </div>
@@ -432,15 +250,9 @@
 
                 <div v-show="videoUrl" class="my-4 rounded-md overflow-hidden relative">
                   <video ref="videoContainer" :src="videoUrl" controls width="100%" />
-                  <UButton
-                    @click="removeVideo"
-                    icon="i-heroicons-trash"
+                  <UButton @click="removeVideo" icon="i-heroicons-trash"
                     class="absolute z-20 top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
-                    size="2xs"
-                    color="primary"
-                    square
-                    variant="soft"
-                  />
+                    size="2xs" color="primary" square variant="soft" />
 
                   <!-- <div class="w-full z-10 absolute top-0 left-0 h-full flex items-center justify-center"
                                         v-if="progress > 0 && progress < 100">
@@ -449,171 +261,85 @@
                                         </UButton>
                                     </div> -->
                   <div class="w-full" v-if="progress > 0">
-                    <div
-                      class="relative dark:bg-slate-800 bg-slate-300 h-2 rounded-md overflow-hidden"
-                    >
-                      <div
-                        class="bg-green-600 absolute top-0 left-0 h-full"
-                        :style="`width: ${progress}%;`"
-                      ></div>
+                    <div class="relative dark:bg-slate-800 bg-slate-300 h-2 rounded-md overflow-hidden">
+                      <div class="bg-green-600 absolute top-0 left-0 h-full" :style="`width: ${progress}%;`"></div>
                     </div>
                   </div>
                 </div>
                 <div class="flex space-x-4 items-center pt-4">
-                  <input
-                    ref="inputFileImage"
-                    type="file"
-                    id="file-input-image"
-                    @change="onImageFileChange"
-                    accept="image/*"
-                    hidden
-                    :multiple="multiple"
-                  />
-                  <input
-                    ref="inputVideoPicker"
-                    type="file"
-                    id="file-input-video"
-                    @change="onVideoFileChange"
-                    accept="video/*"
-                    hidden
-                    :multiple="multiple"
-                  />
-                  <UButton
-                    :disabled="postHasMedia"
-                    @click="triggerFileInput"
-                    icon="i-heroicons-photo"
-                    size="xs"
-                    color="primary"
-                    square
-                    variant="ghost"
+                  <input ref="inputFileImage" type="file" id="file-input-image" @change="onImageFileChange"
+                    accept="image/*" hidden :multiple="multiple" />
+                  <input ref="inputVideoPicker" type="file" id="file-input-video" @change="onVideoFileChange"
+                    accept="video/*" hidden :multiple="multiple" />
+                  <UButton :disabled="postHasMedia" @click="triggerFileInput" icon="i-heroicons-photo" size="xs"
+                    color="primary" square variant="ghost"
                     class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
-                    label="Image"
-                  />
-                  <UButton
-                    :disabled="postHasMedia"
-                    @click="triggerVideoPicker"
-                    icon="i-heroicons-video-camera"
+                    label="Image" />
+                  <UButton :disabled="postHasMedia" @click="triggerVideoPicker" icon="i-heroicons-video-camera"
                     size="xs"
                     class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
-                    color="primary"
-                    square
-                    variant="ghost"
-                    label="Video"
-                  />
+                    color="primary" square variant="ghost" label="Video" />
                 </div>
               </div>
             </div>
             <template #footer>
               <div class="flex justify-end">
-                <UButton
-                  size="lg"
-                  @click="submitForm"
-                  color="green"
-                  :disabled="submitBtn"
-                  :loading="isLoading"
-                  class="px-4 py-2"
-                  icon="i-heroicons-arrow-right"
-                  trailing
-                  >{{ $t("Post") }}</UButton
-                >
+                <UButton size="lg" @click="submitForm" color="green" :disabled="submitBtn" :loading="isLoading"
+                  class="px-4 py-2" icon="i-heroicons-arrow-right" trailing>{{ $t("Post") }}</UButton>
               </div>
             </template>
           </UCard>
         </UModal>
 
         <UModal v-model="editPost" :ui="{ width: 'w-full sm:w-full' }" prevent-close>
-          <UCard
-            :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }"
-          >
+          <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
             <template #header>
               <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
                   {{ $t("Create publication") }}
                 </h3>
-                <UButton
-                  color="gray"
-                  variant="ghost"
-                  icon="i-heroicons-x-mark-20-solid"
-                  class="-my-1"
-                  @click="closeEdit"
-                />
+                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                  @click="closeEdit" />
               </div>
             </template>
             <div class="flex flex-col space-y-4 relative">
               <div class="flex flex-col">
-                <div
-                  class="relative"
-                  :class="
-                    keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
-                      ? 'border-[1px] border-red-400 rounded-md'
-                      : ''
-                  "
-                >
-                  <QuillEditor
-                    :class="colorMode.value == 'dark' ? 'dark-theme' : ''"
-                    :options="options"
-                    theme="bubble"
-                    @text-change="onTextChange"
-                    v-model:content="content"
-                    contentType="html"
-                  />
-                  <p
-                    class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
-                    :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'"
-                  >
+                <div class="relative" :class="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
+                    ? 'border-[1px] border-red-400 rounded-md'
+                    : ''
+                  ">
+                  <QuillEditor :class="colorMode.value == 'dark' ? 'dark-theme' : ''" :options="options" theme="bubble"
+                    @text-change="onTextChange" v-model:content="content" contentType="html" />
+                  <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
+                    :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'">
                     {{ charCount }} / {{ maxLength }}
                   </p>
                 </div>
-                <p
-                  v-show="
-                    keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
-                  "
-                  class="text-red-500 text-[10px] mb-2"
-                >
+                <p v-show="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
+                  " class="text-red-500 text-[10px] mb-2">
                   {{ getErrorMessage("content") }}
                 </p>
 
                 <div v-if="compressedFiles?.length > 0" class="my-4">
                   <div
-                    class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100"
-                  >
-                    <div
-                      v-for="(file, index) in compressedFiles"
-                      :key="index"
-                      class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out"
-                    >
+                    class="flex flex-nowrap overflow-x-auto space-x-4 items-center scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full scrollbar-thumb-slate-300/80 scrollbar-track-slate-100">
+                    <div v-for="(file, index) in compressedFiles" :key="index"
+                      class="relative group w-32 h-32 flex-none ring-1 ring-gray-200 dark:ring-gray-800 shadow rounded-md overflow-hidden transition-all duration-150 ease-in-out">
                       <div class="w-full h-full overflow-hidden border-e">
-                        <img
-                          :src="file.preview"
-                          alt="Selected Image"
-                          class="object-cover w-full h-full"
-                        />
+                        <img :src="file.preview" alt="Selected Image" class="object-cover w-full h-full" />
                       </div>
-                      <div
-                        v-if="file.progress < 100"
-                        class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center"
-                      >
-                        <UButton
-                          loading
-                          :color="colorMode.value != 'light' ? 'white' : 'primary'"
-                          variant="link"
-                          disabled
-                        >
+                      <div v-if="file.progress < 100"
+                        class="absolute w-full h-full dark:bg-black/60 bg-white/80 top-0 left-0 flex justify-center items-center">
+                        <UButton loading :color="colorMode.value != 'light' ? 'white' : 'primary'" variant="link"
+                          disabled>
                           Compressing...
                         </UButton>
                       </div>
                       <div
-                        class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden"
-                      >
-                        <UButton
-                          @click="removeImage(index)"
-                          icon="i-heroicons-trash"
+                        class="bg-primary/75 w-full h-full absolute top-0 group-hover:flex items-center justify-center hidden">
+                        <UButton @click="removeImage(index)" icon="i-heroicons-trash"
                           class="bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
-                          size="2xs"
-                          color="primary"
-                          square
-                          variant="soft"
-                        />
+                          size="2xs" color="primary" square variant="soft" />
                       </div>
                     </div>
                   </div>
@@ -621,72 +347,30 @@
 
                 <div v-if="videoUrl" class="my-4 rounded-md overflow-hidden relative">
                   <video :src="videoUrl" controls width="100%" />
-                  <UButton
-                    @click="removeVideo"
-                    icon="i-heroicons-trash"
+                  <UButton @click="removeVideo" icon="i-heroicons-trash"
                     class="absolute top-1 right-1 bg-transparent text-red-400 hover:bg-red-700/5 hover:text-red-500 text-xs dark:text-white"
-                    size="2xs"
-                    color="primary"
-                    square
-                    variant="soft"
-                  />
+                    size="2xs" color="primary" square variant="soft" />
                 </div>
                 <div class="flex space-x-4 items-center pt-4">
-                  <input
-                    ref="inputFileImage"
-                    type="file"
-                    id="file-input-image"
-                    @change="onImageFileChange"
-                    accept="image/*"
-                    hidden
-                    :multiple="multiple"
-                  />
-                  <input
-                    ref="inputVideoPicker"
-                    type="file"
-                    id="file-input-video"
-                    @change="onVideoFileChange"
-                    accept="video/*"
-                    hidden
-                    :multiple="multiple"
-                  />
-                  <UButton
-                    :disabled="postHasMedia"
-                    @click="triggerFileInput"
-                    icon="i-heroicons-photo"
-                    size="xs"
-                    color="primary"
-                    square
-                    variant="ghost"
+                  <input ref="inputFileImage" type="file" id="file-input-image" @change="onImageFileChange"
+                    accept="image/*" hidden :multiple="multiple" />
+                  <input ref="inputVideoPicker" type="file" id="file-input-video" @change="onVideoFileChange"
+                    accept="video/*" hidden :multiple="multiple" />
+                  <UButton :disabled="postHasMedia" @click="triggerFileInput" icon="i-heroicons-photo" size="xs"
+                    color="primary" square variant="ghost"
                     class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
-                    label="Image"
-                  />
-                  <UButton
-                    :disabled="postHasMedia"
-                    @click="triggerVideoPicker"
-                    icon="i-heroicons-video-camera"
+                    label="Image" />
+                  <UButton :disabled="postHasMedia" @click="triggerVideoPicker" icon="i-heroicons-video-camera"
                     size="xs"
                     class="hover:bg-primary dark:text-white disabled:text-primary transition-all duration-300 ease-in-out hover:text-white px-2"
-                    color="primary"
-                    square
-                    variant="ghost"
-                    label="Video"
-                  />
+                    color="primary" square variant="ghost" label="Video" />
                 </div>
               </div>
             </div>
             <template #footer>
               <div class="flex justify-end">
-                <UButton
-                  size="lg"
-                  @click="submitForm"
-                  :disabled="submitBtn"
-                  :loading="isLoading"
-                  class="dark:bg-emerald-500 dark:text-white px-4 py-2"
-                  icon="i-heroicons-arrow-right"
-                  trailing
-                  >{{ $t("Submit") }}</UButton
-                >
+                <UButton color="green" size="lg" @click="submitForm" :disabled="submitBtn" :loading="isLoading"
+                  class=" px-4 py-2" icon="i-heroicons-arrow-right" trailing>{{ $t("Submit") }}</UButton>
               </div>
             </template>
           </UCard>
@@ -967,44 +651,16 @@
 
         <div class="flex flex-col space-y-4" v-if="postReactions">
           <div v-for="reaction in postReactions.data">
-            <div
-              class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-            >
+            <div class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
               <div
-                class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center"
-              >
-                <img
-                  v-if="reaction.user.image_url"
-                  class="rounded-full object-cover w-full h-full"
-                  :src="reaction.user.image_url"
-                  alt="avatar"
-                />
+                class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center">
+                <img v-if="reaction.user.image_url" class="rounded-full object-cover w-full h-full"
+                  :src="reaction.user.image_url" alt="avatar" />
                 <UAvatar v-else :alt="reaction.user.full_name" size="sm" />
-                <UButton
-                  size="xs"
-                  color="primary"
-                  square
-                  variant="link"
-                  class="absolute -right-1 -bottom-1 p-0"
-                >
-                  <Icon
-                    v-if="reaction.type == 1"
-                    name="tabler:thumb-up-filled"
-                    class="text-green-600"
-                    size="16"
-                  />
-                  <Icon
-                    v-if="reaction.type == 2"
-                    name="tabler:heart-filled"
-                    class="text-red-600"
-                    size="16"
-                  />
-                  <Icon
-                    v-if="reaction.type == 3"
-                    name="tabler:mood-smile-filled"
-                    class="text-orange-500"
-                    size="16"
-                  />
+                <UButton size="xs" color="primary" square variant="link" class="absolute -right-1 -bottom-1 p-0">
+                  <Icon v-if="reaction.type == 1" name="tabler:thumb-up-filled" class="text-green-600" size="16" />
+                  <Icon v-if="reaction.type == 2" name="tabler:heart-filled" class="text-red-600" size="16" />
+                  <Icon v-if="reaction.type == 3" name="tabler:mood-smile-filled" class="text-orange-500" size="16" />
                 </UButton>
               </div>
               <h4>{{ reaction.user.full_name }}</h4>
@@ -1012,20 +668,10 @@
           </div>
 
           <div v-if="postReactions.meta.total == 0">
-            <img
-              class="flex dark:hidden mx-auto"
-              src="~/assets/svg/vectors/empty.svg"
-              draggable="false"
-              alt=""
-              srcset=""
-            />
-            <img
-              class="hidden dark:flex mx-auto"
-              src="~/assets/svg/vectors/empty-white.svg"
-              draggable="false"
-              alt=""
-              srcset=""
-            />
+            <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
+              srcset="" />
+            <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false" alt=""
+              srcset="" />
             <div class="my-4 text-center">
               <h2 class="text-xl font-semibold">{{ $t("No reactions on post") }}</h2>
             </div>
@@ -1033,10 +679,8 @@
         </div>
 
         <div class="flex flex-col space-y-4" v-else>
-          <div
-            v-for="i in 3"
-            class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-          >
+          <div v-for="i in 3"
+            class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
             <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
             <div class="flex flex-1 flex-col space-y-3">
               <USkeleton class="h-4" />
@@ -1046,11 +690,7 @@
         </div>
 
         <template #footer v-if="postReactions && postReactions.meta.total > 10">
-          <UPagination
-            v-model="page"
-            :page-count="10"
-            :total="postReactions.meta.total"
-          />
+          <UPagination v-model="page" :page-count="10" :total="postReactions.meta.total" />
         </template>
       </UCard>
     </UModal>
@@ -1067,24 +707,14 @@
           </div>
         </template>
 
-        <div
-          class="flex flex-col space-y-2 h-[350px] overflow-auto is-scrollbar-hidden"
-          v-if="postCommnets"
-        >
+        <div class="flex flex-col space-y-2 h-[350px] overflow-auto is-scrollbar-hidden" v-if="postCommnets">
           <div v-for="comment in postCommnets.data">
             <div class="flex items-center justify-between">
-              <div
-                class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-              >
-                <UAvatar
-                  :src="comment.user.image_url"
-                  :alt="comment.user.full_name"
-                  size="lg"
-                />
+              <div class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+                <UAvatar :src="comment.user.image_url" :alt="comment.user.full_name" size="lg" />
                 <div class="flex flex-1 flex-col items-start">
                   <div
-                    class="flex flex-col px-3 py-2 text-sm bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-md"
-                  >
+                    class="flex flex-col px-3 py-2 text-sm bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-md">
                     <h4 class="font-bold">{{ comment.user.full_name }}</h4>
                     <p>{{ comment.description }}</p>
                   </div>
@@ -1092,29 +722,15 @@
                 </div>
               </div>
               <div v-if="comment.mine">
-                <UDropdown
-                  :items="items"
-                  :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                  :popper="{ placement: 'bottom-start' }"
-                >
-                  <UButton
-                    icon="i-heroicons-ellipsis-vertical"
-                    size="sm"
-                    :color="colorMode.value == 'dark' ? 'white' : 'black'"
-                    variant="link"
-                    :trailing="false"
-                  />
+                <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                  :popper="{ placement: 'bottom-start' }">
+                  <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
+                    :color="colorMode.value == 'dark' ? 'white' : 'black'" variant="link" :trailing="false" />
 
                   <template #item="{ item }">
-                    <button
-                      class="w-full flex items-center justify-between"
-                      @click="item.function(comment)"
-                    >
+                    <button class="w-full flex items-center justify-between" @click="item.function(comment)">
                       <span class="truncate">{{ item.label }}</span>
-                      <UIcon
-                        :name="item.icon"
-                        class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
-                      />
+                      <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
                     </button>
                   </template>
                 </UDropdown>
@@ -1131,25 +747,12 @@
               <span>No more data found!</span>
             </template>
           </InfiniteLoading>
-          <div
-            class="flex justify-center items-center w-full h-full"
-            v-if="postCommnets.meta.total == 0"
-          >
+          <div class="flex justify-center items-center w-full h-full" v-if="postCommnets.meta.total == 0">
             <div>
-              <img
-                class="flex dark:hidden mx-auto"
-                src="~/assets/svg/vectors/empty.svg"
-                draggable="false"
-                alt=""
-                srcset=""
-              />
-              <img
-                class="hidden dark:flex mx-auto"
-                src="~/assets/svg/vectors/empty-white.svg"
-                draggable="false"
-                alt=""
-                srcset=""
-              />
+              <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
+                srcset="" />
+              <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false" alt=""
+                srcset="" />
               <div class="my-4 text-center">
                 <h2 class="text-xl font-semibold">No comment on post</h2>
               </div>
@@ -1157,14 +760,9 @@
           </div>
         </div>
 
-        <div
-          class="flex flex-col space-y-4 h-[350px] overflow-auto is-scrollbar-hidden"
-          v-else
-        >
-          <div
-            v-for="i in 8"
-            class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-          >
+        <div class="flex flex-col space-y-4 h-[350px] overflow-auto is-scrollbar-hidden" v-else>
+          <div v-for="i in 8"
+            class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
             <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
             <div class="flex flex-1 flex-col space-y-3">
               <USkeleton class="h-4" />
@@ -1174,20 +772,10 @@
         </div>
 
         <template #footer>
-          <UInput
-            v-model="comment"
-            @keyup.enter="sendComment"
-            class="flex-1"
-            size="lg"
-            placeholder="Write a comment..."
-          >
+          <UInput v-model="comment" @keyup.enter="sendComment" class="flex-1" size="lg"
+            placeholder="Write a comment...">
             <template #trailing>
-              <UButton
-                size="sm"
-                :color="colorMode.value == 'dark' ? 'white' : 'black'"
-                square
-                variant="link"
-              >
+              <UButton size="sm" :color="colorMode.value == 'dark' ? 'white' : 'black'" square variant="link">
                 <Icon name="tabler:send-2" size="22" />
               </UButton>
             </template>
@@ -1747,7 +1335,7 @@ const postDropDown = [
   font-size: 10px !important;
 }
 
-.blog-content > .th-btn.btn-sm {
+.blog-content>.th-btn.btn-sm {
   background: var(--theme-color);
 }
 </style>
