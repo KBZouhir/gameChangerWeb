@@ -681,6 +681,9 @@ const isURL = (str, protocol = "") => {
 watchEffect(() => {
     getConversationsData()
     getOrCreateCon()
+
+    console.log(user.value);
+    
 })
 
 </script>

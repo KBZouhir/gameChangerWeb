@@ -1,8 +1,7 @@
 <template>
-  <div class="relative bg-slate-50 dark:bg-slate-900">
-    <div class="mx-auto max-w-s w-full max-w-screen-xl  h-full   grid grid-cols-5 gap-0 "
-      :class="activeStep != 2 ? 'h-screen' : ''">
-      <div class="flex  justify-center items-center col-span-5 lg:col-span-3 ">
+  <div class="relative w-full">
+    <div class="mx-auto max-w-s max-w-screen-xl h-full ">
+      <div class="flex  justify-center items-center col-span-5 lg:col-span-4 ">
         <div class="h-full flex flex-col w-full px-4 sm:px-6 lg:px-2 py-8">
           <h1 class="text-3xl font-bold">Complete profile</h1>
 
@@ -25,12 +24,13 @@
 
           <div v-show="activeStep == 1" class="flex-1 flex flex-col overflow-hidden">
             <h1 class="text-2xl font-bold">Select your working domain</h1>
-            <p class="text-[#989394]">
+            <p class="text-[#989394] mb-6">
               Select a few of your working domain to match with users who have similar
               things in common.
             </p>
-
-            <SelectDomain v-model="formData.domains" />
+            <div class="min-h-[400px]">
+              <SelectDomain v-model="formData.domains" />
+            </div>
           </div>
 
           <div v-show="activeStep == 2" class="flex-1 overflow-auto">
@@ -78,13 +78,13 @@
               class="px-6 py-3 text-[#0F1454] dark:disabled:text-emerald-300 dark:text-emerald-400 dark:hover:text-emerald-500 hover:no-underline">
               Previous
             </UButton>
-            <UButton @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="activeStep >= steps - 1"
-              class="px-10 py-3 bg-emerald-400 dark:bg-emerald-400 dark:hover:bg-emerald-500">
+            <UButton color="green" @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="!allowNext"
+              class="px-10 py-3 ">
               Next
             </UButton>
 
-            <UButton @click="submitForm" v-if="activeStep >= steps - 1"
-              class="px-6 py-3 bg-emerald-400 dark:bg-emerald-400 dark:hover:bg-emerald-500">
+            <UButton :loading="isLoading" color="green" @click="submitForm" v-if="activeStep >= steps - 1"
+              class="px-6 py-3 ">
               Finish
             </UButton>
           </div>
@@ -92,7 +92,7 @@
         <Loading v-model="isLoading" />
 
       </div>
-      <div class=" col-span-2  h-full flex-1 hidden lg:flex justify-center items-center ">
+      <!-- <div class=" col-span-2  h-full flex-1 hidden lg:flex justify-center items-center ">
         <img class="absolute hidden right-0 top-0" width="80%" :src="greenBlurEffect" alt="">
 
         <ClientOnly>
@@ -104,7 +104,7 @@
             width="50%">
         </ClientOnly>
 
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -132,7 +132,7 @@ import mapImageWhite from '~/assets/svg/vectors/map.svg'
 import greenBlurEffect from '~/assets/img/green-blur-effect.png'
 
 definePageMeta({
-  layout: "auth",
+  layout: "validation",
   title: "Login Page",
   middleware: ['auth', 'valid']
 });
@@ -140,6 +140,17 @@ definePageMeta({
 const intrestStore = useInterestsStore();
 const intrestBusinessSectorStore = useBusinessSectorsStore();
 const intrestDomainsStore = useDomainsStore();
+
+const allowNext = computed(() => {
+  if (activeStep.value == 0) {
+    return formData.interests.length > 0
+  }
+
+  if (activeStep.value == 1) {
+    return formData.domains.length > 0
+  }
+})
+
 
 const activeStep = ref(0);
 const isOpen = ref(false);
@@ -237,8 +248,9 @@ const submitForm = async () => {
   payload.address.lat = payload.address.lat.toString();
   payload.address.lon = payload.address.lon.toString();
 
-
+  isLoading.value = true;
   const result = await completeProfile(payload);
+  isLoading.value = false;
   console.log(result);
 
   if (!result.data) {
@@ -248,6 +260,9 @@ const submitForm = async () => {
     }
   }
   if (result?.data?.success) {
+    setTimeout(() => {
+      location.reload();
+    }, 500);
     await navigateTo('/')
   }
 };

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col space-y-2">
+    <div class="flex flex-col space-y-2 min-h-full flex-1">
         <label class="block font-medium text-gray-700 dark:text-gray-200">Select domains</label>
         <div :class="(keyExists('domain') && selectedViewDomains.length <= 0) ? `border-red-500` : `border-[#d1d5db] dark:border-[#374151]`"
             class="p-2 py-6 border rounded-md  bg-white  dark:bg-[#111827]">
@@ -101,6 +101,7 @@ const intrestDomainsStore = useDomainsStore()
 
 const domains = computed(() => intrestDomainsStore.getDomains)
 const businessSectors = computed(() => businessSectorStore.getBusinessSectors);
+
 
 const domainLoading = ref(false)
 const isOpen = ref(false)

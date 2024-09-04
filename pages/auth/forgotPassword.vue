@@ -2,9 +2,7 @@
 import schema from '~/schemas/auth/forgotpassword';
 import { forgotPassword, VerifyExistencePhone, sendOtp } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
-
-const { $auth, $RecaptchaVerifier } = useNuxtApp();
-
+const { executeRecaptcha } = useGoogleRecaptcha()
 
 
 definePageMeta({
@@ -55,11 +53,11 @@ const getRecaptchaToken = async () => {
     }
 }
 
-onMounted(() => {
-    window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
-        'size': 'invisible',
-    });
-})
+// onMounted(() => {
+//     window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
+//         'size': 'invisible',
+//     });
+// })
 
 
 async function onSubmit(event) {
@@ -71,10 +69,11 @@ async function onSubmit(event) {
 
         const result = await VerifyExistencePhone(data);
         if (result?.data?.success) {
-            await getRecaptchaToken()
+            const { token } = await executeRecaptcha('submit')
+            
             let payload = {
                 phoneNumber: data.phone,
-                recaptchaToken: recaptchaToken.value
+                recaptchaToken: token
             }
             await sendOtp(payload);
 
