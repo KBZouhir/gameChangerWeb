@@ -150,7 +150,6 @@ async function onSubmit(event) {
         hendleLoginData(result.data.user, result)
     } else {
         const { error } = result
-        console.log(error.data?.message);
 
         snackbar.add({
             type: 'error',

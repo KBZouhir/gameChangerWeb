@@ -103,6 +103,7 @@ export default defineNuxtConfig({
       appId: process.env.FIRE_APPID,
       measurementId: process.env.FIRE_MEASUREMENTID,
       apiBaseUrl: process.env.API_BASE_URL,
+      recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
     },
   },
 
