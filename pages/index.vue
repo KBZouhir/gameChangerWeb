@@ -1,6 +1,8 @@
 <template>
-  <div class="h-full grid grid-cols-6 gap-6 dark:bg-[#0f172a] bg-[#F1F5F9] py-8 relative text-dark dark:text-white">
-    <div class="gridlines absolute inset-x-0 z-10 -mt-8 py-20"></div>
+  <div
+    class="h-full grid grid-cols-6 gap-6 dark:bg-[#0f172a] bg-[#F1F5F9] py-8 text-dark dark:text-white"
+  >
+    <!-- <div class="gridlines absolute inset-x-0 z-10 -mt-8 py-20"></div> -->
     <div class="flex flex-col col-span-6 lg:col-span-4 mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-6 text-white">
         <div class="md:col-span-3  bg-[url('~/assets/img/announcent.webp')] bg-cover rounded-lg overflow-hidden">
@@ -44,7 +46,9 @@
         <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt="" srcset="" />
         <div>
           <h2>Hello {{ user.first_name }} 👋</h2>
-          <h1 class="text-2xl font-bold text-dark dark:text-white">What are you looking for today?</h1>
+          <h1 class="text-2xl font-bold text-dark dark:text-white">
+            What are you looking for today?
+          </h1>
         </div>
 
         <div class="flex items-center space-x-4">
@@ -373,10 +377,264 @@
         </UModal>
       </ClientOnly>
     </div>
-    <div class="sticky top-0 hidden md:block col-span-6 lg:col-span-2 gap-4">
-      <div class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 h-96 mb-4"></div>
-      <div class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 h-80 mb-4"></div>
-      <div class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 h-96 mb-4"></div>
+    <div class="relative col-span-6 lg:col-span-2">
+      <div class="sticky top-100 hidden md:block gap-4">
+        <div
+          class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 mb-4 shadow-sm p-5 px-6"
+        >
+          <div class="flex justify-between text-black dark:text-white">
+            <h3 class="font-bold text-base">Peaple You might know</h3>
+            <button type="button">
+              <i
+                name="sync-outline"
+                class="text-xl md hydrated"
+                role="img"
+                aria-label="sync outline"
+              ></i>
+            </button>
+          </div>
+
+          <div
+            class="space-y-4 capitalize text-xs font-normal mt-5 mb-2 text-gray-500 dark:text-white/80"
+          >
+            <div class="flex items-center gap-3">
+              <a href="profile.html">
+                <img
+                  src="https://demo.foxthemes.net/instello/assets/images/avatars/avatar-7.jpg"
+                  alt=""
+                  class="bg-gray-200 rounded-full w-10 h-10"
+                />
+              </a>
+              <div class="flex-1">
+                <a href="profile.html"
+                  ><h4 class="font-semibold text-sm text-black dark:text-white">
+                    Johnson smith
+                  </h4></a
+                >
+                <div class="mt-0.5">Suggested For You</div>
+              </div>
+              <button
+                type="button"
+                class="text-sm rounded-full py-1.5 px-4 font-semibold bg-secondery"
+              >
+                Follow
+              </button>
+            </div>
+            <div class="flex items-center gap-3">
+              <a href="profile.html">
+                <img
+                  src="https://demo.foxthemes.net/instello/assets/images/avatars/avatar-5.jpg"
+                  alt=""
+                  class="bg-gray-200 rounded-full w-10 h-10"
+                />
+              </a>
+              <div class="flex-1">
+                <a href="profile.html"
+                  ><h4 class="font-semibold text-sm text-black dark:text-white">
+                    James Lewis
+                  </h4></a
+                >
+                <div class="mt-0.5">Followed by Johnson</div>
+              </div>
+              <button
+                type="button"
+                class="text-sm rounded-full py-1.5 px-4 font-semibold bg-secondery"
+              >
+                Follow
+              </button>
+            </div>
+            <div class="flex items-center gap-3">
+              <a href="profile.html">
+                <img
+                  src="https://demo.foxthemes.net/instello/assets/images/avatars/avatar-2.jpg"
+                  alt=""
+                  class="bg-gray-200 rounded-full w-10 h-10"
+                />
+              </a>
+              <div class="flex-1">
+                <a href="profile.html"
+                  ><h4 class="font-semibold text-sm text-black dark:text-white">
+                    John Michael
+                  </h4></a
+                >
+                <div class="mt-0.5">Followed by Monroe</div>
+              </div>
+              <button
+                type="button"
+                class="text-sm rounded-full py-1.5 px-4 font-semibold bg-secondery"
+              >
+                Follow
+              </button>
+            </div>
+            <div class="flex items-center gap-3">
+              <a href="profile.html">
+                <img
+                  src="https://demo.foxthemes.net/instello/assets/images/avatars/avatar-3.jpg"
+                  alt=""
+                  class="bg-gray-200 rounded-full w-10 h-10"
+                />
+              </a>
+              <div class="flex-1">
+                <a href="profile.html"
+                  ><h4 class="font-semibold text-sm text-black dark:text-white">
+                    Monroe Parker
+                  </h4></a
+                >
+                <div class="mt-0.5">Suggested For You</div>
+              </div>
+              <button
+                type="button"
+                class="text-sm rounded-full py-1.5 px-4 font-semibold bg-secondery"
+              >
+                Follow
+              </button>
+            </div>
+            <div class="flex items-center gap-3">
+              <a href="profile.html">
+                <img
+                  src="https://demo.foxthemes.net/instello/assets/images/avatars/avatar-4.jpg"
+                  alt=""
+                  class="bg-gray-200 rounded-full w-10 h-10"
+                />
+              </a>
+              <div class="flex-1">
+                <a href="profile.html"
+                  ><h4 class="font-semibold text-sm text-black dark:text-white">
+                    Martin Gray
+                  </h4></a
+                >
+                <div class="mt-0.5">Suggested For You</div>
+              </div>
+              <button
+                type="button"
+                class="text-sm rounded-full py-1.5 px-4 font-semibold bg-secondery"
+              >
+                Follow
+              </button>
+            </div>
+          </div>
+        </div>
+        <div
+          class="card bg-white rounded-xl shadow-sm p-5 px-6 text-sm font-medium dark:bg-slate-800 mb-4"
+        >
+          <div class="flex justify-between text-black dark:text-white">
+            <h3 class="font-bold text-base">Trends for you</h3>
+            <button type="button">
+              <i
+                name="sync-outline"
+                class="text-xl md hydrated"
+                role="img"
+                aria-label="sync outline"
+              ></i>
+            </button>
+          </div>
+
+          <div
+            class="space-y-3.5 capitalize text-xs font-normal mt-5 mb-2 text-gray-600 dark:text-white/80"
+          >
+            <a href="#">
+              <div class="flex items-center gap-3 p">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5 -mt-2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                  ></path>
+                </svg>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-black dark:text-white text-sm">
+                    artificial intelligence
+                  </h4>
+                  <div class="mt-0.5">1,245,62 post</div>
+                </div>
+              </div>
+            </a>
+            <a href="#" class="block">
+              <div class="flex items-center gap-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5 -mt-2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                  ></path>
+                </svg>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-black dark:text-white text-sm">
+                    Web developers
+                  </h4>
+                  <div class="mt-0.5">1,624 post</div>
+                </div>
+              </div>
+            </a>
+            <a href="#" class="block">
+              <div class="flex items-center gap-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5 -mt-2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                  ></path>
+                </svg>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-black dark:text-white text-sm">
+                    Ui Designers
+                  </h4>
+                  <div class="mt-0.5">820 post</div>
+                </div>
+              </div>
+            </a>
+            <a href="#" class="block">
+              <div class="flex items-center gap-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5 -mt-2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                  ></path>
+                </svg>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-black dark:text-white text-sm">
+                    affiliate marketing
+                  </h4>
+                  <div class="mt-0.5">480 post</div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div
+          class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 h-96 mb-4"
+        ></div>
+      </div>
     </div>
 
     <!-- list of reactions -->
