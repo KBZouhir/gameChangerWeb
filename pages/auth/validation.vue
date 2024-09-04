@@ -8,13 +8,13 @@ const { $auth, $RecaptchaVerifier } = useNuxtApp();
 
 
 definePageMeta({
-    layout: 'auth',
+    layout: 'validation',
     title: 'Validation',
     middleware: ['auth']
 })
 
 const error = ref(false)
-const timeLeft = ref(2)
+const timeLeft = ref(30)
 const form = ref()
 const loading = ref(false)
 let recaptchaToken = ref(null)
@@ -150,9 +150,9 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="relative min-h-screen py-12">
-        <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden">
+    <div class="relative py-12">
+        <div class="mx-auto w-full flex justify-center items-center h-full">
+            <UCard class="w-full p-8 relative overflow-hidden">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                     class="w-12 absolute top-0 right-0" alt="" srcset="">
                 <h2 class="text-3xl font-bold">Verification code</h2>

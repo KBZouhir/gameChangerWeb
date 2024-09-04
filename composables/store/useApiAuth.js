@@ -4,6 +4,7 @@ import { useSettings } from "~/stores/settings";
 import { excludeKeys } from "~/utils/excludeKeys";
 
 const register = async (payload) => {
+  const { $auth, $signInWithEmailAndPassword } = useNuxtApp();
   let cleanData = { ...payload };
   if (!payload.email || payload.email === "0") {
     const { email, ...rest } = payload;
@@ -18,6 +19,11 @@ const register = async (payload) => {
   if (data) {
     const userTokenCookie = useCookie("user_access_token");
     userTokenCookie.value = data.token;
+    const { user } = await $signInWithEmailAndPassword(
+      $auth,
+      payload.email,
+      payload.password
+    );
   }
   return { data, error, refresh, pending };
 };
@@ -134,6 +140,7 @@ const login = async (payload) => {
         payload.email,
         payload.password
       );
+
     }
   }
   return { data, error, refresh, pending };

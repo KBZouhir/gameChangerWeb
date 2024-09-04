@@ -11,6 +11,7 @@
              :draggable="true"
               @dragend="onMarkerDragEnd(index, $event)" />
         </GMapMap>
+
         </div>
     </div>
 </template>
@@ -44,23 +45,53 @@ const markers = ref([
 
 const moveMarker = () => {
     markers.value[0].position.lat = addressComponents.value.lat
-    markers.value[0].position.lng = addressComponents.value.lng
+    markers.value[0].position.lng = addressComponents.value.lon
     mapCenter.value.lat = addressComponents.value.lat
-    mapCenter.value.lng = addressComponents.value.lng
+    mapCenter.value.lng = addressComponents.value.lon
 }
 
 const onMarkerDragEnd = (index,event) => {
-    console.log(index,event.latLng);
+    console.log(index, event.latLng);
+
+    const geocoder = new google.maps.Geocoder();
+    const latLng = {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng()
+    };
+
+    geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === "OK") {
+            if (results[0]) {
+                const place = results[0];
+                const components = place.address_components;
+                const getAddressComponent = (type) => {
+                    return components.find(component => component.types.includes(type))?.long_name || '';
+                }
+
+                addressComponents.value = {
+                    country: getAddressComponent('country'),
+                    city: getAddressComponent('administrative_area_level_1'),
+                    zip_code: getAddressComponent('postal_code') || getAddressComponent('administrative_area_level_5') || getAddressComponent('postal_code'),
+                    lat: latLng.lat,
+                    lon: latLng.lng,
+                    address: place.formatted_address
+                }
+
+                emit('update:modelValue', addressComponents.value);
+            } else {
+                console.log("No results found");
+            }
+        } else {
+            console.log("Geocoder failed due to: " + status);
+        }
+    });
     
 }
 
 const initializeAutocomplete = () => {
     if (window.google && window.google.maps && window.google.maps.places) {
         const google = window.google;
-        autocomplete = new google.maps.places.Autocomplete(autocompleteInput.value, {
-            types: ["address"],
-            fields: ["address_components", "formatted_address", "geometry"]
-        })
+        autocomplete = new google.maps.places.Autocomplete(autocompleteInput.value)
 
         autocomplete.addListener('place_changed', () => {
             const place = autocomplete.getPlace()

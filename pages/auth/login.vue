@@ -180,9 +180,9 @@ const signInWithFacebook = async () => {
 </script>
 
 <template>
-    <div class="relative h-full py-12 pb-6">
+    <div class="relative min-h-screen py-12 pb-6">
         <div class="mx-3 md:mx-auto  max-w-4xl flex justify-center items-center h-full">
-            <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden z-50">
+            <UCard class="md:w-3/5 w-full p-8 relative overflow-hidden">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                     class="w-12 absolute top-0 right-0" alt="" srcset="">
                 <h2 class="text-3xl font-bold">{{ $t('login.welcome_back') }}</h2>
