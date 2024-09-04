@@ -1,10 +1,10 @@
 <template>
     <div class="mx-auto w-full h-full">
-        <div class="overflow-hidden h-full grid grid-cols-5 bg-[#F1F5F9]">
+        <div class="overflow-hidden h-full grid grid-cols-6 border dark:border-slate-800 rounded-md bg-[#F1F5F9]">
             <div
-                class="bg-white hidden lg:col-span-1 col-span-2 dark:bg-[#111827] dark:border-[#0d121d] border-r border-t md:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
+                class="bg-white hidden lg:col-span-2 col-span-2 dark:bg-[#111827] dark:border-[#0d121d] border-r  md:flex flex-col overflow-y-auto h-[calc(100vh-80px)]">
                 <div class="p-4">
-                    <!-- <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
+                    <UInput size="lg" placeholder="Search..." class="focus:ring-green-500" color="gray">
                         <template #leading>
                             <UButton icon="i-heroicons-arrow-left" color="primary" class="p-0 dark:text-white" square
                                 variant="link" />
@@ -13,7 +13,7 @@
                         <template #trailing>
                             <UIcon name="i-heroicons-magnifying-glass" />
                         </template>
-                    </UInput> -->
+                    </UInput>
 
                     <div class="pt-4">
                         <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <div v-if="selectedUser" class="flex flex-col col-span-5 md:col-span-3 lg:col-span-4 ml-20 md:ml-0">
+            <div v-if="selectedUser" class="flex flex-col col-span-6 md:col-span-4 lg:col-span-4 ml-20 md:ml-0">
                 <div
                     class="h-16 flex justify-between items-center border-y bg-white dark:border-[#0d121d] dark:bg-[#111827]">
                     <div class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
@@ -180,7 +180,39 @@
                             <UDivider :label="date" size="2xs" />
 
                             <div v-for="message in listMessages">
-                                <div v-if="message.sender_uid != user.firebase_uuid"
+
+                                <div :class="(message.sender_uid != user.firebase_uuid) ? 'items-start' : 'items-end justify-end'"
+                                    class="flex  space-x-2.5 sm:space-x-5 mb-3">
+                                    <div :class="(message.sender_uid != user.firebase_uuid) ? 'items-end' : 'items-start'"
+                                        class="flex flex-col items-end space-y-3.5">
+                                        <div :class="(message.sender_uid != user.firebase_uuid) ? '' : ''"
+                                            class="flex flex-col ml-4 max-w-lg sm:ml-10">
+                                            <template v-if="message.content">
+                                                <div v-if="isURL(message.content)">
+                                                    <LinkPreview :url="message.content" />
+                                                </div>
+                                                <span v-else
+                                                    :class="(message.sender_uid != user.firebase_uuid) ? 'dark:bg-white text-primary bg-info/10' : ' bg-primary text-white dark:text-white'"
+                                                    class="rounded-2xl p-3 shadow-sm">
+                                                    {{ message.content }}
+                                                </span>
+                                            </template>
+                                            <div v-for="attachment in message.attachments">
+                                                <ImageView v-if="attachment.type == 'image'" :id="attachment.id" />
+                                                <VideoPlayer v-if="attachment.type == 'video'" :id="attachment.id" />
+                                                <AudioPlayer v-if="attachment.type == 'audio'" :id="attachment.id" />
+                                            </div>
+                                            <p class="ml-auto mt-1 text-left text-xs text-slate-400 dark:text-navy-300">
+                                                {{ firebaseTimeGo(message.created_at) }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                                <!-- <div v-if="message.sender_uid != user.firebase_uuid"
                                     class="flex items-start space-x-2.5 sm:space-x-5 mb-3">
                                     <div class="flex flex-col justify-end items-end space-y-3.5">
                                         <div class="mr-4 max-w-lg sm:mr-10">
@@ -194,32 +226,9 @@
                                             </p>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
 
-                                <div v-else class="flex items-start justify-end space-x-2.5 sm:space-x-5 mb-3">
-                                    <div class="flex flex-col items-end space-y-3.5">
-                                        <div class="flex flex-col justify-end items-end ml-4 max-w-lg sm:ml-10">
-                                            <template v-if="message.content">
-                                                <div v-if="isURL(message.content)">
-                                                    <LinkPreview :url="message.content" />
-                                                </div>
-                                                <span v-else
-                                                    class="rounded-2xl  bg-info/10 p-3 bg-primary text-white shadow-sm dark:bg-accent dark:text-white">
-                                                    {{ message.content }}
-                                                </span>
-                                            </template>
-                                            <div v-for="attachment in message.attachments">
 
-                                                <ImageView v-if="attachment.type == 'image'" :id="attachment.id" />
-                                                <VideoPlayer v-if="attachment.type == 'video'" :id="attachment.id" />
-                                                <AudioPlayer v-if="attachment.type == 'audio'" :id="attachment.id" />
-                                            </div>
-                                            <p class="ml-auto mt-1 text-left text-xs text-slate-400 dark:text-navy-300">
-                                                {{ firebaseTimeGo(message.created_at) }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -236,7 +245,7 @@
             </div>
 
             <div
-                class="dark:border-[#0d121d] bg-white border-t border-r dark:bg-[#111827] p-4 col-span-1 h-full fixed flex flex-col space-y-4 w-20 md:hidden">
+                class="dark:border-[#0d121d] bg-white border-r dark:bg-[#111827] p-4 col-span-1 h-full fixed flex flex-col space-y-4 w-20 md:hidden">
                 <UButton @click="isOpen = true" size="lg" square
                     class="block md:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
                     <template #leading>
@@ -317,7 +326,8 @@
                             <UIcon name="i-heroicons-magnifying-glass" />
                         </template>
                     </UInput> -->
-                    <UButton @click="isOpen = false" icon="i-heroicons-arrow-left" color="green" class="p-0 dark:text-white" square variant="link" />
+                    <UButton @click="isOpen = false" icon="i-heroicons-arrow-left" color="green"
+                        class="p-0 dark:text-white" square variant="link" />
 
                     <div class="pt-4">
                         <div class="grid grid-cols-2 rounded-full dark:bg-slate-800 bg-white/60 p-1">
@@ -410,12 +420,10 @@
             </USlideover>
         </div>
     </div>
-
 </template>
 
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
 import { collection, addDoc, query, doc, where, updateDoc, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
 import { useAuthStore } from '~/stores/authStore';
 import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation'
@@ -425,7 +433,6 @@ const authStore = useAuthStore();
 const conversationStore = useConversationStore();
 
 const { $db } = useNuxtApp()
-const { $moment } = useNuxtApp()
 const route = useRoute()
 const router = useRouter()
 
@@ -525,9 +532,13 @@ const getOrCreateCon = async () => {
 const fetchMoreUsersConversations = async () => {
     loadConversations.value = true
     seeMoreLoading.value = true
+    
+    
     if (hasMore.value) {
         try {
+
             const arrayConversationIds = conversationIds.value.slice((page.value - 1) * 10, page.value * 10)
+           
             const result = await getConversations(arrayConversationIds, conversations.value, true);
             if (result?.length < 10) {
                 hasMore.value = false
@@ -544,31 +555,39 @@ const fetchMoreUsersConversations = async () => {
 }
 
 const getConversation = async (conversationData) => {
+
     isOpen.value = false
+    messages.value = []
     let id = (conversationData.conversation.conversationable_id) ? conversationData.conversation.conversationable_id : conversationData.user.id
+
     selectedUser.value = conversationData.user;
     selectedService.value = conversationData.conversationable;
     const conversationID = await getOrCreateConversation(id, conversationType.value)
+    console.log(conversationID);
 
+    if (conversationID) {
+        selectedConversation.value = conversationID?.id
+        messages.value = []
+        getMessagesFirebase(selectedConversation.value)
+    }
 
-    selectedConversation.value = conversationID?.id
-    messages.value = []
-
-    getMessagesFirebase(selectedConversation.value)
 }
 
 const getMessagesFirebase = (targetConversation) => {
+
     try {
         const messagesCollectionRef = collection($db, "conversations", targetConversation, "messages");
         const messagesQuery = query(messagesCollectionRef, orderBy("created_at", "asc"));
 
         onSnapshot(messagesQuery, (snapshot) => {
             const messagesList = snapshot.docs.map((doc) => doc.data());
+        
+            // const filteredMessages = messagesList.filter(
+            //     (message) => message.sender_uid === selectedUser.value.firebase_uuid
+            // )
 
-            const filteredMessages = messagesList.filter(
-                (message) => message.sender_uid === selectedUser.value.firebase_uuid
-            )
-
+            // console.log('filteredMessages', filteredMessages);
+            
             const groupedMessages = messagesList.reduce((acc, message) => {
                 const date = dayjs.unix(message.created_at?.seconds).format('YYYY-MM-DD');
                 if (!acc[date]) {
@@ -579,11 +598,8 @@ const getMessagesFirebase = (targetConversation) => {
                 return acc;
             }, {});
 
-
-            if (filteredMessages.length > 0) {
-                messages.value = groupedMessages
-            }
-
+            messages.value = groupedMessages
+            
             nextTick().then(() => {
                 if (scrollContainer.value) {
                     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
@@ -642,8 +658,12 @@ const selectTab = (tab) => {
         path: route.path,
         query: {}
     })
-    conversationType.value = tab;
+    page.value = 1
+    hasMore.value = true
     selectedUser.value = null
+    conversationType.value = tab;
+    conversationStore.clearUsersConversations()
+
 }
 
 

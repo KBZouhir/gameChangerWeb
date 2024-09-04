@@ -38,9 +38,7 @@ export const useConversationStore = defineStore("ConversationStore", {
         }
       })
     },
-    clearUsersConversations() {
-      console.log("clear  this.usersConversations ");
-      
+    clearUsersConversations() {      
       this.usersConversations  = []
     }
   },

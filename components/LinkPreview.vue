@@ -1,7 +1,7 @@
 <template>
-    <div v-if="ogData" class="flex space-x-4 border rounded-md overflow-hidden bg-white dark:border-gray-900 dark:bg-slate-800 mt-4">
+    <div v-if="ogData && ogData['og:image']" class="flex space-x-4 border rounded-md overflow-hidden bg-white dark:border-gray-900 dark:bg-slate-800 mt-4">
         <div class="w-40 h-40 ">
-            <img :src="ogData['og:image']" class="w-full h-full object-cover" alt="" srcset="">
+            <img  :src="ogData['og:image']" class="w-full h-full object-cover" alt="" srcset="">
         </div>
         <div class="flex flex-col p-2">
             <div class="flex flex-1 flex-col">
@@ -13,7 +13,13 @@
             <nuxt-link target="_blank" class="text-sm text-gray-400" :to="ogData['og:url']">{{ ogData['og:url'] }}</nuxt-link>
         </div>
     </div>
-    <div class="flex space-x-4 border rounded-md overflow-hidden bg-white dark:border-gray-900 dark:bg-[#0f172a] " v-else>
+    
+    <div v-else class="rounded-2xl bg-primary p-3 text-white shadow-sm dark:bg-navy-700 dark:text-navy-100">
+        <nuxt-link :to="url" external>{{url}}</nuxt-link>
+    </div>
+
+
+        <!-- <div class="flex space-x-4 border rounded-md overflow-hidden bg-white dark:border-gray-900 dark:bg-[#0f172a] " v-else>
         <div class="w-40 h-40 ">
             <USkeleton class="w-full h-full" />
         </div>
@@ -29,7 +35,7 @@
             </div>
             <USkeleton class="w-full h-2" />
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script setup>
