@@ -697,6 +697,22 @@
     </div>
     <div class="relative col-span-6 lg:col-span-2">
       <div class="sticky top-100 hidden md:block gap-4">
+      
+        <div
+          class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 shadow-sm p-4 mb-4"
+        >
+          <ClientOnly>
+                    <VCalendar ref="calendarRef" expanded color="green"   
+                    view="weekly" transparent borderless
+                     :min-date="new Date()" :value="new Date()"
+                     :week-height="100"
+      :show-weeks="1"
+                        :is-dark="colorMode.value == 'dark' ? true : false"></VCalendar>
+                    <template #fallback>
+                        <p>{{ $t('Loading calendar...') }}</p>
+                    </template>
+                </ClientOnly>
+        </div>
         <div
           class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 mb-4 shadow-sm p-5 px-6"
         >
@@ -949,17 +965,6 @@
           </div>
         </div>
 
-        <div
-          class="card bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 shadow-sm p-5 px-6 "
-        >
-          <ClientOnly>
-                    <VCalendar ref="calendarRef" expanded color="green"  
-                        :is-dark="colorMode.value == 'dark' ? true : false"></VCalendar>
-                    <template #fallback>
-                        <p>{{ $t('Loading calendar...') }}</p>
-                    </template>
-                </ClientOnly>
-        </div>
       </div>
     </div>
 
