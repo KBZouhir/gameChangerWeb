@@ -43,15 +43,15 @@ watch(() => state.email, (newValue) => {
 })
 
 
-const getRecaptchaToken = async () => {
-    try {
-        await window.recaptchaVerifier.render();
-        const token = await window.recaptchaVerifier.verify();
-        recaptchaToken.value = token;
-    } catch (error) {
-        console.error('Error getting reCAPTCHA token:', error);
-    }
-}
+// const getRecaptchaToken = async () => {
+//     try {
+//         await window.recaptchaVerifier.render();
+//         const token = await window.recaptchaVerifier.verify();
+//         recaptchaToken.value = token;
+//     } catch (error) {
+//         console.error('Error getting reCAPTCHA token:', error);
+//     }
+// }
 
 // onMounted(() => {
 //     window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
@@ -127,7 +127,7 @@ async function onSubmit(event) {
 
 <template>
     <div class="relative h-screen px-4 md:px-0 py-12">
-        <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
+        <div class="mx-3 md:mx-auto  max-w-4xl flex justify-center items-center h-full">
             <UCard class="md:w-2/4 w-full p-8 relative overflow-hidden" v-show="!linkSend">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                     class="w-12 absolute top-0 right-0" alt="" srcset="">

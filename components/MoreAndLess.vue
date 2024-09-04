@@ -3,7 +3,7 @@
         <div v-if="displayDescription.length > number">
             <div class="relative line-clamp-4" v-if="!readMore">
                 <div v-html="displayDescription"></div>
-                <div class="absolute w-full h-12 bg-red bottom-0 bg-gradient-to-t dark:from-[#111827] from-white to-transparent"></div>
+                <div class="absolute w-full h-12 bg-red bottom-0 bg-gradient-to-t dark:from-slate-800 from-white to-transparent"></div>
             </div>
             <div v-if="readMore" v-html="htmlDescription"></div>
 

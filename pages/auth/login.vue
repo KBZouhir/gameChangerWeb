@@ -3,7 +3,7 @@ import { useNuxtApp } from '#app';
 import { z } from "zod";
 import { login, ResendValidationMail, sendOtp, loginWithGoogle, loginWithFacebook } from '~/composables/store/useApiAuth'
 import { handleApiError } from '~/composables/useApiError'
-const { $auth, $RecaptchaVerifier, $messaging, $getToken, $onMessage } = useNuxtApp();
+const { $auth, $messaging, $getToken, $onMessage } = useNuxtApp();
 
 definePageMeta({
     layout: 'guest',
@@ -12,6 +12,8 @@ definePageMeta({
 })
 
 const snackbar = useSnackbar()
+const { executeRecaptcha } = useGoogleRecaptcha()
+
 
 let showPassword = ref(false)
 
@@ -40,12 +42,6 @@ const hidePhoneComp = () => {
 }
 
 
-onMounted(() => {
-    window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
-        'size': 'invisible',
-    });
-})
-
 const schema = z.object({
     email: z.string().optional().refine((val) => val === "0" || val === undefined || emailRegex.test(val), { message: "Invalid email" }),
     phone: z.string().optional(),
@@ -73,15 +69,6 @@ watch(() => state.email, (newValue) => {
     }
 })
 
-const getRecaptchaToken = async () => {
-    try {
-        await window.recaptchaVerifier.render();
-        const token = await window.recaptchaVerifier.verify();
-        recaptchaToken.value = token;
-    } catch (error) {
-        console.error('Error getting reCAPTCHA token:', error);
-    }
-}
 
 const hendleLoginData = async (data, result) => {
     const { is_completed, is_email_verified, is_phone_verified, phone, email, role } = data
@@ -109,10 +96,12 @@ const hendleLoginData = async (data, result) => {
     }
 
     if (!is_phone_verified && phone && !email) {
+        const { token } = await executeRecaptcha('submit')
+
         await getRecaptchaToken()
         let payload = {
             phoneNumber: data.phone,
-            recaptchaToken: recaptchaToken.value
+            recaptchaToken: token
         }
         await sendOtp(payload);
     }

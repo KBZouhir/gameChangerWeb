@@ -11,7 +11,7 @@ definePageMeta({
     middleware: ['guest']
 })
 
-const { $auth, $RecaptchaVerifier } = useNuxtApp();
+const { executeRecaptcha } = useGoogleRecaptcha()
 
 let showPassword = ref(false)
 let showConfirmationPassword = ref(false)
@@ -31,22 +31,6 @@ const state = reactive({
     password_confirmation: undefined,
 })
 
-onMounted(() => {
-    window.recaptchaVerifier = new $RecaptchaVerifier($auth, 'recaptcha-container', {
-        'size': 'invisible',
-    });
-});
-
-const getRecaptchaToken = async () => {
-    try {
-        await window.recaptchaVerifier.render();
-        const token = await window.recaptchaVerifier.verify();
-        recaptchaToken.value = token;
-        console.log(token);
-    } catch (error) {
-        console.error('Error getting reCAPTCHA token:', error);
-    }
-};
 
 const togglePassword = () => {
     showPassword.value = !showPassword.value
@@ -90,17 +74,14 @@ async function onSubmit(event) {
 
     if (result.data?.success) {
         if (data.email == "0") {
-            await getRecaptchaToken().then(async() => {
-                console.log(recaptchaToken.value);
+            const { token } = await executeRecaptcha('submit')
+            let payload = {
+                phoneNumber: state.phone,
+                recaptchaToken: token
+            }
 
-                let payload = {
-                    phoneNumber: state.phone,
-                    recaptchaToken: recaptchaToken.value
-                }
-
-                const result = await sendOtp(payload);
-                console.log("result", result);
-            })
+            const result = await sendOtp(payload);
+            console.log("result", result);
         }
         await navigateTo('/auth/validation')
     }

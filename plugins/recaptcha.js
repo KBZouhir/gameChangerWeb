@@ -1,16 +1,16 @@
 import { VueReCaptcha } from "vue-recaptcha-v3";
 export default defineNuxtPlugin((nuxtApp) => {
   const { recaptchaSiteKey } = useRuntimeConfig().public;
-    console.log(recaptchaSiteKey);
     
   const options = {
     siteKey: recaptchaSiteKey,
     loaderOptions: {
-      autoHideBadge: false,
+      autoHideBadge: true,
       useRecaptchaNet: true,
       useEnterprise: true,
       renderParameters: {
-        hl: "id",
+        hl: "fr",
+        renderParameters: 'recaptcha-conatier'
       },
     },
   };

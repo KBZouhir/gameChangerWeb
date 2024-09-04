@@ -1140,7 +1140,7 @@
       <UCarousel v-slot="{ item }" arrows :items="items">
         <UCard
           :ui="{ body: 'p-0' }"
-          class="overflow-hidden bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 shadow-sm p-4 w-64 mr-2"
+          class="overflow-hidden bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4 w-64 mr-2"
           v-for="(service, index) in services?.data.slice().reverse()"
         >
           <div class="relative">
@@ -1212,7 +1212,7 @@
     <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4">
       <UCard
         :ui="{ body: 'p-0' }"
-        class="overflow-hidden bg-white rounded-xl shadow-sm text-sm font-medium dark:bg-slate-800 shadow-sm p-4"
+        class="overflow-hidden bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4"
         v-for="(service, index) in services?.data"
       >
         <div class="relative">
