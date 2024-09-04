@@ -80,12 +80,15 @@ const items = [
         <div class="hidden sm:ml-16 sm:flex items-center">
           <div class="flex space-x-4">
             <div id="search--box"
-              class="xl:w-[680px] sm:w-96 sm:relative rounded-xl overflow-hidden z-20 max-md:hidden w-screen left-0 max-sm:fixed max-sm:top-2 dark:bg-slate-700 bg-slate-100"
+              class="xl:w-[680px] sm:w-96 sm:relative rounded-md z-20 max-md:hidden w-screen left-0 max-sm:fixed max-sm:top-2 dark:bg-slate-700 bg-slate-100"
               tabindex="0" aria-haspopup="true" aria-expanded="false">
               <ion-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2 md hydrated" role="img"
                 aria-label="search"></ion-icon>
+
+                <!-- <UInput v-model="value"  placeholder="Search Friends, videos .." size="xl"/> -->
               <input type="text" placeholder="Search Friends, videos .."
-                class="w-full !pl-10 !font-normal !bg-transparent h-12 !text-sm" />
+                class="w-full !pl-10 !font-normal !bg-transparent h-12 !text-sm rounded-md " />
+                <Icon name="tabler:search" size="20" class="absolute top-1/2 -translate-y-1/2 left-3" />
             </div>
           </div>
         </div>

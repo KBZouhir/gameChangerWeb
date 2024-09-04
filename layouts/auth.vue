@@ -56,15 +56,15 @@
               </li>
               <li @click="isOpen = false">
                 <nuxt-link
-                  to="/masterclass"
-                  :class="{ 'bg-[#34d399] text-white': $route.path === '/masterclass' }"
+                  to="/conferences"
+                  :class="{ 'bg-[#34d399] text-white': $route.path === '/conferences' }"
                   class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white"
                 >
-                  <Icon name="tabler:device-tv" size="24" />
-                  Masterclass
+                  <Icon name="tabler:broadcast" size="24" />
+                  Conferences
                 </nuxt-link>
               </li>
-              <li @click="isOpen = false">
+              <!-- <li @click="isOpen = false">
                 <nuxt-link
                   to="/masterclass"
                   :class="{ 'bg-[#34d399] text-white': $route.path === '/masterclass' }"
@@ -83,7 +83,7 @@
                   <Icon name="tabler:device-tv" size="24" />
                   Masterclass
                 </nuxt-link>
-              </li>
+              </li> -->
             </ul>
           </nav>
 
