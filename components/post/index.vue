@@ -18,9 +18,9 @@
                         </span>
                     </div>
                 </div>
-                <div class="flex space-x-4" v-if="post?.author.id == user?.id">
-                    <UDropdown :items="postDropDown" :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                        :popper="{ placement: 'bottom-start' }">
+                <div class="flex space-x-4">
+                    <UDropdown :items="(post?.is_mine) ? minePostDropDown : otherPostDropDown"
+                        :ui="{ item: { disabled: 'cursor-text select-text' } }" :popper="{ placement: 'bottom-start' }">
                         <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
                             :color="$colorMode.value == 'dark' ? 'white' : 'black'" variant="link" :trailing="false" />
 
@@ -97,7 +97,7 @@
                         <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
                         <span class="dark:text-white text-black hover:no-underline">{{
                             post?.comments_count
-                            }}</span>
+                        }}</span>
                     </UButton>
                 </div>
             </div>
@@ -213,6 +213,7 @@
                         </div>
                     </div>
                 </div>
+
                 <InfiniteLoading @infinite="fetchMoreComments">
                     <template #spinner>
                         <div class="flex justify-center w-full">
@@ -223,6 +224,7 @@
                         <span>No more data found!</span>
                     </template>
                 </InfiniteLoading>
+
                 <div class="flex justify-center items-center w-full h-full" v-if="postCommnets.meta.total == 0">
                     <div>
                         <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false"
@@ -260,29 +262,62 @@
             </template>
         </UCard>
     </UModal>
+
+    <UModal v-model="showReport">
+        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+            <template #header>
+                <h2 class="text-lg font-semibold">{{ $t("Report Post") }}</h2>
+            </template>
+            <UForm :schema="schema" :state="state" @submit="sendReport" class="flex flex-col space-y-4">
+                <UFormGroup label="Description" name="description">
+                    <UTextarea v-model="state.description" rows="10" size="lg" placeholder="Write a report..." />
+                </UFormGroup>
+
+                <UButton type="submit" :loading="loading" size="lg" color="green" block>{{ $t("Send Report") }}
+                </UButton>
+            </UForm>
+        </UCard>
+    </UModal>
 </template>
 
 <script setup>
 import { useSettings } from "~/stores/settings"
+import { z } from 'zod'
+import InfiniteLoading from "v3-infinite-loading";
+import "v3-infinite-loading/lib/style.css";
 import { toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments } from "~/composables/store/usePost"
+import { report } from "~/composables/store/useReport"
 
 const settingStore = useSettings()
+const snackbar = useSnackbar()
 
 const settings = computed(() => settingStore.getSettings)
 
 const showComments = ref(false)
 const showReactions = ref(false)
+const showReport = ref(false)
 const postReactions = ref(null)
 const postCommnets = ref(null)
 const comment = ref("");
-const selectedComment = ref(null);
+const selectedComment = ref(null)
+const page = ref(1)
+const loading = ref(false)
 
-const emits = defineEmits(['deletePostFun', 'deletePostFunc']);
+const emits = defineEmits(['deletePostFun', 'deletePostFunc'])
+
+
+const schema = z.object({
+    description: z.string().nonempty("Description is required"),
+})
 
 
 const props = defineProps({
     post: { type: String, required: true },
     user: { type: String, required: true },
+})
+
+const state = reactive({
+    description: "",
 })
 
 
@@ -384,18 +419,55 @@ const deletePostFun = () => {
     emits('deletePostFunc', props.post);
 }
 
+const reportPostFun = () => {
+    showReport.value = true
+    emits('reportPostFunc');
+}
 
-const postDropDown = [
+const sendReport = async () => {
+    const payload = { description: state.description, type: 1 }
+    loading.value = true
+    const result = await report('posts', props.post?.id, payload)
+    loading.value = false
+    if (result?.success) {
+        snackbar.add({
+            type: 'success',
+            text: 'Report sent successfully',
+        })
+        showReport.value = false
+        state.description = ""
+    } else {
+        snackbar.add({
+            type: 'error',
+            text: 'Report failed to send',
+        })
+    }
+}
+
+const minePostDropDown = [
     [
         {
+            key: "edit",
             label: "Edit",
-            icon: "i-heroicons-pencil-square",
+            icon: "tabler:pencil",
             function: editPostFun,
         },
         {
+            key: "delete",
             label: "Delete",
-            icon: "i-heroicons-trash",
+            icon: "tabler:trash",
             function: deletePostFun,
+        },
+    ],
+]
+
+const otherPostDropDown = [
+    [
+        {
+            key: "report",
+            label: "Report",
+            icon: "tabler:alert-octagon",
+            function: reportPostFun,
         },
     ],
 ]

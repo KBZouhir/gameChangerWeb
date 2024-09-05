@@ -39,13 +39,13 @@ onMounted(() => {
 
 const padTime = (value) => {
     return String(value).padStart(2, '0');
-};
+}
 
 const formattedTime = computed(() => {
     const minutes = Math.floor(timeLeft.value / 60);
     const seconds = timeLeft.value % 60;
     return `${padTime(minutes)}:${padTime(seconds)}`;
-});
+})
 
 const counter = () => {
     intervalId = setInterval(() => {
@@ -69,7 +69,7 @@ const validationOtp = async () => {
         const result = await validationMail(state);
         loading.value = false
         console.log(result);
-        
+
         if (result?.success) {
             snackbar.add({
                 type: 'success',
@@ -88,11 +88,11 @@ const validationOtp = async () => {
                 text: data.data.message
             })
         }
-    }else{
+    } else {
         loading.value = true
         let payload = {
             phoneNumber: user.value.full_phone,
-            code: state.code ,
+            code: state.code,
             sessionInfo: sessionInfo.value
         }
         const result = await verifyOtp(payload);
@@ -110,6 +110,15 @@ const getRecaptchaToken = async () => {
     }
 }
 
+const obfuscateEmail = (email) => {
+    const [username, domain] = email.split('@');
+    if (domain === 'mailinator.com') {
+        const obfuscatedUsername = username.charAt(0) + '****';
+        return `${obfuscatedUsername}@${domain}`;
+    }
+    return email;
+}
+
 async function resendOtp() {
     clearInterval(intervalId);
     timeLeft.value = 30
@@ -123,7 +132,7 @@ async function resendOtp() {
                 type: 'success',
                 text: result.data.message
             })
-        }else{
+        } else {
             snackbar.add({
                 type: 'error',
                 text: result.data.data.message
@@ -135,8 +144,8 @@ async function resendOtp() {
             phoneNumber: user.value.full_phone,
             recaptchaToken: recaptchaToken.value
         }
-       const result = await sendOtp(payload)
-       sessionInfo.value = result?.sessionInfo 
+        const result = await sendOtp(payload)
+        sessionInfo.value = result?.sessionInfo
     }
 
 }
@@ -150,7 +159,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="relative py-12">
+    <div class="relative w-full py-12">
         <div class="mx-auto w-full flex justify-center items-center h-full">
             <UCard class="md:w-3/5 w-full p-7 relative overflow-hidden dark:bg-slate-800 rounded-xl">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
@@ -158,6 +167,7 @@ onMounted(() => {
                 <h2 class="text-3xl font-bold">Verification code</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">
                     We just send you a verify code. Check your inbox to get them.
+                    <span v-if="user.email">{{ obfuscateEmail(user.email) }}</span>
                 </p>
                 <UForm ref="form" :state="state" class="mt-8">
                     <div class="mt-8">
@@ -191,9 +201,7 @@ onMounted(() => {
             </UCard>
         </div>
 
-        <div class="absolute top-0 dark:hidden">
-            <img src="~/assets/svg/particules/gradient.svg" draggable="false" />
-        </div>
+        
     </div>
 </template>
 
@@ -215,7 +223,7 @@ onMounted(() => {
 }
 
 .otp-input:focus {
-    outline-color: #4ade80;
+    outline-color: #34d399 !important;
 }
 
 .otp-input.is-complete {
@@ -223,11 +231,12 @@ onMounted(() => {
 }
 
 .dark .otp-input.is-complete {
-    background-color: #1e293b;
+    background-color: #161f2d;
 }
 
 .dark .otp-input {
     border-color: #1e293b;
+    background-color: #313c4f
 }
 
 .otp-input.error {

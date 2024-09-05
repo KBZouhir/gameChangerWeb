@@ -67,7 +67,7 @@
           srcset=""
         />
         <div>
-          <h2>Hello {{ user.first_name }} 👋</h2>
+          <h2>Hello {{ user?.first_name }} 👋</h2>
           <h1 class="text-2xl font-bold text-dark dark:text-white">
             What are you looking for today?
           </h1>

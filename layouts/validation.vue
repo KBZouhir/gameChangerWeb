@@ -6,11 +6,12 @@
 
     <div class="flex flex-col min-h-screen">
       <partialsValidationNavbar />
+
       <div class="flex flex-1 items-center justify-center w-full max-w-[1065px] mx-auto p-4 md:p-0">
         <NuxtPage />
       </div>
     </div>
-
+<PartialsFooter/>
 
 
 

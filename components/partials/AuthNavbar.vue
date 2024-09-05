@@ -36,6 +36,7 @@ const items = [
   ],
   [
     {
+      key: "profile",
       label: "Settings",
       icon: "i-heroicons-cog-8-tooth",
       link: "/profile/update",
@@ -43,6 +44,13 @@ const items = [
   ],
   [
     {
+      key: "switch",
+      label: "Switch mode",
+    },
+  ],
+  [
+    {
+      key: "logout",
       label: "Sign out",
       icon: "i-heroicons-arrow-left-on-rectangle",
       link: null,
@@ -112,7 +120,7 @@ const items = [
 
           </nuxt-link>
 
-          <SwitchMode />
+          
           <nuxt-link v-if="user?.role.id != 3" to="/chat">
             <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
               <template #leading>
@@ -148,7 +156,13 @@ const items = [
             </template>
 
             <template #item="{ item }">
-              <button class="flex justify-between items-center w-full" @click="item.function" v-if="!item?.link">
+
+              <button class="flex justify-between items-center w-full" v-if="item?.key == 'switch'">
+                <SwitchMode :label="item.label" size="xs"/>
+              </button>
+
+
+              <button class="flex justify-between items-center w-full" @click="item.function" v-else-if="!item?.link">
                 <span class="truncate">{{ item.label }}</span>
                 <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
               </button>

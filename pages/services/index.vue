@@ -17,7 +17,7 @@
           </div>
           <div class="relative min-h-[80px] min-w-[180px] shrink-0">
             <div class="absolute bottom-0 -top-10">
-              <img src="" alt="">
+            
             </div>
           </div>
         </div>
@@ -29,7 +29,7 @@
         <UCard
           :ui="{ body: 'p-0' }"
           class="overflow-hidden bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4 w-64 mr-2"
-          v-for="(service, index) in services?.data.slice().reverse()"
+          v-for="(service, index) in services?.data?.slice().reverse()"
         >
           <div class="relative">
             <nuxt-link :to="`/services/details/${service?.id}`">
