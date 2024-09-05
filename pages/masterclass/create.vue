@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-screen-xl mx-auto py-4">
+    <div class="max-w-screen-xl w-full mx-auto py-4">
         <div class="pt-8">
             <h1 class="mb-3 text-2xl font-bold">Create masterclass</h1>
         </div>

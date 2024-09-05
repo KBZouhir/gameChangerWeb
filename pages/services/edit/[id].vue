@@ -1,8 +1,8 @@
 <template>
-    <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
+    <div class="w-full bg-[#f1f5f9] dark:bg-[#0f172a]">
         <div class="mx-auto w-full max-w-screen-xl px-2 ">
             <div class="pt-8">
-                <h1 class="mb-3 text-2xl font-bold">Create Service</h1>
+                <h1 class="mb-3 text-2xl font-bold">Edit Service</h1>
             </div>
             <div class="grid md:grid-cols-5 grid-cols-1 gap-4 w-full">
                 <div class="col-span-3 py-4">

@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-screen-xl mx-auto py-4">
+    <div class="max-w-screen-xl w-full mx-auto py-4">
         <div class="grid grid-cols-1 md:grid-cols-6 gap-6 p-6">
             <div class="md:col-span-4">
                 <div class="rounded-lg overflow-hidden mb-6 h-96">
