@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="w-full">
   
         <div v-if="profile" class="mx-auto w-full max-w-screen-xl py-4">
             <div class="flex flex-col">

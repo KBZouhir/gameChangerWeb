@@ -52,7 +52,7 @@
         <div class="flex items-center space-x-4">
           <div
             class="p-[2px] bg-gray-100 dark:bg-gray-800 border dark:border-slate-700 border-slate-200 rounded-full flex items-center justify-center">
-            <UAvatar :src="user?.image_url" :alt="user.full_name" size="md" />
+            <UAvatar :src="user?.image_url" :alt="user?.full_name" size="md" />
           </div>
 
           <button class="flex-1 text-start bg-slate-100 dark:bg-white/5 py-3 px-4 rounded-lg" @click="isOpen = true">

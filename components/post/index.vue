@@ -184,7 +184,7 @@
                     <div class="flex items-center justify-between">
                         <div
                             class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
-                            <UAvatar :src="comment.user.image_url" :alt="comment.user.full_name" size="lg" />
+                            <UAvatar :src="comment.user.image_url" :alt="comment.user.full_name" size="md" />
                             <div class="flex flex-1 flex-col items-start">
                                 <div
                                     class="flex flex-col px-3 py-2 text-sm bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-md">

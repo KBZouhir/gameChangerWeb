@@ -331,7 +331,7 @@ const snackbar = useSnackbar();
 const { $videojs } = useNuxtApp()
 
 definePageMeta({
-    layout: 'guest',
+    
     title: 'Masterclass',
 })
 

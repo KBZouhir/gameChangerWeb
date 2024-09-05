@@ -21,44 +21,45 @@
                         </span>
                     </h2>
                 </div>
-                <div v-if="appointments?.data?.length > 0 && !loadingAppointments"
-                    class="grid md:grid-cols-2 grid-cols-1 gap-4">
-                    <NuxtLink v-for="appointment in appointments?.data" :to="`/appointment/${appointment.id}`">
+                <div v-if="appointments?.data?.length > 0 && !loadingAppointments" class="grid  grid-cols-1 gap-4">
+                    <div>
+                        <NuxtLink v-for="appointment in appointments?.data" :to="`/appointment/${appointment.id}`">
 
-                        <div
-                            class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
-                            <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
-                                class="w-12 absolute top-0 right-0" alt="" srcset="">
-                            <div class="flex items-start justify-between mt-1">
-                                <div class="flex items-center space-x-4">
-                                    <nuxt-link :to="`profile/${appointment.user.id}`">
-                                        <UAvatar
-                                            :src="(appointment.user.id == user.id) ? appointment.requester.image_url : appointment.user.image_url"
-                                            :alt="(appointment.user.id == user.id) ? appointment.requester.full_name : appointment.user.full_name"
-                                            size="md" />
-                                    </nuxt-link>
+                            <div
+                                class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
+                                <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                                    class="w-12 absolute top-0 right-0" alt="" srcset="">
+                                <div class="flex items-start justify-between mt-1">
+                                    <div class="flex items-center space-x-4">
+                                        <nuxt-link :to="`profile/${appointment.user.id}`">
+                                            <UAvatar
+                                                :src="(appointment.user.id == user.id) ? appointment.requester.image_url : appointment.user.image_url"
+                                                :alt="(appointment.user.id == user.id) ? appointment.requester.full_name : appointment.user.full_name"
+                                                size="md" />
+                                        </nuxt-link>
 
-                                    <div class="flex flex-col">
-                                        <h4 class="font-bold mb-0">{{ (appointment.user.id == user.id) ?
-                                            appointment.requester.full_name : appointment.user.full_name }}</h4>
-                                        <span class="text-xs -mt-[0.5px]">
-                                            {{ convertTo12HourFormat(appointment.begin_at) }} - {{
-                                                convertTo12HourFormat(appointment.end_at) }}
-                                        </span>
+                                        <div class="flex flex-col">
+                                            <h4 class="font-bold mb-0">{{ (appointment.user.id == user.id) ?
+                                                appointment.requester.full_name : appointment.user.full_name }}</h4>
+                                            <span class="text-xs -mt-[0.5px]">
+                                                {{ convertTo12HourFormat(appointment.begin_at) }} - {{
+                                                    convertTo12HourFormat(appointment.end_at) }}
+                                            </span>
+                                        </div>
                                     </div>
+                                    <span :class="badgeType(appointmentStatus(appointment))"
+                                        class="inline-flex items-center rounded-md capitalize  px-2 py-1 text-xs font-medium  ring-1 ring-inset ">
+                                        {{ appointmentStatus(appointment) }}
+                                    </span>
+
                                 </div>
-                                <span :class="badgeType(appointmentStatus(appointment))"
-                                    class="inline-flex items-center rounded-md capitalize  px-2 py-1 text-xs font-medium  ring-1 ring-inset ">
-                                    {{ appointmentStatus(appointment) }}
-                                </span>
 
+                                <div class="">
+                                    {{ appointment.description }}
+                                </div>
                             </div>
-
-                            <div class="">
-                                {{ appointment.description }}
-                            </div>
-                        </div>
-                    </NuxtLink>
+                        </NuxtLink>
+                    </div>
                     <div class="col-span-2 text-center">
                         <InfiniteLoading @infinite="fetchMoreAppointments">
                             <template #spinner>
@@ -83,8 +84,8 @@
                 </div>
 
                 <div v-if="loadingAppointments" class="my-4">
-                    <div class="grid md:grid-cols-2 grid-cols-1 gap-4">
-                        <div v-for="i in 4"
+                    <div class="grid  grid-cols-1 gap-4">
+                        <div v-for="i in 2"
                             class="p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
                             <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                                 class="w-12 absolute top-0 right-0" alt="" srcset="">

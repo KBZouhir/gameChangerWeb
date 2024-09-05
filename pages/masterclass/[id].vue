@@ -144,10 +144,9 @@
                         v-if="!IsPassed && !masterclass.is_subscribed && !masterclassStarted && user.role.id != 3"
                         @click="subscribeUser" label="Subscribe" />
 
-                    <UButton block :loading="joinRoomLoading" size="lg"
-                        class="dark:bg-green-500  disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
+                    <UButton block :loading="joinRoomLoading" color="green" size="lg" class="my-4"
                         v-if="!IsPassed && masterclassStarted && (masterclass?.is_subscribed || masterclass?.is_animator || user.role.id === 3)"
-                        @click="joinRoom" label="Join" />
+                        @click="joinRoom" label="Join masterclass" />
 
 
                     <UButton block :disabled="true" size="lg"
