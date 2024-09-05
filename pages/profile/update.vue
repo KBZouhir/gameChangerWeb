@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-[#F1F5F9] dark:bg-slate-900">
+    <div class="bg-[#F1F5F9] dark:bg-slate-900 w-full" >
         <div class="mx-auto w-full max-w-screen-xl py-4 px-4 lg:px-0">
             <div class="flex flex-col">
                 <div class="rounded-tr-md rounded-tl-md h-96 w-full overflow-hidden relative">

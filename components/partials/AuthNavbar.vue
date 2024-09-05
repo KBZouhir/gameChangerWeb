@@ -158,7 +158,7 @@ const items = [
             <template #item="{ item }">
 
               <button class="flex justify-between items-center w-full" v-if="item?.key == 'switch'">
-                <SwitchMode :label="item.label"/>
+                <SwitchMode :label="item.label" size="xs"/>
               </button>
 
 

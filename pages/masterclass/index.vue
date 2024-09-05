@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-screen-xl mx-auto py-4 p-2">
+    <div class="max-w-screen-xl w-full mx-auto py-4 p-2">
 
         <div class="flex justify-between mb-4">
             <span>

@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-screen-md mx-auto py-4">
+    <div class="max-w-screen-md md:mx-auto xl:mx-0 py-4">
         <div
             class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
             <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false" class="w-12 absolute top-0 right-0"

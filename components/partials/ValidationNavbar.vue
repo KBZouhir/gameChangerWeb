@@ -34,7 +34,12 @@ const items = [
       disabled: true,
     },
   ],
-
+  [
+    {
+      key: "switch",
+      label: "Switch mode",
+    },
+  ],
   [
     {
       label: "Sign out",
@@ -90,7 +95,12 @@ const items = [
             </template>
 
             <template #item="{ item }">
-              <button class="flex justify-between items-center w-full" @click="item.function" v-if="!item?.link">
+
+              <button class="flex justify-between items-center w-full" v-if="item?.key == 'switch'">
+                <SwitchMode :label="item.label" size="xs"/>
+              </button>
+
+              <button class="flex justify-between items-center w-full" @click="item.function" v-else-if="!item?.link">
                 <span class="truncate">{{ item.label }}</span>
                 <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
               </button>

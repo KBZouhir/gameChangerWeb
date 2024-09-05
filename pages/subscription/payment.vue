@@ -56,8 +56,6 @@ const plans = [
             </UCard>
         </div>
 
-        <div class="absolute top-0 dark:hidden">
-            <img src="~/assets/svg/particules/gradient.svg" draggable="false" />
-        </div>
+        
     </div>
 </template>

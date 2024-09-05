@@ -13,15 +13,19 @@ defineProps({
   label: {
     type: String,
     required: true
+  },
+  size: {
+    type: String,
+    default: 'md'
   }
 })
 
 </script>
 <template>
   <ClientOnly>
-    <button @click="isDark = !isDark" class="flex justify-between items-center w-full">
-      <span class="truncate">{{label}}</span>
-      <UButton size="xs"
+    <button @click="isDark = !isDark" :class="label ? 'flex justify-between items-center w-full' : ''">
+      <span v-if="label" class="truncate">{{label}}</span>
+      <UButton :size="size"
         class="text-primary hover:bg-slate-100 dark:hover:bg-white/5 dark:bg-slate-700 bg-slate-50 hover:bg-transparent"
         :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'" color="gray" variant="ghost"
         aria-label="Theme" />
