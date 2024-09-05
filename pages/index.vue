@@ -3,7 +3,7 @@
     class="h-full grid grid-cols-6 gap-6 dark:bg-[#0f172a] bg-[#F1F5F9] py-8 text-dark dark:text-white"
   >
     <!-- <div class="gridlines absolute inset-x-0 z-10 -mt-8 py-20"></div> -->
-    <div class="flex flex-col col-span-6 lg:col-span-4 space-y-6 mx-auto">
+    <div class="flex flex-col col-span-6   lg:col-span-4 space-y-6 mx-auto md:w-3/5 lg:w-full">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-6 text-white">
         <div
           class="md:col-span-3 bg-[url('~/assets/img/announcent.webp')] bg-cover rounded-lg overflow-hidden"
