@@ -12,8 +12,8 @@
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
-            <div v-for="(conference, index) in conferenceList?.data"
-                :key="conference.id" :style="`background-image: url(${(conference.image_url) ? conference.image_url : conference.video_thumbnail});`"
+            <div v-for="(conference, index) in conferenceList?.data" :key="conference.id"
+                :style="`background-image: url(${(conference.image_url) ? conference.image_url : conference.video_thumbnail});`"
                 class="text-white bg-cover rounded-lg overflow-hidden">
                 <div class="p-8 w-full h-full flex flex-col space-y-4 bg-gradient-to-r from-primary to-transparent">
                     <div>
@@ -48,7 +48,8 @@
             </div>
         </div>
 
-        <div v-if="conferenceList.length == 0 && !conferenceList?.meta" class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
+        <div v-if="conferenceList.length == 0 && !conferenceList?.meta"
+            class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
             <div v-for="i in 9" class="text-white bg-cover rounded-lg overflow-hidden border dark:border-slate-900">
                 <USkeleton class="h-64 w-full" />
             </div>
@@ -60,12 +61,32 @@
                     <LoadingIcon />
                 </div>
             </template>
-            <template v-if="conferenceList?.data?.length > 0" #complete>
-                <div class="flex justify-center my-4">
+
+            <template #complete>
+                <div v-if="conferenceList?.data?.length > 0 && conferenceList?.meta?.total > 10" class="flex justify-center my-4">
                     <span>No more data found!</span>
                 </div>
             </template>
+
         </InfiniteLoading>
+
+        <div>
+            <div v-if="loadingMasterClass" class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
+                <div v-for="i in 9" class="text-white bg-cover rounded-lg overflow-hidden border dark:border-slate-900">
+                    <USkeleton class="h-64 w-full" />
+                </div>
+            </div>
+        </div>
+
+        <div v-if="conferenceList?.data?.length == 0 && !loadingConfirence"
+            class="flex flex-1 flex-col items-center justify-center py-4">
+            <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
+                srcset="">
+            <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false" alt=""
+                srcset="">
+            <h2 class="font-semibold text-2xl">{{ $t('No conference available') }}</h2>
+        </div>
+
     </div>
 </template>
 
@@ -86,7 +107,7 @@ const user = computed(() => authStore.getAuthUser)
 const store = useConferenceStore()
 const conferenceList = computed(() => store.getConferenceList)
 
-
+const loadingConfirence = ref(false)
 
 definePageMeta({
     layout: "auth",
@@ -95,7 +116,9 @@ definePageMeta({
 })
 
 const getDataFromApi = async () => {
+    loadingConfirence.value = true
     await listConference()
+    loadingConfirence.value = false
 }
 
 

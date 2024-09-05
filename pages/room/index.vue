@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-screen-xl h-[800px]  mx-auto py-4 p-2 relative">
+    <div class="max-w-screen-xl h-[800px] w-full  mx-auto py-4 p-2 relative">
 
         <div v-if="status == 'endRoom'">
             <UCard class="md:w-3/5 w-full mx-auto p-8 relative overflow-hidden z-50">

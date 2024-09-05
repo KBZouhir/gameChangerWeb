@@ -6,7 +6,7 @@ export const useNotificationsStore = defineStore('interestsStore', {
     count: 0,
   }),
   getters: {
-    getNotifications: (state) => state.notifications,
+    getNotifications: (state) => (state.notifications > 99) ? '+99' : state.notifications,
     unreadNotificationsCount: (state) => state.count,
   },
   actions: {

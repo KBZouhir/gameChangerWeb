@@ -146,13 +146,13 @@
 
                     <UButton block :loading="joinRoomLoading" size="lg"
                         class="dark:bg-green-500  disabled:dark:bg-green-400 bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                        v-if="!IsPassed && conferenceStarted && (conference?.is_subscribed || conference?.is_animator || user.role.id === 3)"
+                        v-if="!IsPassed && conferenceStarted && countdownDone && (conference?.is_subscribed || conference?.is_animator || user.role.id === 3)"
                         @click="joinRoom" label="Join" />
 
 
-                    <UButton block :disabled="true" size="lg"
-                        class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                        v-if="!IsPassed && !conferenceStarted" :label="countdownLabel" />
+                    <UButton block :disabled="true" size="lg" variant="outline" color="green"
+                        class="my-4"
+                        v-if="!IsPassed && !conferenceStarted && !countdownDone" :label="countdownLabel" />
 
                     <div v-if="IsPassed" class="flex justify-center mt-4">
                         <UDivider label="Conference end" />
@@ -187,6 +187,8 @@ const dayjs = useDayjs()
 const now = ref()
 const videoPlayer = ref(null)
 const user = computed(() => authStore.getAuthUser)
+const countdownInterval = ref()
+const countdownDone = ref(false)
 
 const { $videojs } = useNuxtApp()
 
@@ -195,6 +197,7 @@ definePageMeta({
     title: 'Conference',
     middleware: ['masterclass']
 })
+
 
 
 const calculateCountdown = () => {
@@ -206,9 +209,12 @@ const calculateCountdown = () => {
     const seconds = (totalSeconds % 60 < 0) ? 0 : totalSeconds % 60
     countdownLabel.value = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
+    if((days == 0 && hours == 0 && minutes == 0 && seconds == 0) && !countdownDone.value) {
+        countdownDone.value = true
+    }
 }
 
-let countdownInterval;
+
 
 const langage = computed(() => {
     return langs.find(lang => lang.value === conference?.value?.lang)?.label
@@ -300,7 +306,7 @@ const joinRoom = async () => {
 
 
 onMounted(() => {
-    countdownInterval = setInterval(() => {
+    countdownInterval.value = setInterval(() => {
         now.value = dayjs();
         calculateCountdown();
     }, 1000);
@@ -331,7 +337,7 @@ watchEffect((onCleanup) => {
 
 
 onUnmounted(() => {
-    clearInterval(countdownInterval);
+    clearInterval(countdownInterval.value);
 })
 
 </script>

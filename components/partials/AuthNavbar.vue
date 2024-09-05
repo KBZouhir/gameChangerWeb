@@ -63,7 +63,7 @@ const items = [
 <template>
   <nav>
     <div
-      class="z-30 h-[--m-top] h-24 fixed top-0 left-0 w-full flex items-center bg-white dark:bg-slate-800 border-b border-slate-200 dark:bg-dark dark:border-slate-800">
+      class="z-30 h-[--m-top] h-24 fixed top-0 left-0 w-full flex items-center bg-white dark:bg-slate-800 border-b border-slate-200 dark:bg-dark dark:border-slate-800 dark:shadow-md shadow-sm">
       <div class="relative flex w-full items-center justify-between px-4">
         <div class="flex items-center justify-center space-x-2 sm:items-stretch sm:justify-start">
           <UButton @click="isOpen = true" size="lg" square
@@ -88,20 +88,48 @@ const items = [
         <div class="hidden sm:ml-16 sm:flex items-center">
           <div class="flex space-x-4">
             <div id="search--box"
-              class="xl:w-[680px] sm:w-96 sm:relative rounded-md z-20 max-md:hidden w-screen left-0 max-sm:fixed max-sm:top-2 dark:bg-slate-700 bg-slate-100"
+              class="xl:w-[680px] sm:w-96 sm:relative rounded-full z-20 max-md:hidden w-screen left-0 max-sm:fixed max-sm:top-2 dark:bg-slate-700 bg-slate-100"
               tabindex="0" aria-haspopup="true" aria-expanded="false">
               <ion-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2 md hydrated" role="img"
                 aria-label="search"></ion-icon>
 
-                <!-- <UInput v-model="value"  placeholder="Search Friends, videos .." size="xl"/> -->
+              <!-- <UInput v-model="value"  placeholder="Search Friends, videos .." size="xl"/> -->
               <input type="text" placeholder="Search Friends, videos .."
-                class="w-full !pl-10 !font-normal !bg-transparent h-12 !text-sm rounded-md " />
-                <Icon name="tabler:search" size="20" class="absolute top-1/2 -translate-y-1/2 left-3" />
+                class="w-full !pl-10 !font-normal !bg-transparent h-12 !text-sm rounded-full focus:outline-green-400 dark:focus:outline-green-400" />
+              <Icon name="tabler:search" size="20" class="absolute top-1/2 -translate-y-1/2 left-3" />
             </div>
           </div>
         </div>
 
         <div class="flex items-center space-x-4">
+          <div>
+            <UPopover>
+              <UButton label="Create" :ui="{ rounded: 'rounded-full' }" size="md" color="green">
+                <template #leading>
+                  <UIcon name="tabler:plus" />
+                </template>
+              </UButton>
+
+              <template #panel>
+                <div class="p-4 space-y-4">
+                  <UButton size="sm" color="green" variant="ghost" block>
+                    <Icon name="tabler:device-tv" />
+                    <span>Masterclass</span>
+                  </UButton>
+                  <UButton size="sm" color="green" variant="ghost" block>
+                    <Icon name="tabler:calendar" />
+                    <span>Calendar</span>
+                  </UButton>
+                  <UButton size="sm" color="green" variant="ghost" block>
+                    <Icon name="tabler:briefcase" />
+                    <span>Services</span>
+                  </UButton>
+                </div>
+              </template>
+            </UPopover>
+
+
+          </div>
           <!-- <UButton size="sm" square
                         class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5"
                         color="primary">
@@ -110,19 +138,23 @@ const items = [
                         </template>
                     </UButton> -->
           <nuxt-link to="/notifications">
-            <UChip :text="notificationCount" color="red" size="xl">
-              <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
-                <template #leading>
+
+            <UButton :ui="{ rounded: 'rounded-full' }" size="md" square
+              class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
+              <template #leading>
+                <UChip :text="notificationCount" color="red" size="lg">
                   <Icon name="tabler:bell" size="20" class="dark:text-white text-primary" />
-                </template>
-              </UButton>
-            </UChip>
+                </UChip>
+              </template>
+            </UButton>
+
 
           </nuxt-link>
 
-          
+
           <nuxt-link v-if="user?.role.id != 3" to="/chat">
-            <UButton size="sm" square class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
+            <UButton :ui="{ rounded: 'rounded-full' }" size="md" square
+              class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
               <template #leading>
                 <Icon name="tabler:message" size="20" :class="$route.path === '/chat'
                   ? 'text-[#34d399]'
@@ -158,7 +190,7 @@ const items = [
             <template #item="{ item }">
 
               <button class="flex justify-between items-center w-full" v-if="item?.key == 'switch'">
-                <SwitchMode :label="item.label" size="xs"/>
+                <SwitchMode :label="item.label" size="xs" />
               </button>
 
 

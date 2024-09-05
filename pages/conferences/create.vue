@@ -82,7 +82,7 @@
                     </UFormGroup>
 
 
-                    <UFormGroup label="Internal animators" name="price">
+                    <UFormGroup label="Internal animators" name="internal_animators">
                         <!-- <MultiselectCom :items="users" v-model="state.internal_animators" :checkInfiniteScroll="true" /> -->
                         <USelectMenu v-model="state.internal_animators" searchable
                             searchable-placeholder="Search a person..." multiple :options="users" size="lg">

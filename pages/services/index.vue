@@ -87,11 +87,12 @@
             </div>
           </div>
         </UCard>
+        
       </UCarousel>
     </div>
     <div class="flex  justify-between my-6">
       <span>
-        Total services: <span class="font-bold">{{ services?.meta?.total }}</span>
+        {{ $t('Total services') }}: <span class="font-bold">{{ services?.meta?.total }}</span>
       </span>
       <nuxt-link v-if="user?.role.id != 3" :to="`/services/create`">
         <UButton label="Create" color="green" size="md"></UButton>
