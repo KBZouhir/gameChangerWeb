@@ -126,9 +126,9 @@ async function onSubmit(event) {
 </script>
 
 <template>
-    <div class="relative h-screen px-4 md:px-0 py-12">
+    <div class="relative h-screen px-4 md:px-0 ">
         <div class="mx-3 md:mx-auto  max-w-4xl flex justify-center items-center h-full">
-            <UCard class="md:w-2/4 w-full p-8 relative overflow-hidden" v-show="!linkSend">
+            <UCard class="md:w-3/5 w-full p-7 relative overflow-hidden dark:bg-slate-800 rounded-xl" v-show="!linkSend">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                     class="w-12 absolute top-0 right-0" alt="" srcset="">
                 <h2 class="text-3xl font-bold mb-2">Forgotten your password?</h2>
