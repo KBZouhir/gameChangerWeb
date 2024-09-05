@@ -152,7 +152,7 @@ onMounted(() => {
 <template>
     <div class="relative py-12">
         <div class="mx-auto w-full flex justify-center items-center h-full">
-            <UCard class="w-full p-8 relative overflow-hidden">
+            <UCard class="md:w-3/5 w-full p-7 relative overflow-hidden dark:bg-slate-800 rounded-xl">
                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                     class="w-12 absolute top-0 right-0" alt="" srcset="">
                 <h2 class="text-3xl font-bold">Verification code</h2>

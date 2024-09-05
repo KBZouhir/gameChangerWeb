@@ -65,7 +65,7 @@ async function onSubmit() {
 <template>
     <div class="relative bg-slate-100 dark:bg-slate-800 h-full py-12">
         <div class="mx-auto max-w-7xl flex justify-center items-center h-full">
-            <UCard class="md:w-3/5 w-full p-8 relative z-50">
+            <UCard class="md:w-3/5 w-full p-7 relative overflow-hidden dark:bg-slate-800 rounded-xl z-50">
                 <h2 class="text-3xl font-bold">Welcome Back</h2>
                 <p class="text-blueGray-900 dark:text-slate-300">Please log in to continue</p>
 

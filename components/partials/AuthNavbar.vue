@@ -59,7 +59,7 @@ const items = [
       <div class="relative flex w-full items-center justify-between px-4">
         <div class="flex items-center justify-center space-x-2 sm:items-stretch sm:justify-start">
           <UButton @click="isOpen = true" size="lg" square
-            class="block md:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
+            class="block xl:hidden bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5">
             <template #leading>
               <Icon name="tabler:list" size="20" class="dark:text-white text-primary" />
             </template>
