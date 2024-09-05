@@ -107,7 +107,7 @@
         </div>
       </div>
 
-      <post @deletePostFun="deletePostFun" :post="post" :user="user" v-for="(post,index) in posts?.data" :key="index" />
+      <post @deletePostFun="deletePostFun" @editPostFun="editPostFun" :post="post" :user="user" v-for="(post,index) in posts?.data" :key="index" />
 
       <InfiniteLoading @infinite="fetchMorePosts">
         <template #spinner>
@@ -774,249 +774,6 @@
 
       </div>
     </div>
-
-    <!-- list of reactions -->
-    <UModal v-model="showReactions">
-      <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-        <template #header>
-          <div v-if="postReactions">
-            <span class="text-sm">{{ postReactions.meta.total }} Reaction'(s)</span>
-          </div>
-          <div v-else>
-            <span class="text-sm">0 Reaction'(s)</span>
-          </div>
-        </template>
-
-        <div class="flex flex-col space-y-4" v-if="postReactions">
-          <div v-for="reaction in postReactions.data">
-            <div
-              class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-            >
-              <div
-                class="avatar h-10 w-10 relative dark:bg-slate-800 bg-slate-300 rounded-full flex justify-center items-center"
-              >
-                <img
-                  v-if="reaction.user.image_url"
-                  class="rounded-full object-cover w-full h-full"
-                  :src="reaction.user.image_url"
-                  alt="avatar"
-                />
-                <UAvatar v-else :alt="reaction.user.full_name" size="sm" />
-                <UButton
-                  size="xs"
-                  color="primary"
-                  square
-                  variant="link"
-                  class="absolute -right-1 -bottom-1 p-0"
-                >
-                  <Icon
-                    v-if="reaction.type == 1"
-                    name="tabler:thumb-up-filled"
-                    class="text-green-600"
-                    size="16"
-                  />
-                  <Icon
-                    v-if="reaction.type == 2"
-                    name="tabler:heart-filled"
-                    class="text-red-600"
-                    size="16"
-                  />
-                  <Icon
-                    v-if="reaction.type == 3"
-                    name="tabler:mood-smile-filled"
-                    class="text-orange-500"
-                    size="16"
-                  />
-                </UButton>
-              </div>
-              <h4>{{ reaction.user.full_name }}</h4>
-            </div>
-          </div>
-
-          <div v-if="postReactions.meta.total == 0">
-            <img
-              class="flex dark:hidden mx-auto"
-              src="~/assets/svg/vectors/empty.svg"
-              draggable="false"
-              alt=""
-              srcset=""
-            />
-            <img
-              class="hidden dark:flex mx-auto"
-              src="~/assets/svg/vectors/empty-white.svg"
-              draggable="false"
-              alt=""
-              srcset=""
-            />
-            <div class="my-4 text-center">
-              <h2 class="text-xl font-semibold">{{ $t("No reactions on post") }}</h2>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col space-y-4" v-else>
-          <div
-            v-for="i in 3"
-            class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-          >
-            <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
-            <div class="flex flex-1 flex-col space-y-3">
-              <USkeleton class="h-4" />
-              <USkeleton class="h-4 w-2/5" />
-            </div>
-          </div>
-        </div>
-
-        <template #footer v-if="postReactions && postReactions.meta.total > 10">
-          <UPagination
-            v-model="page"
-            :page-count="10"
-            :total="postReactions.meta.total"
-          />
-        </template>
-      </UCard>
-    </UModal>
-
-    <!-- list of commnets -->
-    <UModal v-model="showComments">
-      <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-        <template #header>
-          <div v-if="postCommnets">
-            <span class="text-sm">{{ postCommnets.meta.total }} Comment'(s)</span>
-          </div>
-          <div v-else>
-            <span class="text-sm">0 Comment'(s)</span>
-          </div>
-        </template>
-
-        <div
-          class="flex flex-col space-y-2 h-[350px] overflow-auto is-scrollbar-hidden"
-          v-if="postCommnets"
-        >
-          <div v-for="comment in postCommnets.data">
-            <div class="flex items-center justify-between">
-              <div
-                class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-              >
-                <UAvatar
-                  :src="comment.user.image_url"
-                  :alt="comment.user.full_name"
-                  size="lg"
-                />
-                <div class="flex flex-1 flex-col items-start">
-                  <div
-                    class="flex flex-col px-3 py-2 text-sm bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-md"
-                  >
-                    <h4 class="font-bold">{{ comment.user.full_name }}</h4>
-                    <p>{{ comment.description }}</p>
-                  </div>
-                  <span class="text-xs">{{ $moment(comment.created_at).fromNow() }}</span>
-                </div>
-              </div>
-              <div v-if="comment.mine">
-                <UDropdown
-                  :items="items"
-                  :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                  :popper="{ placement: 'bottom-start' }"
-                >
-                  <UButton
-                    icon="i-heroicons-ellipsis-vertical"
-                    size="sm"
-                    :color="colorMode.value == 'dark' ? 'white' : 'black'"
-                    variant="link"
-                    :trailing="false"
-                  />
-
-                  <template #item="{ item }">
-                    <button
-                      class="w-full flex items-center justify-between"
-                      @click="item.function(comment)"
-                    >
-                      <span class="truncate">{{ item.label }}</span>
-                      <UIcon
-                        :name="item.icon"
-                        class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
-                      />
-                    </button>
-                  </template>
-                </UDropdown>
-              </div>
-            </div>
-          </div>
-          <InfiniteLoading @infinite="fetchMoreComments">
-            <template #spinner>
-              <div class="flex justify-center w-full">
-                <LoadingIcon />
-              </div>
-            </template>
-            <template v-if="postCommnets.data.length > 0" #complete>
-              <span>No more data found!</span>
-            </template>
-          </InfiniteLoading>
-          <div
-            class="flex justify-center items-center w-full h-full"
-            v-if="postCommnets.meta.total == 0"
-          >
-            <div>
-              <img
-                class="flex dark:hidden mx-auto"
-                src="~/assets/svg/vectors/empty.svg"
-                draggable="false"
-                alt=""
-                srcset=""
-              />
-              <img
-                class="hidden dark:flex mx-auto"
-                src="~/assets/svg/vectors/empty-white.svg"
-                draggable="false"
-                alt=""
-                srcset=""
-              />
-              <div class="my-4 text-center">
-                <h2 class="text-xl font-semibold">No comment on post</h2>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="flex flex-col space-y-4 h-[350px] overflow-auto is-scrollbar-hidden"
-          v-else
-        >
-          <div
-            v-for="i in 8"
-            class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-          >
-            <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
-            <div class="flex flex-1 flex-col space-y-3">
-              <USkeleton class="h-4" />
-              <USkeleton class="h-4 w-2/5" />
-            </div>
-          </div>
-        </div>
-
-        <template #footer>
-          <UInput
-            v-model="comment"
-            @keyup.enter="sendComment"
-            class="flex-1"
-            size="lg"
-            placeholder="Write a comment..."
-          >
-            <template #trailing>
-              <UButton
-                size="sm"
-                :color="colorMode.value == 'dark' ? 'white' : 'black'"
-                square
-                variant="link"
-              >
-                <Icon name="tabler:send-2" size="22" />
-              </UButton>
-            </template>
-          </UInput>
-        </template>
-      </UCard>
-    </UModal>
   </div>
 </template>
 
@@ -1025,16 +782,9 @@ import {
   create,
   index,
   update,
-  toogleReaction,
-  getReactions,
-  createComment,
-  editComment,
-  deleteComment,
-  getComments,
   getPaginationsComments,
   deletePost,
 } from "~/composables/store/usePost";
-import { get, getImagebyID } from "~/composables/store/useMedia";
 import axios from "axios";
 
 // import { uploadVideo } from '~/composables/store/useVideo'
@@ -1084,13 +834,7 @@ const page = ref(1);
 const errors = ref([]);
 const compressedFiles = ref([]);
 const multiple = ref(false);
-const showReactions = ref(false);
-const showComments = ref(false);
-const postReactions = ref(null);
-const postCommnets = ref(null);
-const comment = ref("");
-const selectedPost = ref(null);
-const selectedComment = ref(null);
+
 const snackbar = useSnackbar();
 const selectedVideo = ref(null);
 const videoUrl = ref("");
@@ -1112,24 +856,24 @@ defineShortcuts({
       isOpen.value = false;
     },
   },
-});
+})
 
 const getDataFromApi = async () => {
   await index();
-};
+}
 
 watchEffect(() => {
   getDataFromApi();
-});
+})
 
 const keyExists = (key) => {
   return errors.value.some((error) => error.key === key);
-};
+}
 
 const getErrorMessage = (key) => {
   const error = errors.value.find((error) => error.key === key);
   return error ? error.value : "";
-};
+}
 
 const removeImage = (index) => {
   compressedFiles.value.splice(index, 1);
@@ -1137,13 +881,13 @@ const removeImage = (index) => {
   if (compressedFiles.value.length === 0) {
     inputFileImage.value.value = null;
   }
-};
+}
 
 const removeVideo = () => {
   selectedVideo.value = null;
   videoUrl.value = null;
   inputVideoPicker.value.value = null;
-};
+}
 
 const countChars = (htmlString) => {
   const tempDiv = document.createElement("div");
@@ -1152,21 +896,21 @@ const countChars = (htmlString) => {
   const textContent = tempDiv.textContent || tempDiv.innerText || "";
 
   return textContent.length;
-};
+}
 
 const onTextChange = (delta, oldDelta, source) => {
   if (charCount.value > maxLength.value) {
     return;
   }
-};
+}
 
 const triggerFileInput = () => {
   inputFileImage.value.click();
-};
+}
 
 const triggerVideoPicker = () => {
   inputVideoPicker.value.click();
-};
+}
 
 const onImageFileChange = async (event) => {
   const selectedFiles = Array.from(event.target.files);
@@ -1198,7 +942,7 @@ const onImageFileChange = async (event) => {
       console.error("Error compressing file:", error);
     }
   }
-};
+}
 
 const getVideoCover = () => {
   return new Promise((resolve, reject) => {
@@ -1227,7 +971,7 @@ const getVideoCover = () => {
       });
     });
   });
-};
+}
 
 const uploadVideo = async (payload) => {
   const cookie = useCookie("user_access_token");
@@ -1252,7 +996,7 @@ const uploadVideo = async (payload) => {
     submitBtn.value = false;
     return null;
   }
-};
+}
 
 const onVideoFileChange = async (event) => {
   const selectedFiles = Array.from(event.target.files);
@@ -1269,93 +1013,19 @@ const onVideoFileChange = async (event) => {
     selectedVideo.value = result?.id;
     submitBtn.value = false;
   }
-};
-
-const deletePostFun = async (post) => {
-  const result = await deletePost(post?.id);
-
-  if (result?.success) {
-    posts.value.data = posts.value.data.filter((item) => item.id !== post?.id);
-
-    snackbar.add({
-      type: "success",
-      text: "Post deleted successfully",
-    });
-  }
-};
-
-
-const getPostReactions = async (id) => {
-  postReactions.value = null;
-  showReactions.value = true;
-  const result = await getReactions(id);
-  if (result) {
-    postReactions.value = result;
-  }
-};
-
-const getPostComments = async (id) => {
-  showComments.value = true;
-  postCommnets.value = null;
-  selectedPost.value = null;
-  selectedPost.value = id;
-  comment.value = "";
-  const result = await getComments(id);
-  if (result) {
-    postCommnets.value = result;
-  }
-};
-
-const sendComment = async () => {
-  if (comment.value.trim() == "") return;
-  const payload = { description: comment.value };
-  let result = "";
-  if (selectedComment.value) {
-    result = await editComment(selectedPost.value, selectedComment.value.id, payload);
-    let commentIndex = postCommnets.value.data.findIndex(
-      (comment) => comment.id === selectedComment.value.id
-    );
-    postCommnets.value.data[commentIndex].description = comment.value;
-  } else {
-    result = await createComment(selectedPost.value, payload);
-    if (result.success) {
-      getPostComments(selectedPost.value);
-      const index = posts.value.data.findIndex((post) => post.id === selectedPost.value);
-      posts.value.data[index].comments_count += 1;
-    }
-  }
-  selectedComment.value = null;
-  comment.value = "";
-};
-
-const editPostCommnet = (data) => {
-  comment.value = data.description;
-  selectedComment.value = data;
-};
-
-const deletePostCommnet = async (comment) => {
-  const result = await deleteComment(selectedPost.value, comment.id);
-  if (result.success) {
-    postCommnets.value.data = postCommnets.value.data.filter(
-      (item) => item.id !== comment.id
-    );
-    postCommnets.value.meta.total -= 1;
-    const index = posts.value.data.findIndex((post) => post.id === selectedPost.value);
-    posts.value.data[index].comments_count -= 1;
-  }
-};
+}
 
 const validationData = () => {
   if (content.value.replace(/<[^>]*>/g, "").trim() == "") {
     errors.value.push({ key: "content", value: "Content can not be empty" });
   }
-};
+}
 
 const extractHashTags = (content) => {
   const textContent = content.replace(/<\/?[^>]+(>|$)/g, "");
   const hashtags = (textContent.match(/#\w+/g) || []).map((tag) => tag.substring(1));
   return hashtags || [];
-};
+}
 
 const submitForm = async () => {
   let hashtags = [];
@@ -1409,22 +1079,7 @@ const submitForm = async () => {
   }
 
   isLoading.value = false;
-};
-
-const fetchMoreComments = async ($state) => {
-  if (postCommnets.value?.links?.next == null) {
-    $state.complete();
-    return;
-  }
-  try {
-    const result = await getPaginationsComments(postCommnets.value.links.next);
-    postCommnets.value.data.push(...result.data);
-    postCommnets.value.links = result.links;
-    if (result.data.length < 10) $state.complete();
-  } catch (error) {
-    $state.error();
-  }
-};
+}
 
 const fetchMorePosts = async ($state) => {
   if (posts.value?.links?.next == null) {
@@ -1439,7 +1094,7 @@ const fetchMorePosts = async ($state) => {
   } catch (error) {
     $state.error();
   }
-};
+}
 
 const clearData = () => {
   content.value = "";
@@ -1447,35 +1102,33 @@ const clearData = () => {
   compressedFiles.value = [];
   inputVideoPicker.value.value = null;
   inputFileImage.value.value = null;
-};
+}
 
 const closeEdit = () => {
   clearData();
   editPost.value = false;
-};
+}
+
+const deletePostFun = async (post) => {
+  const result = await deletePost(post?.id);
+
+  if (result?.success) {
+    posts.value.data = posts.value.data.filter((item) => item.id !== post?.id);
+
+    snackbar.add({
+      type: "success",
+      text: "Post deleted successfully",
+    });
+  }
+}
 
 const editPostFun = async (post) => {
   selectedPostID.value = post?.id;
   content.value = post?.description;
   editPost.value = true;
-};
+}
 
-const items = [
-  [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square",
-      function: editPostCommnet,
-    },
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash",
-      function: deletePostCommnet,
-    },
-  ],
-];
-
-
+ 
 </script>
 
 <style scoped lang="css">
