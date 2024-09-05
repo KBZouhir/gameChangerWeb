@@ -1,5 +1,6 @@
 <template>
     <div>
+  
         <div v-if="profile" class="mx-auto w-full max-w-screen-xl py-4">
             <div class="flex flex-col">
                 <div class="rounded-tr-md rounded-tl-md h-96 w-full overflow-hidden relative">
