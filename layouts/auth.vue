@@ -236,20 +236,17 @@ const receivedMessageSound = () => {
   audio.play();
 }
 
-const updateUnreadNotificationCount = async () => {
+const getDataFromApi = async () => {
   const result = await unreadNotificationsCount()
-
 }
 
 onMounted(() => {
   requestPermission()
 
-  updateUnreadNotificationCount()
-
   $onMessage($messaging, (payload) => {
     showNotification.value = true
     receivedMessageSound()
-    updateUnreadNotificationCount()
+    getDataFromApi()
     toast.add({
       id: payload.notification.messageId,
       description: payload.notification.body,
@@ -261,6 +258,10 @@ onMounted(() => {
       }
     })
   })
+})
+
+watchEffect(() => {
+  getDataFromApi()
 })
 
 </script>

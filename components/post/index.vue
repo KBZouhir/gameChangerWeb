@@ -379,8 +379,9 @@ const sendComment = async () => {
         result = await createComment(props.post?.id, payload);
         if (result.success) {
             getPostComments(props.post?.id);
-            const index = posts.value.data.findIndex((post) => post.id === props.post?.id);
-            posts.value.data[index].comments_count += 1;
+            props.post.value.comments_count += 1;
+            // const index = posts.value.data.findIndex((post) => post.id === props.post?.id);
+            // post.value.data[index].comments_count += 1;
         }
     }
     selectedComment.value = null;
