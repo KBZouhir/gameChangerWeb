@@ -7730,6 +7730,11 @@ vue3-timepicker@^1.0.0-beta.2:
   dependencies:
     vue "^3.0.5"
 
+wavesurfer.js@^7.8.5:
+  version "7.8.5"
+  resolved "https://registry.npmjs.org/wavesurfer.js/-/wavesurfer.js-7.8.5.tgz"
+  integrity sha512-z3+p2ruYElXFSnxVrIPLcfziQCovf8Jngeq6UIntKeBDBUwveQ6YWf21d5BfYDZM5QoY3DkM91BETvgwZdTYUQ==
+
 web-streams-polyfill@^3.0.3:
   version "3.3.3"
   resolved "https://registry.npmjs.org/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz"

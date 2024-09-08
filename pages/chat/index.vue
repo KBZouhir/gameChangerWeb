@@ -180,7 +180,7 @@
                             <UDivider :label="date" size="2xs" />
 
                             <div v-for="message in listMessages">
-
+                                
                                 <div :class="(message.sender_uid != user.firebase_uuid) ? 'items-start' : 'items-end justify-end'"
                                     class="flex  space-x-2.5 sm:space-x-5 mb-3">
                                     <div :class="(message.sender_uid != user.firebase_uuid) ? 'items-end' : 'items-start'"
@@ -198,6 +198,7 @@
                                                 </span>
                                             </template>
                                             <div v-for="attachment in message.attachments">
+                                                
                                                 <ImageView v-if="attachment.type == 'image'" :id="attachment.id" />
                                                 <VideoPlayer v-if="attachment.type == 'video'" :id="attachment.id" />
                                                 <AudioPlayer v-if="attachment.type == 'audio'" :id="attachment.id" />
@@ -234,13 +235,15 @@
                     </div>
                 </div>
                 <div
-                    class="flex items-center h-16 border-t bg-white dark:border-[#0d121d] dark:bg-[#111827] px-4 space-x-4">
+                    class="flex items-center relative h-16 border-t bg-white dark:border-[#0d121d] dark:bg-[#111827] px-4 space-x-4">
                     <UInput v-model="inputMessage" class="flex-1" variant="none" placeholder="Write your message"
                         @keyup.enter="sendMessage" />
-                    <UButton icon="i-heroicons-photo" class="hidden dark:text-white dark:hover:text-white/70" size="sm"
+                        <VoiceRecord />
+                    
+                    <UButton icon="i-heroicons-photo" class="dark:text-white dark:hover:text-white/70" size="sm"
                         color="primary" square variant="link" />
-                    <UButton icon="i-heroicons-paper-clip" class="hidden dark:text-white dark:hover:text-white/70"
-                        size="sm" color="primary" square variant="link" />
+                    <UButton icon="i-heroicons-paper-clip" class="dark:text-white dark:hover:text-white/70" size="sm"
+                        color="primary" square variant="link" />
                 </div>
             </div>
 
@@ -532,13 +535,13 @@ const getOrCreateCon = async () => {
 const fetchMoreUsersConversations = async () => {
     loadConversations.value = true
     seeMoreLoading.value = true
-    
-    
+
+
     if (hasMore.value) {
         try {
 
             const arrayConversationIds = conversationIds.value.slice((page.value - 1) * 10, page.value * 10)
-           
+
             const result = await getConversations(arrayConversationIds, conversations.value, true);
             if (result?.length < 10) {
                 hasMore.value = false
@@ -581,13 +584,13 @@ const getMessagesFirebase = (targetConversation) => {
 
         onSnapshot(messagesQuery, (snapshot) => {
             const messagesList = snapshot.docs.map((doc) => doc.data());
-        
+
             // const filteredMessages = messagesList.filter(
             //     (message) => message.sender_uid === selectedUser.value.firebase_uuid
             // )
 
             // console.log('filteredMessages', filteredMessages);
-            
+
             const groupedMessages = messagesList.reduce((acc, message) => {
                 const date = dayjs.unix(message.created_at?.seconds).format('YYYY-MM-DD');
                 if (!acc[date]) {
@@ -599,7 +602,7 @@ const getMessagesFirebase = (targetConversation) => {
             }, {});
 
             messages.value = groupedMessages
-            
+
             nextTick().then(() => {
                 if (scrollContainer.value) {
                     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
@@ -683,7 +686,7 @@ watchEffect(() => {
     getOrCreateCon()
 
     console.log(user.value);
-    
+
 })
 
 </script>
