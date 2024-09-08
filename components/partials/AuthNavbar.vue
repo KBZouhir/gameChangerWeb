@@ -1,6 +1,17 @@
 <script setup>
 import { logout, useUser } from "~/composables/store/useApiAuth";
 import { useAuthStore } from "~/stores/authStore";
+import { getNotifications, markAsRead, deleteNotification, markAllAsRead } from '~/composables/store/useNotifications'
+import userImage from '~/assets/svg/icons/user.svg'
+import userWhite from '~/assets/svg/icons/user-white.svg'
+
+import { useNotificationsStore } from "~/stores/notifications"
+import { useDayjs } from '#dayjs'
+const dayjs = useDayjs()
+
+const store = useNotificationsStore()
+
+const notifications = computed(() => store.getNotifications)
 
 const authStore = useAuthStore();
 const user = computed(() => authStore.getAuthUser);
@@ -24,6 +35,80 @@ const logoutUser = async () => {
   authCookie.value = null;
   await navigateTo("/auth/login");
 };
+
+const timego = (dateTime) => {
+  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return dayjs.utc(dateTime).tz(localTimezone).fromNow()
+}
+
+
+const markAllNotifyAsRead = async () => {
+  const result = await markAllAsRead();
+  if (result?.success) {
+    notifications.value.data = notifications.value.data.map(notify => ({
+      ...notify,
+      read_at: new Date()
+    }));
+  }
+}
+
+const markNotifyAsRead = async (notification) => {
+  if (!notification?.read_at) {
+    const result = await markAsRead(notification.id);
+    if (result?.success) {
+      const notifyIndex = notifications.value.data.findIndex(notify => notify.id === notification.id);
+      if (notifyIndex !== -1) {
+        notifications.value.data[notifyIndex].read_at = new Date();
+      }
+    }
+  }
+}
+
+const deleteNotify = async (notification) => {
+  const result = await deleteNotification(notification.id);
+  if (result?.success) {
+    notifications.value.data = notifications.value.data.filter(notify => notify.id !== notification.id);
+  }
+}
+
+
+const getDataFromApi = async () => {
+  await getNotifications()
+}
+
+const fetchMoreNotifications = async $state => {
+  console.log("fetch more data");
+
+  try {
+    const result = await getPaginationsComments(notifications.value.links.next)
+    notifications.value.data.push(...result.data)
+    notifications.value.links = result.links
+    if (result.data.length < 10) $state.complete()
+
+  } catch (error) {
+    $state.error()
+  }
+}
+
+const notifyitems = [
+  [
+    {
+      key: 'as-read',
+      label: 'Mark as read',
+      icon: 'i-heroicons-check',
+      function: markNotifyAsRead
+    }, {
+      key: 'as-delele',
+      label: 'Delete',
+      icon: 'i-heroicons-trash',
+      function: deleteNotify
+    }
+  ]
+]
+
+watchEffect(() => {
+  getDataFromApi()
+})
 
 const items = [
   [
@@ -117,8 +202,8 @@ const items = [
                     <span>Masterclass</span>
                   </UButton>
                   <UButton size="sm" color="green" variant="ghost" block>
-                    <Icon name="tabler:calendar" />
-                    <span>Calendar</span>
+                    <Icon name="tabler:broadcast" />
+                    <span>Conference</span>
                   </UButton>
                   <UButton size="sm" color="green" variant="ghost" block>
                     <Icon name="tabler:briefcase" />
@@ -137,8 +222,8 @@ const items = [
                             <Icon name="tabler:search" size="20" class="dark:text-white text-primary" />
                         </template>
                     </UButton> -->
-          <nuxt-link to="/notifications">
 
+          <UPopover  :popper="{ placement: 'bottom-end', arrow: true }">
             <UButton :ui="{ rounded: 'rounded-full' }" size="md" square
               class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
               <template #leading>
@@ -148,8 +233,86 @@ const items = [
               </template>
             </UButton>
 
+            <template #panel>
+              <div class="max-w-[400px] max-h-[500px] overflow-auto pt-0">
+                <div class="sticky top-0  dark:bg-[#111827] bg-white z-50  pb-2">
+                  <div class="flex justify-between items-center p-4">
+                    <h2 class="font-bold">{{ $t('Notifications List') }}</h2>
+                    <UButton @click="markAllNotifyAsRead" size="md" color="green" variant="link"
+                      label="Mark all as read" class="hover:no-underline hover:bg-green-500/5" :trailing="false">
+                      <template #leading>
+                        <Icon name="tabler:checks" />
+                      </template>
+                    </UButton>
+                  </div>
+                  <UDivider label="" />
+                </div>
 
-          </nuxt-link>
+                <ul v-if="notifications?.data?.length > 0" role="list" class="mt-4 p-4">
+                  <li v-for="(notification, index) in notifications?.data" :key="index"
+                    class="flex items-start p-4 shadow mb-4 rounded-md relative bg-transparent border dark:border-slate-800/40">
+
+                    <div class="flex-1">
+                      <div class="flex items-center space-x-4 ">
+                        <UAvatar v-if="notification.data.image_url" :src="notification.data.image_url" alt=""
+                          size="md" />
+                        <div v-else
+                          class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                          <img alt="user" :src="userImage" className="inline-block dark:hidden" />
+                          <img alt="user" :src="userWhite" className="hidden dark:inline-block" />
+                        </div>
+
+
+                        <div class="flex flex-col">
+                          <h4 class="font-bold mb-0 text-sm">{{ notification.data.message }}</h4>
+
+                          <span class="text-xs -mt-[0.5px]">
+                            {{ timego(notification.created_at) }}
+                          </span>
+                        </div>
+
+                      </div>
+                      <div v-if="!notification.read_at"
+                        class="w-[6px] h-1/2 rounded-tr-md rounded-br-md bg-green-600 absolute top-1/2 -translate-y-1/2 left-0">
+                      </div>
+                    </div>
+                    <div>
+                      <UDropdown :items="notifyitems" :ui="{ item: { disabled: 'cursor-text select-text' } }"
+                        :popper="{ placement: 'bottom-start' }">
+                        <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
+                          :color="($colorMode.value == 'dark') ? 'white' : 'black'" variant="link" :trailing="false" />
+
+                        <template #item="{ item }">
+                          <UButton size="xs" :disabled="(item.key == 'as-read' && notification.read_at) ? true : false"
+                            :color="(item.key == 'as-delele') ? 'red' : 'black'" variant="link"
+                            class="hover:no-underline w-full flex items-center justify-between"
+                            @click="item.function(notification)">
+                            <span class="truncate">{{ item.label }}</span>
+                            <UIcon :name="item.icon"
+                              :class="(item.key == 'as-delele') ? 'text-red-400' : 'dark:text-blacktext-white '"
+                              class="flex-shrink-0 h-4 w-4  ms-auto" />
+                          </UButton>
+                        </template>
+                      </UDropdown>
+                    </div>
+                  </li>
+                </ul>
+
+                <div class="flex justify-center items-center mb-4">
+                  <nuxt-link to="/notifications">
+                    <UButton  size="md" color="green" variant="outline" label="All notifications"
+                    class="hover:no-underline hover:bg-green-500/5" :trailing="false">
+                    
+                  </UButton>
+                  </nuxt-link>
+                </div>
+              </div>
+            </template>
+          </UPopover>
+
+
+
+
 
 
           <nuxt-link v-if="user?.role.id != 3" to="/chat">

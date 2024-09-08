@@ -20,7 +20,7 @@
                 </div>
                 <div class="flex space-x-4">
                     <UDropdown :items="(post?.is_mine) ? minePostDropDown : otherPostDropDown"
-                        :ui="{ item: { disabled: 'cursor-text select-text' } }" :popper="{ placement: 'bottom-start' }">
+                        :ui="{ item: { disabled: 'cursor-text select-text' } }" :popper="{ placement: 'bottom-end' }">
                         <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
                             :color="$colorMode.value == 'dark' ? 'white' : 'black'" variant="link" :trailing="false" />
 
@@ -46,58 +46,67 @@
             <div>
                 <ImageView v-if="post?.image" :url="`${post?.image.url}`" />
 
-                <div class="flex items-center space-x-4 mt-4 text-sm">
-                    <div class="flex items-center">
-                        <UPopover mode="hover" :popper="{ placement: 'top-start' }">
-                            <div class="flex items-center space-x-0 font-semibold">
-                                <div v-if="post?.reaction">
-                                    <UButton v-if="post?.reaction == '1'" @click="togglePostReaction(1)" size="sm"
-                                        color="primary" square variant="link">
-                                        <Icon name="tabler:thumb-up-filled" class="text-green-600" size="22" />
-                                    </UButton>
-                                    <UButton v-if="post?.reaction == '2'" @click="togglePostReaction(2)" size="sm"
-                                        color="primary" square variant="link">
-                                        <Icon name="tabler:heart-filled" class="text-red-600" size="22" />
-                                    </UButton>
-                                    <UButton v-if="post?.reaction == '3'" @click="togglePostReaction(3)" size="sm"
-                                        color="primary" square variant="link">
-                                        <Icon name="tabler:mood-smile-filled" class="text-orange-500" size="22" />
-                                    </UButton>
-                                </div>
-                                <UButton v-else size="sm" @click="togglePostReaction(2)" color="primary" square
-                                    variant="link">
-                                    <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
-                                </UButton>
-                                <span @click="getPostReactions(post?.id)">
-                                    {{ post?.reactions_count }}
-                                </span>
-                            </div>
-
-                            <template #panel>
-                                <div class="p-2 flex space-x-2">
-                                    <div class="flex flex-col items-center" v-for="reaction in settings.reaction.type">
-                                        <UTooltip :text="reaction.label">
-                                            <UButton size="sm" color="primary" square variant="link">
-                                                <Icon v-if="reaction.case == 'LIKE'" @click="togglePostReaction(1)"
-                                                    name="tabler:thumb-up-filled" class="text-green-600" size="22" />
-                                                <Icon v-if="reaction.case == 'LOVE'" @click="togglePostReaction(2)"
-                                                    name="tabler:heart-filled" class="text-red-600" size="22" />
-                                                <Icon v-if="reaction.case == 'HAHA'" @click="togglePostReaction(3)"
-                                                    name="tabler:mood-smile-filled" class="text-orange-500" size="22" />
-                                            </UButton>
-                                        </UTooltip>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 mt-4 text-sm">
+                        <div class="flex items-center">
+                            <UPopover mode="hover" :popper="{ placement: 'top-start' }">
+                                <div class="flex items-center space-x-0 font-semibold">
+                                    <div v-if="post?.reaction">
+                                        <UButton v-if="post?.reaction == '1'" @click="togglePostReaction(1)" size="sm"
+                                            color="primary" square variant="link">
+                                            <Icon name="tabler:thumb-up-filled" class="text-green-600" size="22" />
+                                        </UButton>
+                                        <UButton v-if="post?.reaction == '2'" @click="togglePostReaction(2)" size="sm"
+                                            color="primary" square variant="link">
+                                            <Icon name="tabler:heart-filled" class="text-red-600" size="22" />
+                                        </UButton>
+                                        <UButton v-if="post?.reaction == '3'" @click="togglePostReaction(3)" size="sm"
+                                            color="primary" square variant="link">
+                                            <Icon name="tabler:mood-smile-filled" class="text-orange-500" size="22" />
+                                        </UButton>
                                     </div>
+                                    <UButton v-else size="sm" @click="togglePostReaction(2)" color="primary" square
+                                        variant="link">
+                                        <Icon name="tabler:heart" size="22" class="dark:text-white text-primary" />
+                                    </UButton>
+                                    <span @click="getPostReactions(post?.id)">
+                                        {{ post?.reactions_count }}
+                                    </span>
                                 </div>
-                            </template>
-                        </UPopover>
-                    </div>
 
-                    <UButton @click="getPostComments(post?.id)" size="sm" color="primary" square variant="link"
+                                <template #panel>
+                                    <div class="p-2 flex space-x-2">
+                                        <div class="flex flex-col items-center"
+                                            v-for="reaction in settings.reaction.type">
+                                            <UTooltip :text="reaction.label">
+                                                <UButton size="sm" color="primary" square variant="link">
+                                                    <Icon v-if="reaction.case == 'LIKE'" @click="togglePostReaction(1)"
+                                                        name="tabler:thumb-up-filled" class="text-green-600"
+                                                        size="22" />
+                                                    <Icon v-if="reaction.case == 'LOVE'" @click="togglePostReaction(2)"
+                                                        name="tabler:heart-filled" class="text-red-600" size="22" />
+                                                    <Icon v-if="reaction.case == 'HAHA'" @click="togglePostReaction(3)"
+                                                        name="tabler:mood-smile-filled" class="text-orange-500"
+                                                        size="22" />
+                                                </UButton>
+                                            </UTooltip>
+                                        </div>
+                                    </div>
+                                </template>
+                            </UPopover>
+                        </div>
+
+                        <UButton @click="getPostComments(post?.id)" size="sm" color="primary" square variant="link"
+                            class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
+                            <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
+                            <span class="dark:text-white text-black hover:no-underline">{{
+                                post?.comments_count
+                                }}</span>
+                        </UButton>
+                    </div>
+                    <UButton @click="shareLink()" size="sm" color="primary" square variant="link"
                         class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
-                        <Icon name="tabler:message-dots" class="dark:text-white text-primary" size="22" />
-                        <span class="dark:text-white text-black hover:no-underline">{{
-                            post?.comments_count
-                        }}</span>
+                        <Icon name="tabler:share-3" class="dark:text-white text-primary" size="22" />
                     </UButton>
                 </div>
             </div>
@@ -442,6 +451,15 @@ const sendReport = async () => {
             text: 'Report failed to send',
         })
     }
+}
+
+const shareLink = () => {
+    const url = `${window.location.origin}/post/${props.post?.id}`
+    navigator.clipboard.writeText(url)
+    snackbar.add({
+        type: 'success',
+        text: 'Link copied to clipboard',
+    })
 }
 
 const minePostDropDown = [
