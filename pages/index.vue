@@ -60,7 +60,7 @@
           </button>
           <UButton @click="isOpen = true" label="" :ui="{ rounded: 'rounded-full' }" size="xl" color="green">
             <template #leading>
-              <UIcon name="tabler:plus" />
+              <Icon name="tabler:plus" />
             </template>
           </UButton>
 
@@ -600,7 +600,7 @@ const onTextChange = ({ delta, oldDelta, source }) => {
     while ((match = regex.exec(fullText)) !== null) {
       const startIndex = match.index;
       const endIndex = startIndex + match[0].length;
-      quillInstance.formatText(startIndex, endIndex , { bold: true, color: '#34d399' }, true);
+      quillInstance.formatText(startIndex, endIndex, { bold: true, color: '#34d399' }, true);
     }
   }
 };
@@ -716,24 +716,46 @@ const onVideoFileChange = async (event) => {
   }
 }
 
+const isDeltaEmptyOrWhitespace = (delta) => {
+  if (delta.ops.length === 0) {
+    return true;
+  }
+  for (let i = 0; i < delta.ops.length; i++) {
+    if (delta.ops[i].insert.trim() !== '') {
+      return false;
+    }
+  }
+  return true;
+}
+
 const validationData = () => {
-  if (content.value.replace(/<[^>]*>/g, "").trim() == "") {
+  errors.value = [];  
+  if (isDeltaEmptyOrWhitespace(content.value)) {
     errors.value.push({ key: "content", value: "Content can not be empty" });
   }
 }
 
-const extractHashTags = (content) => {
-  const textContent = content.replace(/<\/?[^>]+(>|$)/g, "");
-  const hashtags = (textContent.match(/#\w+/g) || []).map((tag) => tag.substring(1));
-  return hashtags || [];
-}
+const extractHashTagsFromDelta = (delta) => {
+  const hashtags = [];
+
+  delta.ops.forEach((op) => {
+    if (op.insert && typeof op.insert === 'string') {
+      const matches = op.insert.match(/#\w+/g);
+      if (matches) {
+        matches.forEach((tag) => hashtags.push(tag.substring(1)));
+      }
+    }
+  });
+
+  return hashtags;
+};
 
 const submitForm = async () => {
   let hashtags = [];
   isLoading.value = true;
   validationData();
 
-  hashtags = extractHashTags(content.value);
+  hashtags = extractHashTagsFromDelta(content.value);
 
   if (errors.value.length > 0) {
     isLoading.value = false;

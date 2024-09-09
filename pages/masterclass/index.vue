@@ -11,7 +11,7 @@
             </nuxt-link>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
+        <div class="grid md:grid-cols-2 lg:grid-cols-2 grid-cols-1 gap-4 my-4">
             <div v-for="(masterclass, index) in masterClassList?.data"
                 :key="masterclass.id" :style="`background-image: url(${(masterclass.image_url) ? masterclass.image_url : masterclass.video_thumbnail});`"
                 class="text-white bg-cover rounded-lg overflow-hidden">
