@@ -180,7 +180,7 @@
                             <UDivider :label="date" size="2xs" />
 
                             <div v-for="message in listMessages">
-                                
+
                                 <div :class="(message.sender_uid != user.firebase_uuid) ? 'items-start' : 'items-end justify-end'"
                                     class="flex  space-x-2.5 sm:space-x-5 mb-3">
                                     <div :class="(message.sender_uid != user.firebase_uuid) ? 'items-end' : 'items-start'"
@@ -198,7 +198,7 @@
                                                 </span>
                                             </template>
                                             <div v-for="attachment in message.attachments">
-                                                
+
                                                 <ImageView v-if="attachment.type == 'image'" :id="attachment.id" />
                                                 <VideoPlayer v-if="attachment.type == 'video'" :id="attachment.id" />
                                                 <AudioPlayer v-if="attachment.type == 'audio'" :id="attachment.id" />
@@ -238,8 +238,8 @@
                     class="flex items-center relative h-16 border-t bg-white dark:border-[#0d121d] dark:bg-[#111827] px-4 space-x-4">
                     <UInput v-model="inputMessage" class="flex-1" variant="none" placeholder="Write your message"
                         @keyup.enter="sendMessage" />
-                        <VoiceRecord />
-                    
+                    <VoiceRecord @sendRecordFile="sendRecordFile" />
+
                     <UButton icon="i-heroicons-photo" class="dark:text-white dark:hover:text-white/70" size="sm"
                         color="primary" square variant="link" />
                     <UButton icon="i-heroicons-paper-clip" class="dark:text-white dark:hover:text-white/70" size="sm"
@@ -400,6 +400,7 @@
                         </div>
                     </div>
                 </template>
+                
 
                 <template v-if="!loadConversations && UsersConversations.length == 0">
                     <div class="flex-1 justify-center flex items-center">
@@ -429,7 +430,7 @@
 <script setup>
 import { collection, addDoc, query, doc, where, updateDoc, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore"
 import { useAuthStore } from '~/stores/authStore';
-import { getConversations, getOrCreateConversation } from '~/composables/store/useConversation'
+import { getConversations, getOrCreateConversation, sendAttachements } from '~/composables/store/useConversation'
 import { useConversationStore } from '~/stores/conversations'
 
 const authStore = useAuthStore();
@@ -642,6 +643,18 @@ const sendMessage = async () => {
             console.error('Error sending message:', error);
         }
     }
+}
+
+const sendRecordFile = async (id) => {
+    let payload = {
+        attachements: {
+            0: id
+        }
+    }
+    const result = await sendAttachements(selectedConversation.value, payload)  
+    
+    console.log(result);
+    
 }
 
 const firebaseTimeGo = (timestamp) => {

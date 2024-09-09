@@ -189,9 +189,9 @@ const items = [
         <div class="flex items-center space-x-4">
           <div>
             <UPopover>
-              <UButton label="Create" :ui="{ rounded: 'rounded-full' }" size="md" color="green">
+              <UButton :ui="{ rounded: 'rounded-full' }" size="lg" color="green">
                 <template #leading>
-                  <UIcon name="tabler:plus" />
+                  <Icon name="tabler:plus" />
                 </template>
               </UButton>
 

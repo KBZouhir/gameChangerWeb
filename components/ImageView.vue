@@ -46,7 +46,7 @@ const openLightboxOnSlide = () => {
 
 const fetchImage = async () => {
     let response;
-    let url = (props.url) ? props.url : `${apiBaseUrl}conversations/attachments/${props.id}`
+    let url = (props.url) ? props.url : `${apiBaseUrl}/conversations/attachments/${props.id}`
 
     try {
         response = await axios.get(url, {

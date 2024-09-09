@@ -104,11 +104,12 @@
             <div class="flex flex-col space-y-4 relative">
               <div class="flex flex-col">
                 <div class="relative" :class="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
-                    ? 'border-[1px] border-red-400 rounded-md'
-                    : ''
+                  ? 'border-[1px] border-red-400 rounded-md'
+                  : ''
                   ">
-                  <QuillEditor :class="colorMode.value == 'dark' ? 'dark-theme' : ''" :options="options" theme="bubble"
-                    @text-change="onTextChange" v-model:content="content" contentType="html" />
+                  <QuillEditor ref="quillContainer" :class="colorMode.value == 'dark' ? 'dark-theme' : ''"
+                    :options="options" theme="bubble" @textChange="onTextChange" v-model:content="content"
+                    contentType="delta" />
                   <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                     :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'">
                     {{ charCount }} / {{ maxLength }}
@@ -201,11 +202,12 @@
             <div class="flex flex-col space-y-4 relative">
               <div class="flex flex-col">
                 <div class="relative" :class="keyExists('content') && content.replace(/<[^>]*>/g, '').trim() == ''
-                    ? 'border-[1px] border-red-400 rounded-md'
-                    : ''
+                  ? 'border-[1px] border-red-400 rounded-md'
+                  : ''
                   ">
-                  <QuillEditor :class="colorMode.value == 'dark' ? 'dark-theme' : ''" :options="options" theme="bubble"
-                    @text-change="onTextChange" v-model:content="content" contentType="html" />
+                  <QuillEditor ref="quillContainer" :class="colorMode.value == 'dark' ? 'dark-theme' : ''"
+                    :options="options" theme="bubble" @textChange="onTextChange" v-model:content="content"
+                    contentType="delta" />
                   <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                     :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'">
                     {{ charCount }} / {{ maxLength }}
@@ -508,6 +510,7 @@ const postHasMedia = computed(() => {
 });
 
 const content = ref("");
+const quillContainer = ref()
 const inputFileImage = ref(null);
 const inputVideoPicker = ref();
 const isLoading = ref(false);
@@ -581,11 +584,26 @@ const countChars = (htmlString) => {
   return textContent.length;
 }
 
-const onTextChange = (delta, oldDelta, source) => {
+const onTextChange = ({ delta, oldDelta, source }) => {
   if (charCount.value > maxLength.value) {
     return;
   }
-}
+
+  if (source === 'user') {
+    const regex = /#(\w+)/g;
+    let editor = quillContainer.value;
+    let quillInstance = editor.getQuill();
+
+    const fullText = quillInstance.getText();
+
+    let match;
+    while ((match = regex.exec(fullText)) !== null) {
+      const startIndex = match.index;
+      const endIndex = startIndex + match[0].length;
+      quillInstance.formatText(startIndex, endIndex , { bold: true, color: '#34d399' }, true);
+    }
+  }
+};
 
 const triggerFileInput = () => {
   inputFileImage.value.click();

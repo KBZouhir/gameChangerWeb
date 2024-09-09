@@ -20,6 +20,7 @@ export const getConversations = async (
   );
 
   if (data?.success) {
+    
     let conversationsUsers = [];
 
     data.conversations?.forEach((user) => {
@@ -63,3 +64,17 @@ export const getOrCreateConversation = async (id, type) => {
     return data.data;
   }
 };
+
+export const sendAttachements = async (conversationId, payload) => {
+  const { data, refresh, error, pending } = await useApi(`conversations/${conversationId}/send-attachements`,
+    {
+      initialCache: false,
+      body: payload,
+      method: "POST",
+    }
+  );
+  if (data?.success) {
+    return data.data;
+  }
+};
+
