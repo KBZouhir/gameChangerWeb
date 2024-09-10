@@ -11,7 +11,7 @@
             </nuxt-link>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
+        <div class="grid md:grid-cols-2 lg:grid-cols-2 grid-cols-1 gap-4 my-4">
             <div v-for="(conference, index) in conferenceList?.data" :key="conference.id"
                 :style="`background-image: url(${(conference.image_url) ? conference.image_url : conference.video_thumbnail});`"
                 class="text-white bg-cover rounded-lg overflow-hidden">
@@ -49,7 +49,7 @@
         </div>
 
         <div v-if="conferenceList.length == 0 && !conferenceList?.meta"
-            class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4 my-4">
+            class="grid md:grid-cols-2 lg:grid-cols-2 grid-cols-1 gap-4 my-4">
             <div v-for="i in 9" class="text-white bg-cover rounded-lg overflow-hidden border dark:border-slate-900">
                 <USkeleton class="h-64 w-full" />
             </div>

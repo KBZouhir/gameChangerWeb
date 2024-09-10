@@ -3,11 +3,11 @@
         <div v-if="displayDescription.length > number">
             <div class="relative line-clamp-4" v-if="!readMore">
                 <div v-html="displayDescription"></div>
-                <div class="absolute w-full h-12 bg-red bottom-0 bg-gradient-to-t dark:from-slate-800 from-white to-transparent"></div>
+                
             </div>
             <div v-if="readMore" v-html="htmlDescription"></div>
 
-            <div class="text-xs text-green-500 font-bold cursor-pointer flex justify-start mt-2">
+            <div class="text-xs text-green-500 font-bold cursor-pointer flex justify-end mt-2">
                 <a class="my-50 mb-1" @click="toggleReadMore" v-if="!readMore">
                     Show more
                 </a>

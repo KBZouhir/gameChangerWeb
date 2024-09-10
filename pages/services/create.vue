@@ -123,38 +123,63 @@
                 </div>
 
                 <div class="col-span-2 py-4 sticky top-0 hidden md:block">
-                    <UCard :ui="{ body: 'p-0' }" class="overflow-hidden">
-                        <div :class="`h-64 rounded-tr-lg rounded-tl-lg  bg-cover`"
-                            :style="`background-image: url(${compressedFiles[0]?.preview || fallbackImage});`">
-                        </div>
-                        <div class="flex justify-end -mt-2 ">
-                            <UBadge color="green" size="xs" class="px-4" :ui="{ rounded: 'rounded-none' }">
-                                <span v-if="estimate" class="capitalize">estimate</span>
-                                <span v-else>{{ state.price || 0 }} $</span>
-                            </UBadge>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-semibold truncate mb-2">{{ state.title || `Lorem Ipsum Professional
-                                Services` }}
-                            </h3>
-                            <div class="text-xs text-slate-600 dark:text-gray-400 line-clamp-4">{{ state.description ||
-                                `Lorem ipsum
-                                dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore
-                                et dolore magna
-                                aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                                aliquip ex ea commodo
-                                consequat.`}}
+
+
+                    <UCard :ui="{ body: 'p-0' }" class="overflow-hidden bg-white rounded-xl text-sm font-medium  shadow-sm p-4">
+                        <div class="relative">
+
+                            <div :class="`h-64 rounded-tr-lg rounded-tl-lg  bg-cover`"
+                                :style="`background-image: url(${compressedFiles[0]?.preview || fallbackImage});`">
+                            </div>
+
+
+                            <div class="absolute top-3 right-3 flex justify-end">
+                                <UBadge color="primary" size="md"
+                                    class="px-4 z-20 bg-opacity-75 dark:bg-opacity-75 border border-white"
+                                    :ui="{ rounded: 'rounded-full' }">
+                                    <span v-if="estimate" class="capitalize text-white">Estimate</span>
+                                    <span class="capitalize text-white" v-else>{{ state.price || 0 }} €</span>
+                                </UBadge>
                             </div>
                         </div>
-                        <template #footer>
-                            <div class="flex flex-wrap items-center">
+                        <div class="">
+                            <div class="flex items-center space-x-4 my-4">
+
+                                <UAvatar :src="user.image_url" :alt="user.full_name" size="sm"
+                                    class="dark:bg-gray-600" />
+
+                                <div class="flex flex-col">
+
+                                    <h4 class="font-bold mb-0">{{ user.full_name }}</h4>
+
+                                    <span class="text-xs text-slate-400 -mt-[0.5px]">{{
+                                        $dayjs(state.created_at).format("DD/MM/YYYY h:MM A") }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="min-h-20">
+                                <h3 class="text-lg font-semibold truncate mb-2">
+                                    {{ state.title || `Lorem Ipsum Professional Services` }}
+                                </h3>
+                                <div class="text-xs text-slate-600 dark:text-gray-400 line-clamp-2">
+                                    {{ state.description || `Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.`}}
+                                </div>
+                            </div>
+
+                            <div class="relative flex items-center whitespace-nowrap overflow-hidden">
                                 <UBadge v-if="state.domains.length <= 0" :label="`Domain ${i}`" color="white" size="xs"
                                     class="px-3 m-1 text-[10px]" v-for="i in 4" />
-                                <UBadge :label="domain.translated_name" color="white" size="xs"
-                                    class="px-3 m-1 text-[10px] " v-for="domain in state.domains" />
+
+                                <UBadge :label="domain.translated_name" :ui="{ rounded: 'rounded-full' }" color="white"
+                                    size="xs" class="px-3 m-0.5 text-[10px] bg-opacity-75 dark:bg-opacity-75"
+                                    v-for="domain in state.domains" />
                             </div>
-                        </template>
+                        </div>
                     </UCard>
+
+
+
                 </div>
             </div>
         </div>
@@ -164,12 +189,16 @@
 
 <script setup>
 import { createService } from "~/composables/store/useService"
+import { useAuthStore } from '~/stores/authStore'
+
 import imageCompression from 'browser-image-compression'
 
 import schema from '~/schemas/service'
 
 import fallbackImage from '~/assets/img/profile-cover.webp'
 
+const authStore = useAuthStore();
+const user = computed(() => authStore.getAuthUser)
 
 const colorMode = useColorMode()
 const estimate = ref(false)

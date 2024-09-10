@@ -13,16 +13,20 @@
                 </div>
             </div>
 
-            <div ref="dateContainer"
-                class="flex space-x-6 items-center mx-auto w-full max-w-screen-xl overflow-auto px-4 py-4 scrollbar-thin scrollbar-h-2 scrollbar-thumb-rounded-full dark:scrollbar-thumb-slate-900 scrollbar-thumb-slate-300/80 dark:scrollbar-track-slate-800/80 scrollbar-track-slate-100">
-                <div v-for="{ day, name } in daysOfMonth" :key="day">
-                    <button :class="dayClassCondition(day)" :disabled="day < new Date().getDate()"
-                        @click="getAvailableSlots(day)"
-                        class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
-                        <h2 class="font-semibold text-md">{{ name }}</h2>
-                        <h3 class="font-bold text-2xl">{{ day }}</h3>
-                    </button>
-                </div>
+            <div ref="dateContainer" class="max-w-screen-xl  px-4 py-4 ">
+
+                <UCarousel v-slot="{ item }" arrows :items="daysOfMonth" :ui="{ item: 'snap-start' }" :next-button="{color: 'gray'}" :prev-button="{color: 'gray'}">
+                    <div class="mx-1" :key="item.day">
+                        <button :class="dayClassCondition(item.day)" :disabled="item.day < new Date().getDate()"
+                            @click="getAvailableSlots(item.day)"
+                            class="border rounded-md p-6 flex flex-col justify-center items-center w-20 h-20 dark:text-white text-black cursor-pointer">
+                            <h2 class="font-semibold text-md">{{ item.name }}</h2>
+                            <h3 class="font-bold text-2xl">{{ item.day }}</h3>
+                        </button>
+                    </div>
+                </UCarousel>
+
+
             </div>
 
             <div class="flex flex-wrap justify-center my-4 p-4  mx-auto w-full max-w-screen-xl">
@@ -41,7 +45,8 @@
                 <USkeleton v-if="loadingSlots" v-for="i in 31" class="w-20 h-20 rounded-md m-2" />
             </div>
 
-            <div v-if="isEmpty(availableSlots) && !loadingSlots" class="flex flex-1 flex-col items-center justify-center py-4">
+            <div v-if="isEmpty(availableSlots) && !loadingSlots"
+                class="flex flex-1 flex-col items-center justify-center py-4">
                 <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
                     srcset="">
                 <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false"
@@ -55,8 +60,7 @@
                     <UTextarea v-model="state.description" autofocus
                         placeholder="Describe why you want to book this appointment" :rows="8" class="mb-4" />
                     <div class="flex justify-end">
-                        <UButton @click="submitFrom" :loading="loadingbooking" label="Book appointment"
-                            class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                        <UButton @click="submitFrom" :loading="loadingbooking" label="Book appointment" color="green"
                             size="md">
                         </UButton>
                     </div>
@@ -96,13 +100,17 @@
                         </div>
                         <div class="flex justify-between items-center">
 
-                            <p> {{ $t('Duration') }}:  {{ $dayjs.duration($dayjs(selectedAppointment?.end_at).diff($dayjs(selectedAppointment?.begin_at))).asMinutes() }} minutes</p>
+                            <p> {{ $t('Duration') }}: {{
+                                $dayjs.duration($dayjs(selectedAppointment?.end_at).diff($dayjs(selectedAppointment?.begin_at))).asMinutes()
+                                }} minutes</p>
                             <p>{{ $dayjs(selectedAppointment?.begin_at).format('dddd, MMMM D') }}</p>
                         </div>
                     </div>
                     <nuxt-link :to="`/calendar`">
-                        <UButton block label="Check calendar" class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white"
-                            color="primary" size="md"></UButton>
+                        <UButton block label="Check calendar"
+                            class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                            size="md">
+                        </UButton>
                     </nuxt-link>
                 </div>
             </div>
@@ -193,7 +201,7 @@ const handleDate = () => {
     }
 }
 
-const isEmpty = (obj) =>  {
+const isEmpty = (obj) => {
     return Object.keys(obj).length === 0 && obj.constructor === Object;
 }
 
@@ -237,7 +245,9 @@ watchEffect(() => {
 const submitFrom = async () => {
     loadingbooking.value = true
     const result = await bookAppointment(state)
-    if (result.success) {
+    console.log(result);
+    
+    if (result?.success) {
         selectedAppointment.value = result.appointment
     }
     loadingbooking.value = false

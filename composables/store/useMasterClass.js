@@ -40,9 +40,11 @@ export const showMasterClass = async (id) => {
     {
       initialCache: false,
       method: "GET",
+      caches: false
     }
   );
   
+  console.log(data);
   
   return data
 }

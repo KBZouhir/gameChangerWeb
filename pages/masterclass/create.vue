@@ -15,7 +15,22 @@
                     </UFormGroup>
 
                     <UFormGroup label="Full description" name="full_description">
-                        <UTextarea :rows="8" v-model="state.full_description" size="lg" />
+                        <ClientOnly fallback-tag="div" fallback="">
+                            <div
+                                :class="keyExists('content') && state.full_description.replace(/<[^>]*>/g, '').trim() == '' ? 'border-[1px] border-red-400 rounded-md' : ''">
+                                <div :class="$colorMode.value == 'dark' ? 'dark-theme' : ''">
+                                    <QuillEditor ref="quillContainer" :options="options" theme="snow"
+                                        v-model:content="state.full_description" contentType="html" />
+                                </div>
+                            </div>
+
+                            <p v-show="keyExists('content') && state.full_description.replace(/<[^>]*>/g, '').trim() == ''"
+                                class="text-red-500 text-[10px] mb-2">
+                                {{ getErrorMessage("content") }}
+                            </p>
+                        </ClientOnly>
+
+
                     </UFormGroup>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -115,6 +130,11 @@
                                 <label class="font-semibold " for="email">Email</label>
                                 <UInput type="email" v-model="externalUserEmail" id="email" size="lg" />
                             </div>
+
+                            <div class="col-span-2 flex flex-col text-sm space-y-1">
+                                <label class="font-semibold " for="email">Description</label>
+                                <UTextarea rows="5" v-model="externalUserEmail" id="email" size="lg" />
+                            </div>
                             <div class="col-span-2">
                                 <UButton block @click="addExternalUser" size="lg" color="green" label="Add" />
                             </div>
@@ -134,8 +154,8 @@
                                             {{ external_animator.external_user_email }}
                                         </p>
                                     </div>
-                                    <UButton icon="i-heroicons-x-mark" size="2xs" color="red" @click="removeExternalUser(index)" square
-                                    variant="ghost" />
+                                    <UButton icon="i-heroicons-x-mark" size="2xs" color="red"
+                                        @click="removeExternalUser(index)" square variant="ghost" />
                                 </div>
                             </div>
                         </div>
@@ -173,9 +193,7 @@
                             </div>
                         </div>
                     </div>
-                    <UButton :loading="submitLoading" type="submit" label="Submit"
-                        class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="green"
-                        size="md">
+                    <UButton :loading="submitLoading" type="submit" label="Submit"  color="green" size="md">
                         <template #trailing>
                             <UIcon name="i-heroicons-arrow-right-20-solid" class="w-5 h-5" />
                         </template>
@@ -198,6 +216,9 @@ import { createMasterClass } from '~/composables/store/useMasterClass'
 import { handleApiError } from '~/composables/useApiError'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import "@vueup/vue-quill/dist/vue-quill.bubble.css"
+import { QuillEditor } from "@vueup/vue-quill";
+
 import imageCompression from 'browser-image-compression'
 
 import { usersList } from '~/composables/store/useUser'
@@ -237,9 +258,15 @@ const externalUserEmail = ref()
 
 definePageMeta({
     layout: 'auth',
-    title: 'Service',
+    title: 'Masterclass',
     middleware: ['auth']
 })
+
+const options = ref({
+    modules: {},
+    placeholder: "What's on your mind?",
+    theme: "snow",
+});
 
 
 const state = reactive({
@@ -345,6 +372,11 @@ const removeExternalUser = (index) => {
 
 const validationData = () => {
     errors.value = []
+    console.log(state.full_description.replace(/<[^>]*>/g, "").trim() == "");
+
+    if (state.full_description.replace(/<[^>]*>/g, "").trim() == "") {
+        errors.value.push({ key: "content", value: "Content can not be empty" });
+    }
     if (state.domains.length <= 0) {
         errors.value.push({ key: 'domain', value: 'Domains can not be empty' })
     }
@@ -352,54 +384,56 @@ const validationData = () => {
 
 const onSubmit = async () => {
     validationData()
-    let formData = new FormData()
+    if (errors.value.length === 0) {
+        let formData = new FormData()
 
-    for (const key in state) {
-        if (state.hasOwnProperty(key)) {
-            if (Array.isArray(state[key])) {
-                if (key === 'internal_animators') {
-                    state[key].forEach((item, index) => {
-                        formData.append(`${key}[${index}][user_id]`, (item?.id) ? item.id : item);
-                    })
-                } if (key === 'external_animators') {
-                    state[key].forEach((item, index) => {
-                        formData.append(`${key}[${index}][external_user_name]`, (item?.external_user_name))
-                        formData.append(`${key}[${index}][external_user_email]`, (item?.external_user_email))
-                    })
-                } else {
-                    if (key != 'external_animators' && key != 'internal_animators') {
+        for (const key in state) {
+            if (state.hasOwnProperty(key)) {
+                if (Array.isArray(state[key])) {
+                    if (key === 'internal_animators') {
                         state[key].forEach((item, index) => {
-                            formData.append(`${key}[${index}]`, (item?.id) ? item.id : item);
+                            formData.append(`${key}[${index}][user_id]`, (item?.id) ? item.id : item);
                         })
+                    } if (key === 'external_animators') {
+                        state[key].forEach((item, index) => {
+                            formData.append(`${key}[${index}][external_user_name]`, (item?.external_user_name))
+                            formData.append(`${key}[${index}][external_user_email]`, (item?.external_user_email))
+                        })
+                    } else {
+                        if (key != 'external_animators' && key != 'internal_animators') {
+                            state[key].forEach((item, index) => {
+                                formData.append(`${key}[${index}]`, (item?.id) ? item.id : item);
+                            })
+                        }
                     }
+                } else if (key === 'date') {
+                    const formattedDate = convertTimeToUTC(state[key], 'YYYY-MM-DD HH:mm:ss')
+                    formData.append(key, formattedDate);
+                } else {
+                    formData.append(key, state[key]);
                 }
-            } else if (key === 'date') {
-                const formattedDate = convertTimeToUTC(state[key], 'YYYY-MM-DD HH:mm:ss')
-                formData.append(key, formattedDate);
-            } else {
-                formData.append(key, state[key]);
             }
         }
-    }
 
-    if (compressedFiles.value[0].file) {
-        formData.append('image', compressedFiles.value[0].file)
-    }
-    submitLoading.value = true
-    const result = await createMasterClass(formData)
-    if (result?.success) {
-        // redicrect to masterclass
-        await navigateTo('/masterclass')
-    } else {
-        if (result.error.statusCode == 422) {
-            const error = handleApiError(result.error);
-            console.log(error);
-
-            form.value.setErrors(error.errors);
+        if (compressedFiles.value[0].file) {
+            formData.append('image', compressedFiles.value[0].file)
         }
-    }
+        submitLoading.value = true
+        const result = await createMasterClass(formData)
+        if (result?.success) {
+            // redicrect to masterclass
+            await navigateTo('/masterclass')
+        } else {
+            if (result.error.statusCode == 422) {
+                const error = handleApiError(result.error);
+                console.log(error);
 
-    submitLoading.value = false
+                form.value.setErrors(error.errors);
+            }
+        }
+
+        submitLoading.value = false
+    }
 }
 
 </script>
@@ -464,5 +498,61 @@ const onSubmit = async () => {
     --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
     --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
     --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
+}
+</style>
+
+
+<style scoped lang="css">
+:deep(.ql-editor) {
+    min-height: 200px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding-bottom: 26px;
+    background-color: #FFF;
+}
+
+:deep(.ql-editor.ql-blank::before) {
+    color: #4e4e4e !important;
+}
+
+:deep(.dark-theme > .ql-container > .ql-editor) {
+    background-color: #111827 !important;
+    border-radius: 0 !important;
+    border: 0px solid #374151 !important;
+}
+
+:deep(.dark-theme > .ql-container.ql-snow) {
+    border-radius: 0px !important;
+}
+
+:deep(.dark-theme > .ql-container) {
+    border: 1px solid #374151 !important;
+}
+
+:deep(.dark-theme > .ql-toolbar.ql-snow) {
+    background-color: #111827 !important;
+    border: 1px solid #374151 !important;
+}
+
+:deep(.ql-container) {
+    font-size: 12px;
+}
+
+:deep(.ql-toolbar.ql-snow) {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+:deep(.ql-container.ql-snow) {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+:deep(.dark-theme .ql-toolbar) {
+    color: #111827 !important;
+}
+
+:deep(.dark-theme > .ql-container > .ql-editor.ql-blank::before) {
+    color: #7d7d7d !important;
 }
 </style>

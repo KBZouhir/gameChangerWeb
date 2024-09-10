@@ -19,8 +19,9 @@
                     Home
                   </nuxt-link>
                 </li>
+
                 <UDivider class="pb-2" />
-                <li @click="isOpen = false">
+                <li @click="isOpen = false" v-if="user?.role?.id != 3">
                   <nuxt-link to="/chat" :class="{ 'bg-[#34d399] text-white': $route.path === '/chat' }"
                     class="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 dark:text-white text-gray-600 hover:bg-gray-800 hover:text-white">
                     <Icon name="tabler:message" size="24" />
@@ -94,7 +95,7 @@
                 <div class="text-black dark:text-white">Pages</div>
               </div>
 
-              <ul class="mt-2 -space-y-2 uk-nav" uk-nav="multiple: true">
+              <ul class="mt-2 space-y-2 uk-nav" uk-nav="multiple: true">
                 <li>
                   <a href="setting.html">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -191,7 +192,10 @@ import { registerToken } from '~/composables/store/useApiAuth'
 import { unreadNotificationsCount } from '~/composables/store/useNotifications'
 
 import { useNotificationsStore } from "~/stores/notifications"
+import { useAuthStore } from '~/stores/authStore';
 
+const authStore = useAuthStore();
+const user = computed(() => authStore.getAuthUser);
 
 const showNotification = ref(false)
 const toast = useToast()

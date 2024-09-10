@@ -1,7 +1,9 @@
 <template>
     <UCard :ui="{ body: 'p-0' }"
-        class="overflow-hidden bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4">
-        <div>
+        class="overflow-hidden relative rounded-xl text-sm font-medium dark:shadow-lg shadow-sm"
+        :class="(post?.author.role.id === 3) ? 'p-px bg-gradient-to-br from-green-400 to-[#ffbb0c] ' : ''">
+
+        <div class="w-full p-4 dark:bg-slate-800 bg-white rounded-xl">
             <div class="flex justify-between items-center flex-wrap">
                 <div class="flex items-center space-x-4">
                     <nuxt-link :to="post?.author.id == user?.id
@@ -47,7 +49,7 @@
                 <ImageView v-if="post?.image" :url="`${post?.image.url}`" />
 
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4 mt-4 text-sm">
+                    <div class="flex items-center space-x-4 mt-0 text-sm">
                         <div class="flex items-center">
                             <UPopover mode="hover" :popper="{ placement: 'top-start' }">
                                 <div class="flex items-center space-x-0 font-semibold">
@@ -200,7 +202,51 @@
                                     <h4 class="font-bold">{{ comment.user.full_name }}</h4>
                                     <p>{{ comment.description }}</p>
                                 </div>
-                                <span class="text-xs">{{ $moment(comment.created_at).fromNow() }}</span>
+                                <div class="flex items-center space-x-2">
+                                    <UButton :label="$moment(comment.created_at).fromNow()" size="xs" color="white"
+                                        square variant="link"></UButton>
+                                    <UPopover mode="hover" :popper="{ placement: 'top-start' }">
+                                        <div class="flex items-center space-x-0 font-semibold">
+                                            <div v-if="post?.reaction">
+                                                <UButton v-if="post?.reaction == 1" size="xs" label="Like"
+                                                    color="green" square variant="link" />
+                                                <UButton v-if="post?.reaction == 2" size="xs" label="Love"
+                                                    color="red" square variant="link" />
+                                                <UButton v-if="post?.reaction == 3" size="xs" label="Haha"
+                                                    color="yellow" square variant="link" />
+                                            </div>
+                                            <UButton v-else size="xs" label="Like" @click="togglePostReaction(2)"
+                                                color="white" square variant="link">
+
+                                            </UButton>
+                                        </div>
+
+                                        <template #panel>
+                                            <div class="p-2 flex space-x-2">
+                                                <div class="flex flex-col items-center"
+                                                    v-for="reaction in settings.reaction.type">
+                                                    <UTooltip :text="reaction.label">
+                                                        <UButton size="sm" color="primary" square variant="link">
+                                                            <Icon v-if="reaction.case == 'LIKE'"
+                                                                @click="togglePostReaction(1)"
+                                                                name="tabler:thumb-up-filled" class="text-green-600"
+                                                                size="22" />
+                                                            <Icon v-if="reaction.case == 'LOVE'"
+                                                                @click="togglePostReaction(2)"
+                                                                name="tabler:heart-filled" class="text-red-600"
+                                                                size="22" />
+                                                            <Icon v-if="reaction.case == 'HAHA'"
+                                                                @click="togglePostReaction(3)"
+                                                                name="tabler:mood-smile-filled" class="text-orange-500"
+                                                                size="22" />
+                                                        </UButton>
+                                                    </UTooltip>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </UPopover>
+                                    <UButton label="Reply" size="xs" color="white" square variant="link"></UButton>
+                                </div>
                             </div>
                         </div>
                         <div v-if="comment.mine">
@@ -312,7 +358,7 @@ const selectedComment = ref(null)
 const page = ref(1)
 const loading = ref(false)
 
-const emits = defineEmits(['deletePostFun', 'deletePostFunc'])
+const emits = defineEmits(['deletePostFun'])
 
 
 const schema = z.object({
@@ -423,7 +469,9 @@ const editPostFun = () => {
 }
 
 const deletePostFun = () => {
-    emits('deletePostFunc', props.post);
+    console.log("delete post");
+
+    emits('deletePostFun', props.post);
 }
 
 const reportPostFun = () => {

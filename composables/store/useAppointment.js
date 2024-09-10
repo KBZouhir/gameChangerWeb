@@ -42,7 +42,8 @@ export const bookAppointment = async (payload) => {
     body: payload,
     method: "POST",
   });
-
+  console.log(data);
+  
   return data;
 };
 

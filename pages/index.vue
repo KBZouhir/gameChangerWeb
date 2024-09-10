@@ -109,7 +109,7 @@
                   ">
                   <QuillEditor ref="quillContainer" :class="colorMode.value == 'dark' ? 'dark-theme' : ''"
                     :options="options" theme="bubble" @textChange="onTextChange" v-model:content="content"
-                    contentType="delta" />
+                    contentType="html" />
                   <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                     :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'">
                     {{ charCount }} / {{ maxLength }}
@@ -207,7 +207,7 @@
                   ">
                   <QuillEditor ref="quillContainer" :class="colorMode.value == 'dark' ? 'dark-theme' : ''"
                     :options="options" theme="bubble" @textChange="onTextChange" v-model:content="content"
-                    contentType="delta" />
+                    contentType="html" />
                   <p class="m-0 absolute bottom-2 right-2 text-[8px] font-semibold"
                     :class="charCount >= maxLength ? 'text-red-400' : 'text-slate-400'">
                     {{ charCount }} / {{ maxLength }}
@@ -279,15 +279,7 @@
       <div class="sticky top-100 hidden md:block gap-4">
 
         <div class="card bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4 mb-4">
-          <ClientOnly>
-            <VCalendar ref="calendarRef" expanded color="green" view="weekly" transparent borderless
-              :min-date="new Date()" :value="new Date()" :week-height="100" :show-weeks="1"
-              :is-dark="colorMode.value == 'dark' ? true : false">
-            </VCalendar>
-            <template #fallback>
-              <p>{{ $t('Loading calendar...') }}</p>
-            </template>
-          </ClientOnly>
+          <CalanderWidget />
         </div>
         <div class="card bg-white rounded-xl text-sm font-medium dark:bg-slate-800 mb-4 shadow-sm p-5 px-6">
           <div class="flex justify-between text-black dark:text-white">
@@ -496,7 +488,7 @@ definePageMeta({
 
 const isOpen = ref(false);
 const editPost = ref(false);
-const maxLength = ref(200);
+const maxLength = ref(2000);
 
 const videoContainer = ref();
 
@@ -588,21 +580,21 @@ const onTextChange = ({ delta, oldDelta, source }) => {
   if (charCount.value > maxLength.value) {
     return;
   }
+  
+  // if (source === 'user') {
+  //   const regex = /#(\w+)/g;
+  //   let editor = quillContainer.value;
+  //   let quillInstance = editor.getQuill();
 
-  if (source === 'user') {
-    const regex = /#(\w+)/g;
-    let editor = quillContainer.value;
-    let quillInstance = editor.getQuill();
+  //   const fullText = quillInstance.getText();
 
-    const fullText = quillInstance.getText();
-
-    let match;
-    while ((match = regex.exec(fullText)) !== null) {
-      const startIndex = match.index;
-      const endIndex = startIndex + match[0].length;
-      quillInstance.formatText(startIndex, endIndex, { bold: true, color: '#34d399' }, true);
-    }
-  }
+  //   let match;
+  //   while ((match = regex.exec(fullText)) !== null) {
+  //     const startIndex = match.index;
+  //     const endIndex = startIndex + match[0].length;
+  //     quillInstance.formatText(startIndex, endIndex, { bold: true, color: '#34d399' }, true);
+  //   }
+  // }
 };
 
 const triggerFileInput = () => {
@@ -728,34 +720,46 @@ const isDeltaEmptyOrWhitespace = (delta) => {
   return true;
 }
 
+// const validationData = () => {
+//   errors.value = [];  
+//   if (isDeltaEmptyOrWhitespace(content.value)) {
+//     errors.value.push({ key: "content", value: "Content can not be empty" });
+//   }
+// }
+
 const validationData = () => {
-  errors.value = [];  
-  if (isDeltaEmptyOrWhitespace(content.value)) {
+  if (content.value.replace(/<[^>]*>/g, "").trim() == "") {
     errors.value.push({ key: "content", value: "Content can not be empty" });
   }
 }
 
-const extractHashTagsFromDelta = (delta) => {
-  const hashtags = [];
+// const extractHashTagsFromDelta = (delta) => {
+//   const hashtags = [];
 
-  delta.ops.forEach((op) => {
-    if (op.insert && typeof op.insert === 'string') {
-      const matches = op.insert.match(/#\w+/g);
-      if (matches) {
-        matches.forEach((tag) => hashtags.push(tag.substring(1)));
-      }
-    }
-  });
+//   delta.ops.forEach((op) => {
+//     if (op.insert && typeof op.insert === 'string') {
+//       const matches = op.insert.match(/#\w+/g);
+//       if (matches) {
+//         matches.forEach((tag) => hashtags.push(tag.substring(1)));
+//       }
+//     }
+//   });
 
-  return hashtags;
-};
+//   return hashtags;
+// };
+
+const extractHashTags = (content) => {
+  const textContent = content.replace(/<\/?[^>]+(>|$)/g, "");
+  const hashtags = (textContent.match(/#\w+/g) || []).map((tag) => tag.substring(1));
+  return hashtags || [];
+}
 
 const submitForm = async () => {
   let hashtags = [];
   isLoading.value = true;
   validationData();
 
-  hashtags = extractHashTagsFromDelta(content.value);
+  hashtags = extractHashTags(content.value);
 
   if (errors.value.length > 0) {
     isLoading.value = false;
