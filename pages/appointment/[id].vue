@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-[#f1f5f9] dark:bg-[#0f172a] h-full">
+    <div class="bg-[#f1f5f9] dark:bg-[#0f172a] h-full mx-auto">
         <div class="flex flex-col justify-center items-center max-w-screen-md h-full mx-auto py-4">
             <h2 class="text-2xl font-semibold text-center mb-6">
                 {{ $dayjs(appointment?.begin_at).format('dddd, MMMM D') }}

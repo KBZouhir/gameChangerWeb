@@ -248,6 +248,8 @@ onMounted(() => {
   requestPermission()
 
   $onMessage($messaging, (payload) => {
+    console.log(payload);
+    
     showNotification.value = true
     receivedMessageSound()
     getDataFromApi()

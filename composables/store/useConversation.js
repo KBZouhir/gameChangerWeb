@@ -49,6 +49,8 @@ export const getConversations = async (
 };
 
 export const getOrCreateConversation = async (id, type) => {
+  console.log(id);
+  
   const { data, refresh, error, pending } = await useApi(
     `conversations/get-conversation`,
     {

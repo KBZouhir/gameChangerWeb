@@ -100,15 +100,27 @@
                     <div class="flex items-center justify-between">
                         <p class="flex items-baseline gap-x-1">
                             <span v-if="masterclass?.is_subscribed"
-                                class="text-4xl font-bold tracking-tight dark:text-white"><sup>$</sup>
+                                class="text-4xl font-bold tracking-tight dark:text-white">
                                 {{ masterclass?.price }}
+                                <sup>€</sup>
                             </span>
                             <span v-if="!masterclass?.is_subscribed"
-                                class="text-4xl font-bold tracking-tight dark:text-white"><sup>$</sup>
+                                class="text-4xl font-bold tracking-tight dark:text-white">
                                 {{ masterclass?.subscribers_price }}
+                                <sup>€</sup>
                             </span>
                         </p>
 
+                        <span v-if="masterclass?.places_left > 0 && !masterclass?.is_subscribed" class="font-semibold text-sm" :class="masterclass?.places_left <= 5 ? 'text-red-600' : 'text-green-400'">
+                            {{masterclass?.places_left }} places left
+                        </span>
+                        <span v-else-if="masterclass?.places_left == 0" class="font-semibold text-sm text-red-600">
+                            {{ $t('No places left') }}
+                        </span>
+
+                        <span v-else-if="masterclass?.is_subscribed" class="font-semibold text-sm text-green-400">
+                            {{ $t('Subscribed') }}
+                        </span>
                     </div>
                     <UDivider class="my-2" />
                     <ul role="list" class="space-y-3 text-sm leading-6 dark:text-gray-300 xl:mt-2 flex-1">
@@ -118,12 +130,6 @@
                             <span class="font-bold">{{ $dayjs(masterclass?.date).format('D/M/YYYY hh:mm A') }}</span>
                         </li>
 
-                        <li class="flex items-center gap-x-3">
-                            <Icon name="tabler:users" />
-                            <span>{{ $t('Places left') }} :</span>
-                            <span class="font-bold" :class="masterclass?.places_left <= 5 ? 'text-red-600' : ''">{{
-                                masterclass?.places_left }} / {{ masterclass?.max_attendees }}</span>
-                        </li>
 
                         <li class="flex items-center gap-x-3">
                             <Icon name="tabler:language" />
@@ -145,13 +151,25 @@
                         @click="subscribeUser" label="Subscribe" />
 
                     <UButton block :loading="joinRoomLoading" color="green" size="lg" class="my-4"
-                        v-if="!IsPassed && masterclassStarted && (masterclass?.is_subscribed || masterclass?.is_animator || user.role.id === 3)"
+                        v-if="!IsPassed && (masterclassStarted || countIsDown) && (masterclass?.is_subscribed || masterclass?.is_animator || user.role.id === 3)"
                         @click="joinRoom" label="Join masterclass" />
 
+                        <div v-if="!IsPassed && !countIsDown  && (masterclass?.is_subscribed || user.role.id == 3 )" class="grid grid-cols-3 border-green-400 p-4 rounded-lg text-green-400">
+                            <div class="flex items-start justify-center">
+                                <h4 class="text-3xl font-semibold">{{countdownLabel?.days}}</h4>
+                                <sup class="text-xs">Days</sup>
+                            </div>
 
-                    <UButton block :disabled="true" size="lg"
-                        class="dark:bg-green-500 disabled:dark:bg-green-400 disabled:bg-green-400 text-black bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 my-4"
-                        v-if="!IsPassed && !masterclassStarted" :label="countdownLabel" />
+                            <div class="flex items-start justify-center">
+                                <h4 class="text-3xl font-semibold">{{countdownLabel?.hours}}</h4>
+                                <sup class="text-xs">Hours</sup>
+                            </div>
+
+                            <div class="flex items-start justify-center">
+                                <h4 class="text-3xl font-semibold">{{countdownLabel?.minutes}}</h4>
+                                <sup class="text-xs">Min</sup>
+                            </div>
+                        </div>
 
                     <div v-if="IsPassed" class="flex justify-center mt-4">
                         <UDivider label="Masterclass end" />
@@ -181,11 +199,14 @@ const id = route.params.id
 const masterclass = ref()
 const submitLoading = ref(false)
 const joinRoomLoading = ref(false)
-const countdownLabel = ref('')
+const countdownLabel = ref()
+const countIsDown = ref(false)
 const dayjs = useDayjs()
 const now = ref()
 const videoPlayer = ref(null)
 const user = computed(() => authStore.getAuthUser)
+
+
 
 const { $videojs } = useNuxtApp()
 
@@ -203,8 +224,14 @@ const calculateCountdown = () => {
     const hours = (Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60)) < 0) ? 0 : Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60))
     const minutes = (Math.floor((totalSeconds % (60 * 60)) / 60) < 0) ? 0 : Math.floor((totalSeconds % (60 * 60)) / 60)
     const seconds = (totalSeconds % 60 < 0) ? 0 : totalSeconds % 60
-    countdownLabel.value = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-
+    if(days == 0 && hours == 0 && minutes == 0 && seconds == 0){
+        countIsDown.value = true
+    }
+    countdownLabel.value = {
+        days,
+        hours,
+        minutes
+    }
 }
 
 let countdownInterval;

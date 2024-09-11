@@ -78,10 +78,18 @@
               class="px-6 py-3 text-[#0F1454] dark:disabled:text-emerald-300 dark:text-emerald-400 dark:hover:text-emerald-500 hover:no-underline">
               Previous
             </UButton>
-            <UButton color="green" @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="!allowNext"
-              class="px-10 py-3 ">
-              Next
-            </UButton>
+
+            <div class="flex items-center space-x-4">
+              <nuxt-link to="/">
+                <UButton variant="link" color="green" class="px-10 py-3 ">
+                  Skip
+                </UButton>
+              </nuxt-link>
+              <UButton color="green" @click="activeStep++" v-if="activeStep + 1 != steps" :disabled="!allowNext"
+                class="px-10 py-3 ">
+                Next
+              </UButton>
+            </div>
 
             <UButton :loading="isLoading" color="green" @click="submitForm" v-if="activeStep >= steps - 1"
               class="px-6 py-3 ">

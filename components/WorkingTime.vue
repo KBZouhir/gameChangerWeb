@@ -179,8 +179,8 @@ definePageMeta({
 
 
 onMounted(() => {
-    allowAppointment.value = user.value.settings[0].value.allow
-    meetDuration.value = user.value.settings[0].value.appointment_time
+    allowAppointment.value = user.value?.settings[0].value.allow
+    meetDuration.value = user.value?.settings[0].value.appointment_time
 })
 
 const addRange = (dayIndex) => {

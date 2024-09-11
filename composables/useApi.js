@@ -88,6 +88,8 @@ export const useaSyncApi = async (url, key, options) => {
     () => $fetch(url, {
       baseURL: baseURL,
       onResponseError({ request, response, options }) {
+
+        
         if (response.status === 401) {
           window.location.reload();
         }

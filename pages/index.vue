@@ -41,18 +41,18 @@
 
       <div
         class=" ring-1 relative overflow-hidden ring-gray-200 dark:ring-gray-800 shadow  bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 rounded-xl flex flex-col "
-        v-if="!user.is_completed">
+        v-if="!user.is_completed && user.role.id != 3">
         
         <div class="py-8 px-6">
          
         <div class="grid grid-cols-4 gap-x-8">
           <div class="col-span-1 sm:flex flex-col justify-center hidden">
-            <h2 class="lg:text-6xl sm:text-5xl text-4xl font-bold mb-2">10%</h2>
+            <h2 class="lg:text-6xl sm:text-5xl text-4xl font-bold mb-2">{{calculPercentage}}%</h2>
             <span> of your profile is complete </span>
           </div>
           <div class="col-span-4 sm:col-span-3 flex flex-col">
             <div class="relative p-2 rounded-full w-full bg-slate-100 mb-2">
-              <div class="absolute top-0 left-0 h-full bg-green-400 rounded-l-full" :style="{ width: `40%` }"></div>
+              <div class="absolute top-0 left-0 h-full bg-green-400 rounded-l-full" :style="{ width: `${calculPercentage}%` }"></div>
             </div>
 
             <h2 class="text-xl font-bold my-2">
@@ -535,6 +535,23 @@ const charCount = computed(() => countChars(content.value));
 const user = computed(() => authStore.getAuthUser);
 const settings = computed(() => settingStore.getSettings);
 const posts = computed(() => postStore.getPosts);
+
+const calculPercentage = computed(() => {
+  let percentage = 0;
+  if(user.value.interests.length > 0) {
+    percentage += 33;
+  }
+
+  if(user.value.domains.length > 0) {
+    percentage += 33;
+  }
+
+  if(user.value.address) {
+    percentage += 33;
+  }
+
+  return percentage;
+})
 
 const postHasMedia = computed(() => {
   return videoUrl.value || compressedFiles.value.length > 0 ? true : false;

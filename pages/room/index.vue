@@ -10,10 +10,10 @@
                 <h2 class="text-3xl font-bold text-center mb-4">{{ $t('Thank you for joining the meeting ') }}</h2>
                 <p class="text-blueGray-900 dark:text-slate-300 text-center">{{ $t('Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum has been the industry') }}</p>
 
-                <div class="flex flex-col space-y-4 mt-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                     <UButton @click="joinRoom" block size="lg" color="green">Rejoin to meeting</UButton>
                     <nuxt-link to="/">
-                        <UButton block size="lg" color="red">Back home</UButton>
+                        <UButton size="lg" block variant="outline" color="red">Back home</UButton>
                     </nuxt-link>
                 </div>
             </UCard>

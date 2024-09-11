@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-[#f1f5f9] dark:bg-[#0f172a]">
+    <div class="bg-[#f1f5f9] dark:bg-[#0f172a] mx-auto">
         <div v-if="!selectedAppointment">
             <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
                 <div class="flex justify-between items-center">
@@ -99,16 +99,11 @@
 
                         </div>
                         <div class="flex justify-between items-center">
-
-                            <p> {{ $t('Duration') }}: {{
-                                $dayjs.duration($dayjs(selectedAppointment?.end_at).diff($dayjs(selectedAppointment?.begin_at))).asMinutes()
-                                }} minutes</p>
                             <p>{{ $dayjs(selectedAppointment?.begin_at).format('dddd, MMMM D') }}</p>
                         </div>
                     </div>
                     <nuxt-link :to="`/calendar`">
-                        <UButton block label="Check calendar"
-                            class="dark:bg-emerald-600 disabled:bg-emerald-600 dark:hover:bg-white" color="primary"
+                        <UButton block label="Check calendar" color="green"
                             size="md">
                         </UButton>
                     </nuxt-link>
