@@ -148,7 +148,7 @@ const items = [
 <template>
   <nav>
     <div
-      class="z-30 h-[--m-top] h-24 fixed top-0 left-0 w-full flex items-center bg-white dark:bg-slate-800 border-b border-slate-200 dark:bg-dark dark:border-slate-800 dark:shadow-md shadow-sm">
+      class="z-30 h-[--m-top] h-24 fixed top-0 left-0 w-full flex items-center bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 border-b border-slate-200 dark:bg-dark dark:border-slate-800 dark:shadow-md shadow-sm">
       <div class="relative flex w-full items-center justify-between px-4">
         <div class="flex items-center justify-center space-x-2 sm:items-stretch sm:justify-start">
           <UButton @click="isOpen = true" size="lg" square

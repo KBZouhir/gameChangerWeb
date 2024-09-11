@@ -16,13 +16,18 @@ export default defineNuxtRouteMiddleware(async (to) => {
       return navigateTo("/auth/validation");
     }
   }
-  if (
-    !user.is_completed &&
-    (user.is_email_verified || user.is_phone_verified)
-  ) {
-    if (to.path != "/auth/complete-profile") {
-      abortNavigation();
-      return navigateTo("/auth/complete-profile");
-    }
+
+  if(to.path == "/auth/validation" && (user.is_email_verified || user.is_phone_verified)){
+    return navigateTo("/")
   }
+
+  // if (
+  //   !user.is_completed &&
+  //   (user.is_email_verified || user.is_phone_verified)
+  // ) {
+  //   if (to.path != "/auth/complete-profile") {
+  //     abortNavigation();
+  //     return navigateTo("/auth/complete-profile");
+  //   }
+  // }
 });

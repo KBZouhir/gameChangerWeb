@@ -134,7 +134,7 @@ import greenBlurEffect from '~/assets/img/green-blur-effect.png'
 definePageMeta({
   layout: "validation",
   title: "Login Page",
-  middleware: ['auth', 'valid']
+  middleware: ['auth']
 });
 
 const intrestStore = useInterestsStore();

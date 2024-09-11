@@ -75,10 +75,10 @@ const validationOtp = async () => {
                 type: 'success',
                 text: result?.data.message
             })
-            setTimeout(() => {
-                location.reload();
-            }, 500);
-            // await navigateTo('/auth/complete-profile')
+            // setTimeout(() => {
+            //     location.reload();
+            // }, 500);
+            await navigateTo('/complete-profile')
         } else {
             error.value = true
             const { data } = result

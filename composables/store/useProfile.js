@@ -69,6 +69,29 @@ export const updateDomains = async (payload) => {
   }
 };
 
+export const update = async (payload) => {
+  const authStore = useAuthStore()
+  const { data, refresh, error, pending } = await useApi(`/profile`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+  console.log(data);
+  
+  if (data?.success) {
+    authStore.syncAuthUser(data.user)
+    return {
+      success: true,
+      data: data,
+    };
+  } else {
+    return {
+      success: false,
+      data: error,
+    };
+  }
+};
+
 export const getProfile = async (id) => {
   const authStore = useAuthStore();
   const { data, refresh, error, pending } = await useApi(`/profile/${id}`, {

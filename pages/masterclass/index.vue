@@ -3,39 +3,51 @@
 
         <div class="flex justify-between mb-4">
             <span>
-                {{ $t('Total masterclass') }}: <span class="font-bold">{{ masterClassList?.meta?.total }}</span>
+
             </span>
             <nuxt-link v-if="user?.role.id == 3" :to="`/masterclass/create`">
                 <UButton label="Create" color="green" size="md"></UButton>
             </nuxt-link>
         </div>
 
-        <div class="mx-auto mb-4">
-            <div class="relative isolate overflow-hidden border dark:border-gray-800 bg-gray-900 px-6 py-12 sm:rounded-xl sm:px-8 sm:py-12 lg:py-12 xl:px-12">
-                <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:items-center lg:gap-y-0">
-                    <div class="lg:row-start-2 lg:max-w-md">
-                        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                            {{ masterClassList?.data[0].title }}
-                        </h2>
-                        <p class="mt-6 text-lg leading-8 text-gray-300">
-                            {{ masterClassList?.data[0].short_description }}
-                        </p>
-                    </div>
 
 
-                    <img :src="masterClassList?.data[0].image_url"
-                        alt="Product screenshot"
-                        class="relative -z-20 min-w-full max-w-xl rounded-xl shadow-xl ring-1 ring-white/10 lg:row-span-4 lg:w-[64rem] lg:max-w-none"
-                        width="2432" height="1442">
-
-                    <div class="max-w-xl lg:row-start-3 lg:mt-10 lg:max-w-md lg:border-t lg:border-white/10 lg:pt-10">
-                        
-                    </div>
+        <div
+            class="h-[400px] ring-1 dark:shadow-lg relative ring-gray-200 dark:ring-gray-800 shadow rounded-xl mb-8 bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900    overflow-hidden">
+            <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt=""
+                srcset="" />
+            <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute bottom-0 left-0 rotate-180"
+                alt="" srcset="" />
+            <div class="grid grid-cols-12 h-full">
+                <div class="col-span-5 h-full p-8">
+                    <img class="w-full h-full object-cover rounded-xl"
+                        :src="(masterClassList?.data[0].image_url) ? masterClassList?.data[0].image_url : masterClassList?.data[0].video_thumbnail"
+                        :alt="masterClassList?.data[0].title" srcset="">
                 </div>
-                <div class="pointer-events-none absolute left-12 top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-3xl lg:bottom-[-12rem] lg:top-auto lg:translate-y-0 lg:transform-gpu"
-                    aria-hidden="true">
-                    <div class="aspect-[1155/678] w-[72.1875rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-25"
-                        style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)">
+                <div class="col-span-7 flex flex-col p-8">
+                    <div class="flex-1">
+                        <h1 class="text-2xl font-bold mb-2">{{ masterClassList?.data[3].title }}</h1>
+                        <p class="line-clamp-3">{{ masterClassList?.data[3].short_description }}</p>
+                        <div class="grid grid-cols-4 gap-x-4 my-4">
+                            <div class="flex items-center justify-center ring-1 relative ring-gray-200 dark:ring-gray-800 shadow rounded-xl p-2">
+                                <Icon name="tabler:user" size="46"/>
+                            </div>
+                            <div class="flex items-center justify-center ring-1 relative ring-gray-200 dark:ring-gray-800 shadow rounded-xl p-2">
+
+                            </div>
+                            <div class="flex items-center justify-center ring-1 relative ring-gray-200 dark:ring-gray-800 shadow rounded-xl p-2">
+
+                            </div>
+                            <div class="flex items-center justify-center ring-1 relative ring-gray-200 dark:ring-gray-800 shadow rounded-xl p-2">
+
+                            </div>
+                        </div>
+                    </div>
+                    <UDivider />
+                    <div class="relative flex items-center whitespace-nowrap overflow-hidden py-2">
+                        <UBadge :label="domain.translated_name" :ui="{rounded: 'rounded-full'}" 
+                        color="white" size="xs" class="px-3 mr-1 text-[10px] bg-opacity-75 dark:bg-opacity-75"
+                            v-for="domain in masterClassList?.data[3].domains" />
                     </div>
                 </div>
             </div>
@@ -187,18 +199,6 @@ const fetchMoreMasterClass = async $state => {
         $state.error()
     }
 }
-
-onMounted(() => {
-    setInterval(() => {
-        if (!carouselRef.value) return
-
-        if (carouselRef.value.page === carouselRef.value.pages) {
-            return carouselRef.value.select(0)
-        }
-
-        carouselRef.value.next()
-    }, 3000)
-})
 
 watchEffect(() => {
     getDataFromApi();

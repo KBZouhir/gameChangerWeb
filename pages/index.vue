@@ -40,6 +40,45 @@
       </div>
 
       <div
+        class=" ring-1 relative overflow-hidden ring-gray-200 dark:ring-gray-800 shadow  bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 rounded-xl flex flex-col "
+        v-if="!user.is_completed">
+        
+        <div class="py-8 px-6">
+         
+        <div class="grid grid-cols-4 gap-x-8">
+          <div class="col-span-1 sm:flex flex-col justify-center hidden">
+            <h2 class="lg:text-6xl sm:text-5xl text-4xl font-bold mb-2">10%</h2>
+            <span> of your profile is complete </span>
+          </div>
+          <div class="col-span-4 sm:col-span-3 flex flex-col">
+            <div class="relative p-2 rounded-full w-full bg-slate-100 mb-2">
+              <div class="absolute top-0 left-0 h-full bg-green-400 rounded-l-full" :style="{ width: `40%` }"></div>
+            </div>
+
+            <h2 class="text-xl font-bold my-2">
+              Complete your profile!
+            </h2>
+
+            <p class="text-xs mb-4">
+              To learn more about building a great profile, check out our Braintrust Academy Course and get pro tips on
+              Discord in the "top-notch-profile channel. When you get to 100%, you can apply for jobs and get verified
+              as an
+              Approved Talent!
+            </p>
+
+            <div class="flex items-center justify-between">
+              <nuxt-link to="/complete-profile">
+                <UButton label="Complete Profile" color="green" />
+              </nuxt-link>
+              <UButton label="Why is this important?" color="white" variant="link" />
+            </div>
+          </div>
+        </div>
+        </div>
+        <div class="h-6  bg-[url('~/assets/svg/particules/pattern.svg')]"></div>
+      </div>
+
+      <div
         class="p-4 px-6 ring-1 relative overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-slate-800 rounded-xl flex flex-col space-y-6 ">
         <img src="~/assets/svg/vectors/pattern-rectangle.svg" class="w-12 absolute top-0 right-0" alt="" srcset="" />
         <div>
@@ -580,7 +619,7 @@ const onTextChange = ({ delta, oldDelta, source }) => {
   if (charCount.value > maxLength.value) {
     return;
   }
-  
+
   // if (source === 'user') {
   //   const regex = /#(\w+)/g;
   //   let editor = quillContainer.value;
