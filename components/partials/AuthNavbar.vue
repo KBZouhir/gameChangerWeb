@@ -11,6 +11,8 @@ import { useNotificationsStore } from "~/stores/notifications"
 import { useDayjs } from '#dayjs'
 const dayjs = useDayjs()
 
+const route = useRoute()
+
 const store = useNotificationsStore()
 
 const notifications = computed(() => store.getNotifications)
@@ -19,6 +21,8 @@ const authStore = useAuthStore();
 const user = computed(() => authStore.getAuthUser);
 
 const isOpen = ref(false);
+
+const query = ref(route.query.q)
 
 // watchEffect(() => {
 //     useUser();
@@ -71,6 +75,11 @@ const deleteNotify = async (notification) => {
   if (result?.success) {
     notifications.value.data = notifications.value.data.filter(notify => notify.id !== notification.id);
   }
+}
+
+
+const search = async() => {
+  await navigateTo(`/search?q=${query.value}`)
 }
 
 
@@ -181,7 +190,7 @@ const items = [
                 aria-label="search"></ion-icon>
 
               <!-- <UInput v-model="value"  placeholder="Search Friends, videos .." size="xl"/> -->
-              <input type="text" placeholder="Search Friends, videos .."
+              <input type="text" v-model="query" placeholder="Search Friends, videos .." @keyup.enter="search"
                 class="w-full !pl-10 !font-normal !bg-transparent h-12 !text-sm rounded-full focus:outline-green-400 dark:focus:outline-green-400" />
               <Icon name="tabler:search" size="20" class="absolute top-1/2 -translate-y-1/2 left-3" />
             </div>
@@ -190,32 +199,11 @@ const items = [
 
         <div class="flex items-center space-x-4">
           <div>
-            <UPopover>
-              <UButton :ui="{ rounded: 'rounded-full' }" size="lg" color="green">
+            <UButton :ui="{ rounded: 'rounded-full' }" size="lg" color="green">
                 <template #leading>
                   <Icon name="tabler:plus" />
                 </template>
               </UButton>
-
-              <template #panel>
-                <div class="p-4 space-y-4">
-                  <UButton size="sm" color="green" variant="ghost" block>
-                    <Icon name="tabler:device-tv" />
-                    <span>Masterclass</span>
-                  </UButton>
-                  <UButton size="sm" color="green" variant="ghost" block>
-                    <Icon name="tabler:broadcast" />
-                    <span>Conference</span>
-                  </UButton>
-                  <UButton size="sm" color="green" variant="ghost" block>
-                    <Icon name="tabler:briefcase" />
-                    <span>Services</span>
-                  </UButton>
-                </div>
-              </template>
-            </UPopover>
-
-
           </div>
           <!-- <UButton size="sm" square
                         class="bg-slate-50 hover:bg-slate-100 dark:bg-transparent dark:hover:bg-white/5"
@@ -225,7 +213,7 @@ const items = [
                         </template>
                     </UButton> -->
 
-          <UPopover  :popper="{ placement: 'bottom-end', arrow: true }">
+          <UPopover  :popper="{ placement: 'bottom-end' }">
             <UButton :ui="{ rounded: 'rounded-full' }" size="md" square
               class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
               <template #leading>
@@ -236,7 +224,7 @@ const items = [
             </UButton>
 
             <template #panel>
-              <div class="max-w-[400px] max-h-[500px] overflow-auto pt-0">
+              <div class="w-[400px] max-h-[500px] overflow-auto is-scrollbar-hidden pt-0">
                 <div class="sticky top-0  dark:bg-[#111827] bg-white z-50  pb-2">
                   <div class="flex justify-between items-center p-4">
                     <h2 class="font-bold">{{ $t('Notifications List') }}</h2>
@@ -321,7 +309,7 @@ const items = [
             </template>
           </UPopover>
 
-          <UPopover  :popper="{ placement: 'bottom-end', arrow: true }" v-if="user?.role.id != 3">
+          <UPopover  :popper="{ placement: 'bottom-end'}" v-if="user?.role.id != 3">
             <UButton :ui="{ rounded: 'rounded-full' }" size="md" square
               class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
               <template #leading>
@@ -333,7 +321,7 @@ const items = [
             </UButton>
 
             <template #panel>
-              <div class="max-w-[400px] max-h-[500px] overflow-auto pt-0">
+              <div class="w-[400px] max-h-[500px] is-scrollbar-hidden overflow-auto pt-0">
                 <div class="sticky top-0  dark:bg-[#111827] bg-white z-50  pb-2">
                   <div class="flex justify-between items-center p-4">
                     <h2 class="font-bold">{{ $t('Messages List') }}</h2>

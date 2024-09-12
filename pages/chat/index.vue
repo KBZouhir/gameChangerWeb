@@ -647,6 +647,7 @@ const sendMessage = async () => {
 
 const sendRecordFile = async (id) => {
     let payload = {
+        message:'',
         attachements: {
             0: id
         }

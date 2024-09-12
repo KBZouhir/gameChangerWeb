@@ -268,8 +268,8 @@ async function useUser(key = "me") {
     if (error) {
       console.log(error);
 
-      const authCookie = useCookie("user_access_token");
-      authCookie.value = null;
+      // const authCookie = useCookie("user_access_token");
+      // authCookie.value = null;
 
       authStore.syncAuthUser(null);
     }

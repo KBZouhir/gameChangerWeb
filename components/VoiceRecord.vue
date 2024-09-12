@@ -182,6 +182,8 @@ const toggleRecord = () => {
 }
 
 const sendRocord = async () => {
+  console.log("sendRocord");
+  
   let formdata = new FormData();
   formdata.append("file", recordedBlob.value);
   uploding.value = true

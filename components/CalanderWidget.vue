@@ -15,7 +15,7 @@
             </div>
             <div v-else-if="appointments?.meta.total > 0" class="grid grid-cols-1 gap-4">
                 <div>
-                    <NuxtLink v-for="appointment in appointments?.data" :to="`/appointment/${appointment.id}`">
+                    <NuxtLink v-for="appointment in appointments?.data.splice(2)" :to="`/appointment/${appointment.id}`">
                         <div class="border border-slate-100 dark:border-gray-700 shadow-sm rounded-md px-3 py-4 mb-2">
                             <div class="flex items-start justify-between">
                                 <div>

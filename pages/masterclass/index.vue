@@ -20,8 +20,9 @@
             <USkeleton class="col-span-12 md:col-span-7 flex flex-col p-8"></USkeleton>
         </div>
 
-        <div v-for="(masterclass, index) in masterClassUpcoming" :key="masterclass.id"
-            class="grid md:grid-cols-2 lg:grid-cols-2 grid-cols-1 gap-4 mb-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-2 grid-cols-1 gap-4 mb-8">
+            <template v-for="(masterclass, index) in masterClassUpcoming" :key="masterclass.id">
+            
             <template v-if="index == 0">
                 <nuxt-link class="col-span-2" :to="`/masterclass/${masterclass.id}`">
                     <div
@@ -131,7 +132,7 @@
 
                             <div class="flex-1 pl-4">
                                 <nuxt-link :to="`/masterclass/${masterclass.id}`">
-                                    <p class="line-clamp-3 text-sm min-h-[60px]">
+                                    <p class="line-clamp-3 text-sm min-h-[60px] dark:text-white text-black">
                                         {{ masterclass.short_description }}
                                     </p>
                                 </nuxt-link>
@@ -142,6 +143,7 @@
                     </div>
                 </div>
             </template>
+        </template>
         </div>
 
 
@@ -191,7 +193,7 @@
                     </div>
                     <div
                         class="p-4 border dark:border-gray-800 rounded-b-lg bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900">
-                        <div class="flex items-center space-x-4 divide-x-[1px] divide-slate-700">
+                        <div class="flex items-center space-x-4 divide-x-[1px] dark:divide-slate-700 divide-slate-300">
                             <div
                                 class="w-16 h-16 bg-green-400 text-black rounded-md flex flex-col justify-center items-center">
                                 <p class="text-2xl font-semibold ">{{ $dayjs(masterclass?.date).format('DD') }}</p>
@@ -200,7 +202,7 @@
 
                             <div class="flex-1 pl-4">
                                 <nuxt-link :to="`/masterclass/${masterclass.id}`">
-                                    <p class="line-clamp-3 text-sm min-h-[60px]">
+                                    <p class="line-clamp-3 text-sm min-h-[60px] dark:text-white text-black">
                                         {{ masterclass.short_description }}
                                     </p>
                                 </nuxt-link>

@@ -1,31 +1,29 @@
 <template>
     <div class="w-full px-4 py-4 max-w-screen-xl mx-auto">
         <WorkingTime />
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <ClientOnly>
-                    <VCalendar ref="calendarRef" expanded color="green" @dayclick="selectDay"
-                        @did-move="calendarSwipePage" :attributes="attributes"
-                        :is-dark="$colorMode.value == 'dark' ? true : false"></VCalendar>
-                    <template #fallback>
-                        <p>{{ $t('Loading calendar...') }}</p>
-                    </template>
-                </ClientOnly>
-            </div>
-            <div class="flex flex-col justify-start">
-                <div class="flex items-center justify-between space-x-4 mb-6">
-                    <h1 class="font-bold text-2xl">Appointments</h1>
-                    <h2 class="text-green-400">{{ $t('Appointments for ') }}
-                        <span class="font-semibold">
-                            {{ $dayjs(selectedDay).format("YYYY-MM-DD") }}
-                        </span>
-                    </h2>
+        <div class="flex gap-6">
+            <div class="w-1/2">
+                <div class="sticky top-0">
+                    <ClientOnly>
+                        <VCalendar ref="calendarRef" expanded color="green" @dayclick="selectDay"
+                            @did-move="calendarSwipePage" :attributes="attributes"
+                            :is-dark="$colorMode.value == 'dark' ? true : false"></VCalendar>
+                        <template #fallback>
+                            <p>{{ $t('Loading calendar...') }}</p>
+                        </template>
+                    </ClientOnly>
                 </div>
-                <div v-if="appointments?.data?.length > 0 && !loadingAppointments" class="grid  grid-cols-1 gap-4">
-                    <div>
-                        <NuxtLink v-for="appointment in appointments?.data" :to="`/appointment/${appointment.id}`">
-
-                            <div
+            </div>
+            <div class="w-1/2 flex flex-col justify-start">
+                <div class="flex items-center justify-between space-x-4 mb-6">
+                    <h1 class="font-bold text-2xl">Upcoming Appointments</h1>
+                </div>
+                
+                <div v-if="appointments?.data?.length > 0 && !loadingAppointments" class="grid flex-1 grid-cols-1 gap-4">
+                    <div class="h-full">
+                        <NuxtLink v-for="(appointment, index) in appointments?.data"
+                            :to="`/appointment/${appointment.id}`">
+                            <div v-if="appointmentComming(appointment) && index < 2"
                                 class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
                                 <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
                                     class="w-12 absolute top-0 right-0" alt="" srcset="">
@@ -59,6 +57,15 @@
                                 </div>
                             </div>
                         </NuxtLink>
+
+                        <div v-if="upcomingCount == 0 && !loadingAppointments"
+                            class="flex flex-1 flex-col items-center justify-center py-4">
+                            <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false"
+                                alt="" srcset="">
+                            <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg"
+                                draggable="false" alt="" srcset="">
+                            <h2 class="font-semibold text-lg">{{ $t('No Upcoming Appointments') }}</h2>
+                        </div>
                     </div>
                     <div class="col-span-2 text-center">
                         <InfiniteLoading @infinite="fetchMoreAppointments">
@@ -73,6 +80,8 @@
                         </InfiniteLoading>
                     </div>
                 </div>
+
+
 
                 <div v-if="appointments?.data?.length == 0 && !loadingAppointments"
                     class="flex flex-1 flex-col items-center justify-center py-4">
@@ -113,6 +122,106 @@
 
             </div>
         </div>
+        <div class="w-full flex flex-col justify-start mt-6">
+            <div class="flex items-center justify-between space-x-4 mb-6">
+                <h1 class="font-bold text-2xl">Appointments</h1>
+                <h2 class="text-green-400">{{ $t('Appointments for ') }}
+                    <span class="font-semibold">
+                        {{ $dayjs(selectedDay).format("YYYY-MM-DD") }}
+                    </span>
+                </h2>
+            </div>
+            <div v-if="appointments?.data?.length > 0 && !loadingAppointments" class="grid grid-cols-2  gap-4">
+                <div v-for="appointment in appointments?.data">
+                    <NuxtLink :to="`/appointment/${appointment.id}`">
+
+                        <div
+                            class="p-4 px-6 ring-1 relative cursor-pointer hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
+                            <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                                class="w-12 absolute top-0 right-0" alt="" srcset="">
+                            <div class="flex items-start justify-between mt-1">
+                                <div class="flex items-center space-x-4">
+                                    <nuxt-link :to="`profile/${appointment.user.id}`">
+                                        <UAvatar
+                                            :src="(appointment.user.id == user.id) ? appointment.requester.image_url : appointment.user.image_url"
+                                            :alt="(appointment.user.id == user.id) ? appointment.requester.full_name : appointment.user.full_name"
+                                            size="md" />
+                                    </nuxt-link>
+
+                                    <div class="flex flex-col">
+                                        <h4 class="font-bold mb-0">{{ (appointment.user.id == user.id) ?
+                                            appointment.requester.full_name : appointment.user.full_name }}</h4>
+                                        <span class="text-xs -mt-[0.5px]">
+                                            {{ convertTo12HourFormat(appointment.begin_at) }} - {{
+                                                convertTo12HourFormat(appointment.end_at) }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <span :class="badgeType(appointmentStatus(appointment))"
+                                    class="inline-flex items-center rounded-md capitalize  px-2 py-1 text-xs font-medium  ring-1 ring-inset ">
+                                    {{ appointmentStatus(appointment) }}
+                                </span>
+
+                            </div>
+
+                            <div class="">
+                                {{ appointment.description }}
+                            </div>
+                        </div>
+                    </NuxtLink>
+                </div>
+                <div class="col-span-2 text-center">
+                    <InfiniteLoading @infinite="fetchMoreAppointments">
+                        <template #spinner>
+                            <div class="flex justify-center w-full">
+                                <LoadingIcon />
+                            </div>
+                        </template>
+                        <template v-if="appointments?.data.length > 0" #complete>
+                            <span></span>
+                        </template>
+                    </InfiniteLoading>
+                </div>
+            </div>
+
+            <div v-if="appointments?.data?.length == 0 && !loadingAppointments"
+                class="flex flex-1 flex-col items-center justify-center py-4">
+                <img class="flex dark:hidden mx-auto" src="~/assets/svg/vectors/empty.svg" draggable="false" alt=""
+                    srcset="">
+                <img class="hidden dark:flex mx-auto" src="~/assets/svg/vectors/empty-white.svg" draggable="false"
+                    alt="" srcset="">
+                <h2 class="font-semibold text-2xl">{{ $t('No Appointments for this date') }}</h2>
+            </div>
+
+            <div v-if="loadingAppointments" class="my-4">
+                <div class="grid  grid-cols-1 gap-4">
+                    <div v-for="i in 2"
+                        class="p-4 px-6 ring-1 relative hover:shadow-lg ease-in-out duration-150 transition-all overflow-hidden ring-gray-200 dark:ring-gray-800 shadow bg-white dark:bg-gray-900 rounded-xl flex flex-col space-y-6 mb-4">
+                        <img src="~/assets/svg/vectors/pattern-rectangle.svg" draggable="false"
+                            class="w-12 absolute top-0 right-0" alt="" srcset="">
+                        <div class="flex items-start justify-between mt-1">
+                            <div class="flex items-center space-x-4">
+                                <USkeleton class="h-12 w-12" :ui="{ rounded: 'rounded-full' }" />
+
+                                <div class="flex flex-col">
+                                    <USkeleton class="h-4 w-[100px] mb-4" />
+                                    <span class="flex space-x-2 text-xs -mt-[0.5px]">
+                                        <USkeleton class="h-2 w-[80px]" />
+                                    </span>
+                                </div>
+                            </div>
+                            <USkeleton class="h-6 w-[70px]" />
+                        </div>
+
+                        <div class="">
+                            <USkeleton class="h-4 w-full mb-2" />
+                            <USkeleton class="h-4 w-2/3" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 </template>
 
@@ -127,6 +236,7 @@ const selectedDay = ref(new Date())
 const appointments = ref([])
 const authStore = useAuthStore()
 
+const upcomingCount = ref(0)
 
 
 const maxDate = computed(() => {
@@ -296,6 +406,19 @@ const fetchMoreAppointments = async $state => {
     } catch (error) {
         $state.error()
     }
+}
+
+
+const appointmentComming = (appointment) => {
+
+    const dayjs = useDayjs()
+    const now = dayjs();
+    const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const appointmentDate = dayjs.utc(appointment?.begin_at).tz(localTimezone)
+
+    if (appointmentDate.isAfter(now)) { upcomingCount.value++ }
+    return appointmentDate.isAfter(now)
+
 }
 
 if (calendarRef.value) {

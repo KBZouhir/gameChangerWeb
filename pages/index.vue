@@ -103,6 +103,12 @@
             </template>
           </UButton>
 
+          <UButton style="position: fixed;top: 14px;z-index: 999;right: 173px;" @click="isOpen = true" label="" :ui="{ rounded: 'rounded-full' }" size="xl" color="green">
+            <template #leading>
+              <Icon name="tabler:plus" />
+            </template>
+          </UButton>
+
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto w-full max-w-screen-xl px-2 py-8">
     <div class="col-span-6 col-span-12 lg:col-span-6 mb-4">
-      <div
+      <!-- <div
         class="mb-4 ring-1 ring-gray-200 dark:ring-gray-800 bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4 p-8 bg-gradient-to-r from-green-500 to-yellow "
       >
         <div class="flex flex-col justify-between gap-y-16 sm:flex-row sm:gap-y-0">
@@ -21,36 +21,53 @@
             </div>
           </div>
         </div>
+      </div> -->
+      <div class="mx-auto max-w-7xl ">
+        <div
+          class="relative border dark:border-slate-800 isolate overflow-hidden bg-gradient-to-br dark:from-slate-800 dark:to-slate-800 px-6 pt-8 dark:shadow-2xl sm:rounded-xl sm:px-8 md:pt-16 lg:flex lg:gap-x-20 lg:px-16 lg:pt-0">
+          <svg viewBox="0 0 1024 1024"
+            class="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] sm:left-full sm:-ml-80 lg:left-1/2 lg:ml-0 lg:-translate-x-1/2 lg:translate-y-0"
+            aria-hidden="true">
+            <circle cx="512" cy="512" r="512" fill="url(#759c1415-0410-454c-8f7c-9a820de03641)" fill-opacity="0.7" />
+            <defs>
+              <radialGradient id="759c1415-0410-454c-8f7c-9a820de03641">
+                <stop stop-color="#0f1454" />
+                <stop offset="1" stop-color="#34d399" />
+              </radialGradient>
+            </defs>
+          </svg>
+          <div class="mx-auto max-w-md text-center lg:mx-0 lg:flex-auto lg:py-32 lg:text-left">
+            <h2 class="text-3xl font-bold tracking-tight text-black dark:text-white sm:text-4xl">Services</h2>
+            <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300"> Lorem ipsum dolor sit amet, consectetur
+              adipiscing elit. Si longus, levis
+              dictata sunt. Quare attende, quaeso</p>
+
+          </div>
+          <div class="relative mt-16 h-80 lg:mt-8">
+            <img class="absolute left-0 top-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
+              src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png" alt="App screenshot"
+              width="1824" height="1080">
+          </div>
+        </div>
       </div>
     </div>
     <div>
       <p class="text-2xl font-bold mb-4">Services by game changer</p>
       <UCarousel v-slot="{ item }" arrows :items="items">
-        <UCard
-          :ui="{ body: 'p-0' }"
+        <UCard :ui="{ body: 'p-0' }"
           class="overflow-hidden bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4 w-64 mr-2"
-          v-for="(service, index) in services?.data?.slice().reverse()"
-        >
+          v-for="(service, index) in services?.data?.slice().reverse()">
           <div class="relative">
             <nuxt-link :to="`/services/details/${service?.id}`">
-              <div
-                :class="`relative h-32 rounded-lg bg-cover`"
-                :style="`background-image:url('${service.image_url}')`"
-              ></div>
+              <div :class="`relative h-32 rounded-lg bg-cover`" :style="`background-image:url('${service.image_url}')`">
+              </div>
             </nuxt-link>
 
             <div class="absolute -bottom-3 right-1 flex justify-end">
-              <UBadge
-                color="primary"
-                size="xs"
-                class="px-4   border border-white"
-                :ui="{
-                  rounded: 'rounded-full',
-                }"
-              >
-                <span v-if="service.price" class="capitalize text-white"
-                  >{{ service.price }} €</span
-                >
+              <UBadge color="primary" size="xs" class="px-4   border border-white" :ui="{
+                rounded: 'rounded-full',
+              }">
+                <span v-if="service.price" class="capitalize text-white">{{ service.price }} €</span>
                 <span class="capitalize text-white" v-else>Estimate</span>
               </UBadge>
             </div>
@@ -58,12 +75,8 @@
           <div class="">
             <div class="flex items-center space-x-2  my-2 mt-4">
               <nuxt-link :to="`/profile/${service?.user.id}`">
-                <UAvatar
-                  :src="service.user.image_url"
-                  :alt="service.user.full_name"
-                  size="xs"
-                  class="dark:bg-gray-600"
-                />
+                <UAvatar :src="service.user.image_url" :alt="service.user.full_name" size="xs"
+                  class="dark:bg-gray-600" />
               </nuxt-link>
 
               <div class="flex flex-col">
@@ -78,16 +91,14 @@
                 <h3 class="text-md font-medium truncate mb-1">
                   {{ service?.title }}
                 </h3>
-                <div
-                  class="text-xs font-light text-slate-600 dark:text-gray-400 line-clamp-1"
-                >
+                <div class="text-xs font-light text-slate-600 dark:text-gray-400 line-clamp-1">
                   {{ service?.description }}
                 </div>
               </nuxt-link>
             </div>
           </div>
         </UCard>
-        
+
       </UCarousel>
     </div>
     <div class="flex  justify-between my-6">
@@ -99,31 +110,21 @@
       </nuxt-link>
     </div>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4">
-      <UCard
-        :ui="{ body: 'p-0' }"
+      <UCard :ui="{ body: 'p-0' }"
         class="overflow-hidden bg-white rounded-xl text-sm font-medium dark:bg-slate-800 shadow-sm p-4"
-        v-for="(service, index) in services?.data"
-      >
+        v-for="(service, index) in services?.data">
         <div class="relative">
           <nuxt-link :to="`/services/details/${service?.id}`">
-            <div
-              :class="`relative h-64 rounded-lg bg-cover`"
-              :style="`background-image:url('${service.image_url}')`"
-            ></div>
+            <div :class="`relative h-64 rounded-lg bg-cover`" :style="`background-image:url('${service.image_url}')`">
+            </div>
           </nuxt-link>
 
           <div class="absolute top-3 right-3 flex justify-end">
-            <UBadge
-              color="primary"
-              size="md"
-              class="px-4 z-20 bg-opacity-75 dark:bg-opacity-75 border border-white"
+            <UBadge color="primary" size="md" class="px-4 z-20 bg-opacity-75 dark:bg-opacity-75 border border-white"
               :ui="{
                 rounded: 'rounded-full',
-              }"
-            >
-              <span v-if="service.price" class="capitalize text-white"
-                >{{ service.price }} €</span
-              >
+              }">
+              <span v-if="service.price" class="capitalize text-white">{{ service.price }} €</span>
               <span class="capitalize text-white" v-else>Estimate</span>
             </UBadge>
           </div>
@@ -131,12 +132,7 @@
         <div class="">
           <div class="flex items-center space-x-4 my-4">
             <nuxt-link :to="`/profile/${service?.user.id}`">
-              <UAvatar
-                :src="service.user.image_url"
-                :alt="service.user.full_name"
-                size="sm"
-                class="dark:bg-gray-600"
-              />
+              <UAvatar :src="service.user.image_url" :alt="service.user.full_name" size="sm" class="dark:bg-gray-600" />
             </nuxt-link>
 
             <div class="flex flex-col">
@@ -159,16 +155,10 @@
           </div>
 
           <div class="relative flex items-center whitespace-nowrap overflow-hidden">
-            <UBadge
-              :label="domain.translated_name"
-              :ui="{
-                rounded: 'rounded-full',
-              }"
-              color="white"
-              size="xs"
-              class="px-3 m-0.5 text-[10px] bg-opacity-75 dark:bg-opacity-75"
-              v-for="domain in service.domains"
-            />
+            <UBadge :label="domain.translated_name" :ui="{
+              rounded: 'rounded-full',
+            }" color="white" size="xs" class="px-3 m-0.5 text-[10px] bg-opacity-75 dark:bg-opacity-75"
+              v-for="domain in service.domains" />
           </div>
         </div>
       </UCard>

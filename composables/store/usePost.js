@@ -1,14 +1,26 @@
 import { useApi } from "~/composables/useApi";
 import { usePostStore } from "~/stores/posts";
 
-const index = async () => {
+const index = async (query = "") => {
   let store = usePostStore();
-  const { data, refresh, error, pending } = await useApi(`/posts`, {
+  const { data, refresh, error, pending } = await useApi(`/posts?search=${query}`, {
     initialCache: false,
     method: "GET",
   });
   if (data) {
     store.setPosts(data)
+  }
+};
+
+
+const search = async (query = "") => {
+  let store = usePostStore();
+  const { data, refresh, error, pending } = await useApi(`/posts?search=${query}`, {
+    initialCache: false,
+    method: "GET",
+  });
+  if (data) {
+    return data
   }
 };
 
@@ -110,4 +122,4 @@ const getPaginationsComments = async (url) => {
   return data
 };
 
-export { index, create, update ,deletePost, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments };
+export { index, create, update ,search ,deletePost, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments };

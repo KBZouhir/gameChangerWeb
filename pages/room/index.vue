@@ -8,7 +8,9 @@
                 <img class="mx-auto mb-8 flex dark:hidden " src="~/assets/svg/vectors/alert.svg" />
                 <img class="mx-auto mb-8 hidden dark:flex " src="~/assets/svg/vectors/alert-white.svg" />
                 <h2 class="text-3xl font-bold text-center mb-4">{{ $t('Thank you for joining the meeting ') }}</h2>
-                <p class="text-blueGray-900 dark:text-slate-300 text-center">{{ $t('Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum has been the industry') }}</p>
+                <p class="text-blueGray-900 dark:text-slate-300 text-center">{{ 
+                    $t('Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum has been the industry') }}
+                </p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                     <UButton @click="joinRoom" block size="lg" color="green">Rejoin to meeting</UButton>
@@ -36,6 +38,7 @@ const IFRAME_OPTIONS = {
 };
 
 const route = useRoute()
+const snackbar = useSnackbar()
 // Reactive state
 const status = ref("home");
 const callFrame = ref(null);
@@ -82,12 +85,20 @@ const joinRoom = () => {
             if (participant.owner) {
                 callFrame.value.updateParticipant(participant.session_id, {
                     updatePermissions: {
-                        canSend: new Set(['video', 'audio']),  
+                        canSend: new Set(['video', 'audio']),
+                        canAdmin: new Set(['participants', 'streaming','transcription']),
+                    }
+                })
+            }else{
+                callFrame.value.updateParticipant(participant.session_id, {
+                    updatePermissions: {
                         hasPresence: false,
-                        canAdmin: new Set(['participants', 'streaming']),
                     }
                 })
             }
+
+            console.log(participant)
+
         })
     }
 
@@ -97,23 +108,35 @@ const joinRoom = () => {
 
     }
 
+    const participantLeft = (e) => {
+        console.log('participantLeft ', e)
+        snackbar.add({
+            type: 'error',
+            text: `${e.participant.user_name} left the meeting` 
+        })
+    }
+
     const participantJoined = (e) => {
         console.log('participantJoined ', e)
+        snackbar.add({
+            type: 'success',
+            text: `${e.participant.user_name} joined the meeting` 
+        })
     }
 
     const raiseHand = () => {
         let ps = callFrame.value.participants();
-            
 
-            Object.keys(ps).forEach(p => {
-                let participant = ps[p];
+
+        Object.keys(ps).forEach(p => {
+            let participant = ps[p];
             console.log(participant);
-            
-                if (participant.owner) {
-                    return;
-                }
 
-            });
+            if (participant.owner) {
+                return;
+            }
+
+        });
     }
 
     const leaveCall = () => {
@@ -137,7 +160,7 @@ const joinRoom = () => {
         .on("joined-meeting", joinedMeeting)
         .on("left-meeting", leaveCall)
         .on("participant-joined", participantJoined)
-        .on("participant-left", updateParticipants)
+        .on("participant-left", participantLeft)
 
     frame.join({ url: roomLink, token: token, showFullscreenButton: true, showLeaveButton: true });
 
@@ -146,7 +169,7 @@ const joinRoom = () => {
 onBeforeUnmount(() => {
 
 })
-    
+
 
 
 </script>

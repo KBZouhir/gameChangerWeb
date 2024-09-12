@@ -178,6 +178,42 @@
       </div>
     </div>
 
+    <div class="h-16 block md:hidden w-full bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 border-t border-slate-200 dark:bg-dark dark:border-slate-800 dark:shadow-md shadow-sm fixed bottom-0">
+        <div class="flex items-center justify-between h-full px-8">
+          <UButton size="sm" variant>
+            <template #leading>
+              <Icon name="tabler:home" size="24" />
+            </template>
+          </UButton>
+
+          <UButton size="sm" variant>
+            <template #leading>
+              <Icon name="tabler:briefcase" size="24" />
+            </template>
+          </UButton>
+
+
+          <UButton class="relative flex justify-center items-center  -mt-16 w-14 h-14" @click="isOpen = true" label="" :ui="{ rounded: 'rounded-full' }" size="xl" color="green">
+            <template #leading>
+              <Icon name="tabler:plus" />
+            </template>
+          </UButton>
+
+
+          <UButton size="sm" variant>
+            <template #leading>
+              <Icon name="tabler:device-tv" size="24" />
+            </template>
+          </UButton>
+
+          <UButton size="sm" variant>
+            <template #leading>
+              <Icon name="tabler:broadcast" size="24" />
+            </template>
+          </UButton>
+        </div>
+    </div>
+
     <UNotifications v-if="showNotification" class="z-20" />
     <!-- <img class="absolute top-0 right-0 z-10" :src="yellowBlurEffect" alt="" srcset=""> -->
   </div>

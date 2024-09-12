@@ -50,9 +50,9 @@
                         <div class="grid md:grid-cols-2 gap-4 my-4" v-if="item.key === 'animator'">
                             <UCard class="relative" :ui="{ body: 'p-0' }" v-for="animator in masterclass?.animators ">
                                 <div class="h-44 overflow-hidden relative">
-                                    <img :src="fallbackImage" alt="" class="rounded-tr-lg rounded-tl-lg" srcset="">
+                                    <img :src="fallbackImage" alt="" class="rounded-tr-lg rounded-tl-lg h-full object-cover" srcset="">
                                     <div
-                                        class="absolute top-0 left-0 bg-gradient-to-t from-black/80 to-transparent  opacity-80 w-full h-full">
+                                        class="absolute top-0 left-0 bg-gradient-to-t from-black to-transparent  opacity-80 w-full h-full">
                                     </div>
                                 </div>
                                 <div class="p-4 -mt-16 flex items-center space-x-4 z-50 relative">

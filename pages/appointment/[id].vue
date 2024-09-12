@@ -156,21 +156,21 @@
                 <div v-if="appointmentStatus(appointment) == 'waiting' && !appointment.is_requested_by_me && readyTojoin && !readyTojoinLive"
                     class="grid grid-cols-2 space-x-2">
                     <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
-                    <UButton @click="startAppointmentFun" :loading="joinLoading" block label="Start" color="green" size="lg" />
+                    <UButton @click="startAppointmentFun" :loading="joinLoading" block label="Start" color="green"
+                        size="lg" />
                 </div>
 
                 <!-- requster join or cancel -->
                 <div v-if="appointmentStatus(appointment) == 'waiting' && appointment.is_requested_by_me && readyTojoin"
                     class="grid grid-cols-2 space-x-2">
                     <UButton @click="cancelAppointmentModal = true" block label="Cancel" color="red" size="lg" />
-                    <UButton @click="acceptAppointmentFun" block label="Start" color="green"
-                        size="lg" />
+                    <UButton @click="acceptAppointmentFun" block label="Start" color="green" size="lg" />
                 </div>
 
                 <!-- Room Started -->
-                <div v-if="readyTojoinLive"
-                    class="grid grid-cols-1 space-x-2">
-                    <UButton @click="startAppointmentFun" :loading="joinLoading" block label="Start" color="green" size="lg" />
+                <div v-if="readyTojoinLive" class="grid grid-cols-1 space-x-2">
+                    <UButton @click="startAppointmentFun" :loading="joinLoading" block label="Start" color="green"
+                        size="lg" />
                 </div>
 
             </div>
@@ -226,7 +226,7 @@
                         <div class="grid grid-cols-2 space-x-2">
                             <UButton @click="cancelAppointmentModal = false" variant="link" block label="Cancel"
                                 :color="$colorMode.value == 'dark' ? 'green' : 'primary'" size="lg" />
-                            <UButton @click="cancelAppointmentFun" block label="Confirm" color="red" size="lg" />
+                            <UButton @click="cancelAppointmentFun" :loading="isLoading" block label="Confirm" color="red" size="lg" />
                         </div>
                     </template>
                 </UCard>
@@ -239,6 +239,9 @@
 import { getAppointment, acceptAppointment, rejectAppointment, cancelAppointment, startAppointment } from '~/composables/store/useAppointment'
 import { handleApiError } from '~/composables/useApiError'
 import { useAuthStore } from "~/stores/authStore"
+
+const { $messaging, $onMessage } = useNuxtApp()
+
 
 const authStore = useAuthStore()
 const appointment = ref()
@@ -255,6 +258,8 @@ const targetDate = ref()
 const readyTojoin = ref(false)
 const readyTojoinLive = ref(false)
 const joinLoading = ref(false)
+const isLoading = ref(false)
+
 
 let interval
 
@@ -284,8 +289,8 @@ const appointmentLive = () => {
 
 
 const canJoin = () => {
-    
-    if (appointment.value?.room_opened_at && appointment.value?.status == 1 && appointmentLive()){
+
+    if (appointment.value?.room_opened_at && appointment.value?.status == 1 && appointmentLive()) {
         readyTojoinLive.value = true
     }
 }
@@ -425,10 +430,14 @@ const rejectAppointmentFun = async () => {
 
 const cancelAppointmentFun = async () => {
     const data = { rejected_reason: cancel_reason.value }
-
+    isLoading.value = true
     const result = await cancelAppointment(appointment.value?.id, data)
+    isLoading.value = false
     if (result.success) {
-        appointment.value = result?.appointment
+        appointment.value.rejected_reason = result?.appointment.rejected_reason
+        appointment.value.status = result?.appointment.status
+        appointment.value.room_closed_at = result?.appointment.room_closed_at
+        appointment.value.room_opened_at = result?.appointment.room_opened_at
     } else {
         if (result.error.statusCode == 422) {
             const error = handleApiError(result.error);
@@ -443,7 +452,7 @@ const startAppointmentFun = async () => {
     const result = await startAppointment(id)
     joinLoading.value = false
     console.log(result);
-    
+
     if (result?.success) {
         await navigateTo(
             {
@@ -454,10 +463,10 @@ const startAppointmentFun = async () => {
                 }
             }
         )
-    }else{
-        const {data} = result.data
+    } else {
+        const { data } = result.data
         console.log(data.message);
-        
+
         snackbar.add({
             type: 'error',
             text: data.message
@@ -473,7 +482,23 @@ onMounted(() => {
         canJoin()
     }, 1000);
 
-    console.log('appointmentLive',appointmentLive());
+
+    $onMessage($messaging, (payload) => {
+        console.log(payload.data.notification_type);
+        
+        if(payload.data.notification_type == 3){
+            const parsedData = JSON.parse(payload.data.data);
+            console.log(parsedData.appointment);
+            console.log(parsedData);
+            
+            appointment.value.rejected_reason = parsedData.appointment.rejected_reason
+            appointment.value.status = parsedData.appointment.status
+            appointment.value.room_closed_at = parsedData.appointment.room_closed_at
+            appointment.value.room_opened_at = parsedData.appointment.room_opened_at
+        }
+    })
+
+    console.log('appointmentLive', appointmentLive())
 });
 
 watchEffect(() => {
