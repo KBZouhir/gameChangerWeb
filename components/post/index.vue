@@ -48,7 +48,7 @@
             <div>
                 <ImageView v-if="post?.image" :url="`${post?.image.url}`" />
 
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between mt-4">
                     <div class="flex items-center space-x-4 mt-0 text-sm">
                         <div class="flex items-center">
                             <UPopover mode="hover" :popper="{ placement: 'top-start' }">
@@ -106,10 +106,13 @@
                                 }}</span>
                         </UButton>
                     </div>
-                    <UButton @click="shareLink()" size="sm" color="primary" square variant="link"
+                    <div class="flex items-center space-x-4 mt-0 text-sm">
+                        <UButton @click="shareLink()" size="sm" color="primary" square variant="link"
                         class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
                         <Icon name="tabler:share-3" class="dark:text-white text-primary" size="22" />
                     </UButton>
+                    
+                     </div>   
                 </div>
             </div>
         </div>
@@ -182,6 +185,7 @@
     <UModal v-model="showComments">
         <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
             <template #header>
+                
                 <div v-if="postCommnets">
                     <span class="text-sm">{{ postCommnets.meta.total }} Comment'(s)</span>
                 </div>
@@ -501,10 +505,19 @@ const sendReport = async () => {
 
 const shareLink = () => {
     const url = `${window.location.origin}/post/${props.post?.id}`
-    navigator.clipboard.writeText(url)
-    snackbar.add({
-        type: 'success',
-        text: 'Link copied to clipboard',
+    navigator.share({
+        title: 'Share Post',
+        text: 'Check out this post',
+        url: url,
+    })
+}
+
+const copyLink = () => {
+    const url = `${window.location.origin}/post/${props.post?.id}`
+    navigator.share({
+        title: 'Share Post',
+        text: 'Check out this post',
+        url: url,
     })
 }
 

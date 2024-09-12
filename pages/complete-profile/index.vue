@@ -30,7 +30,7 @@
                             things in common.
                         </p>
                         <div class="min-h-[400px]">
-                            <SelectDomain v-model="formData.domains" />
+                            <SelectDomain v-model="formData.domains" :domains="formData.domains"/>
                         </div>
                     </div>
 
@@ -84,7 +84,7 @@
                             Next
                         </UButton>
 
-                        <UButton :loading="isLoading" color="green" @click="submitForm" v-if="activeStep >= steps - 1"
+                        <UButton :loading="isLoading" color="green" @click="submitStep()" v-if="activeStep >= steps - 1"
                             class="px-6 py-3 ">
                             Finish
                         </UButton>
@@ -202,10 +202,22 @@ const submitStep = async () => {
         }
     }
 
+    if (activeStep.value == 2) {
+        payload = {
+            address: formData.address
+        }
+        payload.address.lat = payload.address.lat.toString()
+        payload.address.lon = payload.address.lon.toString()
+    }
+
     isLoading.value = true;
     const result = await update(payload);
     if (result.success) {
-        activeStep.value++
+        if(activeStep.value == 2){
+            await navigateTo('/')
+        }else{
+            activeStep.value++
+        }
     }
     isLoading.value = false;
 

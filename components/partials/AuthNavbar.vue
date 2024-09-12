@@ -4,6 +4,8 @@ import { useAuthStore } from "~/stores/authStore";
 import { getNotifications, markAsRead, deleteNotification, markAllAsRead } from '~/composables/store/useNotifications'
 import userImage from '~/assets/svg/icons/user.svg'
 import userWhite from '~/assets/svg/icons/user-white.svg'
+import bell from '~/assets/svg/vectors/bell.svg'
+import bellWhite from '~/assets/svg/vectors/bell-white.svg'
 
 import { useNotificationsStore } from "~/stores/notifications"
 import { useDayjs } from '#dayjs'
@@ -298,6 +300,15 @@ const items = [
                   </li>
                 </ul>
 
+                <div v-if="notifications?.data?.length == 0"
+                class="flex flex-col justify-center items-center space-y-2 mb-8">
+                <ClientOnly>
+                    <img :src="$colorMode.value == 'dark' ? bellWhite : bell" alt="" srcset="">
+                    <h2 class="font-semibold text-xl uppercase">{{ $t('No notifications') }}</h2>
+                </ClientOnly>
+
+            </div>
+
                 <div class="flex justify-center items-center mb-4">
                   <nuxt-link to="/notifications">
                     <UButton  size="md" color="green" variant="outline" label="All notifications"
@@ -310,12 +321,7 @@ const items = [
             </template>
           </UPopover>
 
-
-
-
-
-
-          <nuxt-link v-if="user?.role.id != 3" to="/chat">
+          <UPopover  :popper="{ placement: 'bottom-end', arrow: true }" v-if="user?.role.id != 3">
             <UButton :ui="{ rounded: 'rounded-full' }" size="md" square
               class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
               <template #leading>
@@ -325,7 +331,46 @@ const items = [
                   " />
               </template>
             </UButton>
-          </nuxt-link>
+
+            <template #panel>
+              <div class="max-w-[400px] max-h-[500px] overflow-auto pt-0">
+                <div class="sticky top-0  dark:bg-[#111827] bg-white z-50  pb-2">
+                  <div class="flex justify-between items-center p-4">
+                    <h2 class="font-bold">{{ $t('Messages List') }}</h2>
+                  </div>
+                  <UDivider label="" />
+                </div>
+
+                <usersConvertions/>
+
+                
+
+                <div class="flex justify-center items-center mb-4">
+                  <nuxt-link to="/chat">
+                    <UButton  size="md" color="green" variant="outline" label="All messages"
+                    class="hover:no-underline hover:bg-green-500/5" :trailing="false">
+                    
+                  </UButton>
+                  </nuxt-link>
+                </div>
+              </div>
+            </template>
+          </UPopover>
+
+
+
+
+          <!-- <nuxt-link v-if="user?.role.id != 3" to="/chat">
+            <UButton :ui="{ rounded: 'rounded-full' }" size="md" square
+              class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-white/5">
+              <template #leading>
+                <Icon name="tabler:message" size="20" :class="$route.path === '/chat'
+                  ? 'text-[#34d399]'
+                  : 'text-[#0f1454] dark:text-white'
+                  " />
+              </template>
+            </UButton>
+          </nuxt-link> -->
           <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
             :popper="{ placement: 'bottom-start' }">
             <div

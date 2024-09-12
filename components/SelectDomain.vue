@@ -107,6 +107,7 @@ const domainLoading = ref(false)
 const isOpen = ref(false)
 const selectedDomains = ref([])
 const selectedSector = ref([])
+const selectedSectors = ref([])
 const showDomains = ref(false)
 const selectedViewDomains = ref([])
 
@@ -117,12 +118,14 @@ const props = defineProps(['domains']);
 
 
 onMounted(() => {
+    console.log(props.domains);
+    
     if (props.domains && props.domains.length > 0) {
         selectedViewDomains.value = props.domains
         selectedDomains.value = [...props.domains]
         props.domains.forEach(domain => {
-            if (!selectedSector.value.includes(domain.business_sector_id)) {
-                selectedSector.value.push(domain.business_sector_id)
+            if (!selectedSectors.value.includes(domain.business_sector_id)) {
+                selectedSectors.value.push(domain.business_sector_id)
             }
         });
     }
@@ -132,9 +135,10 @@ watch(() => props.domains, (newDomains) => {
     if (newDomains && newDomains.length > 0) {
         selectedViewDomains.value = newDomains
         selectedDomains.value = [...newDomains]
+        {{selectedSector}}
         newDomains.forEach(domain => {
-            if (!selectedSector.value.includes(domain.business_sector_id)) {
-                selectedSector.value.push(domain.business_sector_id)
+            if (!selectedSectors.value.includes(domain.business_sector_id)) {
+                selectedSectors.value.push(domain.business_sector_id)
             }
         })
     }
