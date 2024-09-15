@@ -160,5 +160,24 @@ const replyComment  = async (id, payload) => {
   return data
 };
 
+const editCommentReply = async (id, replyId, payload) => {
+  const { data, refresh, error, pending } = await useApi(`comments/${id}/replies/${replyId}`, {
+    initialCache: false,
+    body: payload,
+    method: "PUT",
+  });
 
-export { index, create, update ,search ,deletePost, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, toggleCommentReaction, getCommentReactions, getCommentReplies, replyComment };
+  return data
+}
+
+const deleteCommentReply = async (id, replyId) => {
+  const { data, refresh, error, pending } = await useApi(`comments/${id}/replies/${replyId}`, {
+    initialCache: false,
+    method: "DELETE",
+  });
+
+  return data
+}
+
+
+export { index, create, update ,search ,deletePost, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, toggleCommentReaction, getCommentReactions, getCommentReplies, replyComment, deleteCommentReply, editCommentReply };

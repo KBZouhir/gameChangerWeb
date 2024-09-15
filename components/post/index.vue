@@ -195,8 +195,11 @@
             </template>
 
             <div class="flex flex-col space-y-2 h-[350px] overflow-auto is-scrollbar-hidden" v-if="postCommnets">
+                <div class="flex items-center justify-between p-2">
+                    <!-- <USelect v-model="commentSort" :options="commentSorts" variant="outline"/> -->
+                </div>
                 <div v-for="comment in postCommnets.data">
-                    <PostComment :comment="comment" :user="user" />
+                    <PostComment :comment="comment" :user="user" @editPostCommnet="editPostCommnet" @deletePostCommnet="deletePostCommnet"/>
                 </div>
 
                 <!-- <InfiniteLoading @infinite="fetchMoreComments">
@@ -273,7 +276,7 @@ import { useSettings } from "~/stores/settings"
 import { z } from 'zod'
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
-import { toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, replyComment } from "~/composables/store/usePost"
+import { toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments } from "~/composables/store/usePost"
 import { report } from "~/composables/store/useReport"
 
 const settingStore = useSettings()
@@ -291,6 +294,8 @@ const comment = ref("");
 const selectedComment = ref(null)
 const page = ref(1)
 const loading = ref(false)
+const commentSorts = ['Recently', 'Relevant']
+const commentSort = ref(commentSorts[0])
 
 
 const emits = defineEmits(['deletePostFun'])
@@ -483,19 +488,19 @@ const otherPostDropDown = [
     ],
 ]
 
-const items = [
-    [
-        {
-            label: "Edit",
-            icon: "i-heroicons-pencil-square",
-            function: editPostCommnet,
-        },
-        {
-            label: "Delete",
-            icon: "i-heroicons-trash",
-            function: deletePostCommnet,
-        },
-    ],
-]
+// const items = [
+//     [
+//         {
+//             label: "Edit",
+//             icon: "i-heroicons-pencil-square",
+//             function: editPostCommnet,
+//         },
+//         {
+//             label: "Delete",
+//             icon: "i-heroicons-trash",
+//             function: deletePostCommnet,
+//         },
+//     ],
+// ]
 
 </script>

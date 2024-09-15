@@ -150,14 +150,14 @@ import { useSettings } from "~/stores/settings"
 
 
 const settingStore = useSettings()
-
-
 const settings = computed(() => settingStore.getSettings)
 
 const props = defineProps({
     comment: { type: String, required: true },
     user: { type: String, required: true },
 })
+
+const emits = defineEmits(['deleteReply', 'editReply'])
 
 const reactionColor = computed(() => {
     if (props.comment?.reaction) {
@@ -179,11 +179,11 @@ const commentReactions = ref()
 
 
 const editPostCommnet = (comment) => {
-    console.log(comment)
+    emits('editReply', comment)
 }
 
 const deletePostCommnet = (comment) => {
-    console.log(comment)
+    emits('deleteReply', comment)
 }
 
 const toggleCommentReactionFun = async (reaction) => {

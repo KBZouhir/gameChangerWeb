@@ -61,27 +61,31 @@
                                 variant="link"></UButton>
                         </div>
                     </div>
-                    <UButton :loading="isLoading" size="xs" v-if="comment.replies_count > 0" @click="getCommentRepliesFun()"
+                    <UButton :loading="isLoading" size="xs" v-if="comment.replies_count > 0"
+                        @click="getCommentRepliesFun()"
                         :label="(tempReplies.length > 0) ? `View previous replies` : `(${comment.replies_count}) Show reply`"
                         color="green" square variant="link" />
                     <div class="flex flex-col space-y-4 w-full border-l dark:border-l-slate-800">
                         <template v-if="showReplies">
-                            <PostReply v-for="(comment, index) in commentReplies?.data" :key="index" :comment="comment"
+                            <PostReply @editReply="editReply" @deleteReply="deleteReply"
+                                v-for="(comment, index) in commentReplies?.data" :key="index" :comment="comment"
                                 :user="user" />
 
                             <div v-if="commentReplies?.meta.total > commentReplies?.data.length">
-                                <UButton :loading="isLoading" size="xs" @click="getMoreRepliesFun()" label="Show more replies" color="green" square variant="link" />  
+                                <UButton :loading="isLoading" size="xs" @click="getMoreRepliesFun()"
+                                    label="Show more replies" color="green" square variant="link" />
                             </div>
                         </template>
 
                         <template v-if="tempReplies">
-                            <PostReply v-for="(comment, index) in tempReplies" :key="index" :comment="comment"
-                                :user="user" />
+                            <PostReply @editReply="editReply" @deleteReply="deleteReply"
+                                v-for="(comment, index) in tempReplies" :key="index" :comment="comment" :user="user" />
                         </template>
 
                         <div v-if="showReplyInput" class="px-2">
-                            <UInput ref="replyInput" id="replyInput" v-model="replyValue" @keyup.enter="sendReply(comment)"
-                                class="flex-1 text-xs" color="white" size="md" placeholder="Write a comment...">
+                            <UInput ref="replyInput" id="replyInput" v-model="replyValue"
+                                @keyup.enter="sendReply(comment)" class="flex-1 text-xs" color="white" size="md"
+                                placeholder="Write a comment...">
                                 <template #leading>
                                     <UAvatar :src="user.image_url" :alt="user.full_name" size="xs" />
                                 </template>
@@ -174,7 +178,7 @@
 
 <script setup>
 
-import { toggleCommentReaction, getCommentReactions, getCommentReplies, replyComment } from '~/composables/store/usePost'
+import { toggleCommentReaction, getCommentReactions, getCommentReplies, replyComment, editCommentReply, deleteCommentReply } from '~/composables/store/usePost'
 import { useSettings } from "~/stores/settings"
 
 
@@ -186,7 +190,7 @@ const props = defineProps({
     user: { type: String, required: true },
 })
 
-
+const emits = defineEmits(['editPostCommnet', 'deletePostCommnet'])
 
 const reactionColor = computed(() => {
     if (props.comment?.reaction) {
@@ -211,16 +215,17 @@ const showReplyInput = ref(false)
 const replyInput = ref()
 const replyValue = ref()
 const tempReplies = ref([])
+const selectedReply = ref(null)
 const prePage = ref(3)
 const page = ref(1)
 
 
 const editPostCommnet = (comment) => {
-    console.log(comment)
+    emits('editPostCommnet', comment)
 }
 
 const deletePostCommnet = (comment) => {
-    console.log(comment)
+    emits('deletePostCommnet', comment)
 }
 
 const toggleCommentReactionFun = async (reaction) => {
@@ -252,7 +257,7 @@ const showReactionList = async () => {
 
 const handleReplyUi = () => {
     showReplyInput.value = true
-    
+
     setTimeout(() => {
         const element = document.getElementById("replyInput")
         element?.focus()
@@ -262,20 +267,45 @@ const handleReplyUi = () => {
 
 const sendReply = async (comment) => {
     if (replyValue.value.trim() == "") return;
-
-    const payload = {
-        description: replyValue.value,
-    }
-    const result = await replyComment(comment.id, payload)
-    if (result?.success) {
-        comment.replies_count += 1
-        if (commentReplies.value) {
-            commentReplies.value.data.push(result.comment)
-        } else {
-            tempReplies.value.push(result.comment)
+    
+    if (selectedReply.value) {
+        const payload = {
+            description: replyValue.value,
         }
-        replyValue.value = ""
+        const result = await editCommentReply(props.comment.id ,selectedReply.value.id, payload)
+
+        if (result?.success) {
+            let index = null
+            if (commentReplies.value) {
+                index = commentReplies.value?.data.findIndex((item) => item.id == selectedReply.value.id)
+            } else {
+                index = tempReplies.value.findIndex((item) => item.id == selectedReply.value.id)
+            }
+            if (commentReplies.value) {
+                commentReplies.value.data[index].description = replyValue.value
+            }else{
+                tempReplies.value[index].description = replyValue.value
+            }
+            selectedReply.value = null
+            replyValue.value = ""
+        }
+
+    } else {
+        const payload = {
+            description: replyValue.value,
+        }
+        const result = await replyComment(comment.id, payload)
+        if (result?.success) {
+            comment.replies_count += 1
+            if (commentReplies.value) {
+                commentReplies.value.data.push(result.comment)
+            } else {
+                tempReplies.value.push(result.comment)
+            }
+            replyValue.value = ""
+        }
     }
+
 
 }
 
@@ -299,7 +329,7 @@ const getCommentRepliesFun = async () => {
 
 const getMoreRepliesFun = async () => {
 
-    if(commentReplies.value.meta.last_page > commentReplies.value.meta.current_page){
+    if (commentReplies.value.meta.last_page > commentReplies.value.meta.current_page) {
         isLoading.value = true
         const result = await getCommentReplies(props.comment.id, commentReplies.value.meta.current_page + 1, prePage.value)
         isLoading.value = false
@@ -307,6 +337,39 @@ const getMoreRepliesFun = async () => {
         commentReplies.value.meta.current_page = result.meta.current_page
     }
 
+}
+
+
+const deleteReply = async (comment) => {
+
+    let index = null
+
+    if (commentReplies.value) {
+        index = commentReplies.value?.data.findIndex((item) => item.id == comment.id)
+    } else {
+        index = tempReplies.value.findIndex((item) => item.id == comment.id)
+    }
+
+    const result = await deleteCommentReply(props.comment.id, comment.id)
+
+    if (result?.success && index != null) {
+        props.comment.replies_count -= 1
+        if (commentReplies.value) {
+            commentReplies.value?.data.splice(index, 1)
+        } else {
+            tempReplies.value.splice(index, 1)
+        }
+    }
+}
+
+const editReply = (comment) => {
+    selectedReply.value = comment
+    replyValue.value = comment.description
+    setTimeout(() => {
+        const element = document.getElementById("replyInput")
+        element?.focus()
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 100)
 }
 
 const items = [
