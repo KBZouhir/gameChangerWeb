@@ -108,11 +108,11 @@
                     </div>
                     <div class="flex items-center space-x-4 mt-0 text-sm">
                         <UButton @click="shareLink()" size="sm" color="primary" square variant="link"
-                        class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
-                        <Icon name="tabler:share-3" class="dark:text-white text-primary" size="22" />
-                    </UButton>
-                    
-                     </div>   
+                            class="flex items-center space-x-0 font-semibold cursor-pointer hover:no-underline">
+                            <Icon name="tabler:share-3" class="dark:text-white text-primary" size="22" />
+                        </UButton>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -185,7 +185,7 @@
     <UModal v-model="showComments">
         <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
             <template #header>
-                
+
                 <div v-if="postCommnets">
                     <span class="text-sm">{{ postCommnets.meta.total }} Comment'(s)</span>
                 </div>
@@ -196,84 +196,10 @@
 
             <div class="flex flex-col space-y-2 h-[350px] overflow-auto is-scrollbar-hidden" v-if="postCommnets">
                 <div v-for="comment in postCommnets.data">
-                    <div class="flex items-center justify-between">
-                        <div
-                            class="flex items-center space-x-2.5 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
-                            <UAvatar :src="comment.user.image_url" :alt="comment.user.full_name" size="md" />
-                            <div class="flex flex-1 flex-col items-start">
-                                <div
-                                    class="flex flex-col px-3 py-2 text-sm bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-md">
-                                    <h4 class="font-bold">{{ comment.user.full_name }}</h4>
-                                    <p>{{ comment.description }}</p>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <UButton :label="$moment(comment.created_at).fromNow()" size="xs" color="white"
-                                        square variant="link"></UButton>
-                                    <UPopover mode="hover" :popper="{ placement: 'top-start' }">
-                                        <div class="flex items-center space-x-0 font-semibold">
-                                            <div v-if="post?.reaction">
-                                                <UButton v-if="post?.reaction == 1" size="xs" label="Like"
-                                                    color="green" square variant="link" />
-                                                <UButton v-if="post?.reaction == 2" size="xs" label="Love"
-                                                    color="red" square variant="link" />
-                                                <UButton v-if="post?.reaction == 3" size="xs" label="Haha"
-                                                    color="yellow" square variant="link" />
-                                            </div>
-                                            <UButton v-else size="xs" label="Like" @click="togglePostReaction(2)"
-                                                color="white" square variant="link">
-
-                                            </UButton>
-                                        </div>
-
-                                        <template #panel>
-                                            <div class="p-2 flex space-x-2">
-                                                <div class="flex flex-col items-center"
-                                                    v-for="reaction in settings.reaction.type">
-                                                    <UTooltip :text="reaction.label">
-                                                        <UButton size="sm" color="primary" square variant="link">
-                                                            <Icon v-if="reaction.case == 'LIKE'"
-                                                                @click="togglePostReaction(1)"
-                                                                name="tabler:thumb-up-filled" class="text-green-600"
-                                                                size="22" />
-                                                            <Icon v-if="reaction.case == 'LOVE'"
-                                                                @click="togglePostReaction(2)"
-                                                                name="tabler:heart-filled" class="text-red-600"
-                                                                size="22" />
-                                                            <Icon v-if="reaction.case == 'HAHA'"
-                                                                @click="togglePostReaction(3)"
-                                                                name="tabler:mood-smile-filled" class="text-orange-500"
-                                                                size="22" />
-                                                        </UButton>
-                                                    </UTooltip>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </UPopover>
-                                    <UButton label="Reply" size="xs" color="white" square variant="link"></UButton>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="comment.mine">
-                            <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
-                                :popper="{ placement: 'bottom-start' }">
-                                <UButton icon="i-heroicons-ellipsis-vertical" size="sm"
-                                    :color="$colorMode.value == 'dark' ? 'white' : 'black'" variant="link"
-                                    :trailing="false" />
-
-                                <template #item="{ item }">
-                                    <button class="w-full flex items-center justify-between"
-                                        @click="item.function(comment)">
-                                        <span class="truncate">{{ item.label }}</span>
-                                        <UIcon :name="item.icon"
-                                            class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
-                                    </button>
-                                </template>
-                            </UDropdown>
-                        </div>
-                    </div>
+                    <PostComment :comment="comment" :user="user" />
                 </div>
 
-                <InfiniteLoading @infinite="fetchMoreComments">
+                <!-- <InfiniteLoading @infinite="fetchMoreComments">
                     <template #spinner>
                         <div class="flex justify-center w-full">
                             <LoadingIcon />
@@ -282,7 +208,7 @@
                     <template v-if="postCommnets.data.length > 0" #complete>
                         <span>No more data found!</span>
                     </template>
-                </InfiniteLoading>
+                </InfiniteLoading> -->
 
                 <div class="flex justify-center items-center w-full h-full" v-if="postCommnets.meta.total == 0">
                     <div>
@@ -309,13 +235,16 @@
             </div>
 
             <template #footer>
-                <UInput v-model="comment" @keyup.enter="sendComment" class="flex-1" size="lg"
+                <UInput ref="commentInput" v-model="comment" @keyup.enter="sendComment" class="flex-1" size="lg"
                     placeholder="Write a comment...">
-                    <template #trailing>
+                    <!-- <template #trailing>
                         <UButton size="sm" :color="$colorMode.value == 'dark' ? 'white' : 'black'" square
                             variant="link">
                             <Icon name="tabler:send-2" size="22" />
                         </UButton>
+                    </template> -->
+                    <template #leading>
+                        <UAvatar :src="user.image_url" :alt="user.full_name" size="xs" />
                     </template>
                 </UInput>
             </template>
@@ -344,7 +273,7 @@ import { useSettings } from "~/stores/settings"
 import { z } from 'zod'
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
-import { toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments } from "~/composables/store/usePost"
+import { toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, replyComment } from "~/composables/store/usePost"
 import { report } from "~/composables/store/useReport"
 
 const settingStore = useSettings()
@@ -352,6 +281,7 @@ const snackbar = useSnackbar()
 
 const settings = computed(() => settingStore.getSettings)
 
+const commentInput = ref()
 const showComments = ref(false)
 const showReactions = ref(false)
 const showReport = ref(false)
@@ -361,6 +291,7 @@ const comment = ref("");
 const selectedComment = ref(null)
 const page = ref(1)
 const loading = ref(false)
+
 
 const emits = defineEmits(['deletePostFun'])
 
@@ -415,7 +346,10 @@ const getPostComments = async (id) => {
     }
 }
 
+
 const sendComment = async () => {
+
+
     if (comment.value.trim() == "") return;
     const payload = { description: comment.value };
     let result = "";

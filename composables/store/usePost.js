@@ -122,4 +122,43 @@ const getPaginationsComments = async (url) => {
   return data
 };
 
-export { index, create, update ,search ,deletePost, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments };
+const toggleCommentReaction = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(`comments/${id}/react`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data
+};
+
+const getCommentReactions  = async (id) => {
+  const { data, refresh, error, pending } = await useApi(`comments/${id}/reactions`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+  return data
+};
+
+const getCommentReplies  = async (id, page = 1, perPage = 10) => {
+  const { data, refresh, error, pending } = await useApi(`comments/${id}/replies?per_page=${perPage}&page=${page}&order_by=relevant&order_direction=desc`, {
+    initialCache: false,
+    method: "GET",
+  });
+
+  return data
+};
+
+const replyComment  = async (id, payload) => {
+  const { data, refresh, error, pending } = await useApi(`comments/${id}/replies`, {
+    initialCache: false,
+    body: payload,
+    method: "POST",
+  });
+
+  return data
+};
+
+
+export { index, create, update ,search ,deletePost, toogleReaction, getReactions, createComment, editComment, deleteComment, getComments, getPaginationsComments, toggleCommentReaction, getCommentReactions, getCommentReplies, replyComment };
